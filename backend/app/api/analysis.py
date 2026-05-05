@@ -16,6 +16,7 @@ async def analyze_blog(request: AnalysisRequest, db: Session = Depends(get_db)) 
         # AI 엔진 호출 (사용자 키 있으면 우선 사용, 없으면 서버 키 로테이션)
         analysis_data = await ai_engine.analyze_blog_content(
             content=request.content,
+            platform=request.platform,
             api_key=request.api_key,
         )
         

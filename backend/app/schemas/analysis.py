@@ -11,7 +11,8 @@ class HiddenNegative(BaseModel):
     reasoning: str
 
 class AnalysisRequest(BaseModel):
-    content: str = Field(..., min_length=10, description="블로그 본문 텍스트")
+    content: str = Field(..., min_length=10, description="분석할 텍스트 본문")
+    platform: str = Field("general", description="플랫폼 종류: instagram | naver_store | coupang | general")
     api_key: Optional[str] = Field(None, exclude=True, description="사용자 Gemini API 키 (선택사항, 사용 후 즉시 폐기)")
 
 class AnalysisResponse(BaseModel):

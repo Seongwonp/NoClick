@@ -4,7 +4,7 @@ import json
 import logging
 from typing import Dict, Any, Optional
 from app.core.config import settings
-from app.core.prompts import AD_DETECTION_PROMPT
+from app.core.prompts import get_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +27,10 @@ class AIEngine:
         self._exhausted_keys.add(key)
         logger.warning(f"Gemini 키 소진 처리 (끝 4자리: ...{key[-4:]})")
 
-    async def analyze_blog_content(self, content: str, api_key: Optional[str] = None) -> Dict[str, Any]:
+    async def analyze_blog_content(self, content: str, platform: str = "general", api_key: Optional[str] = None) -> Dict[str, Any]:
         truncated = content[:MAX_INPUT_CHARS]
-        full_prompt = f"{AD_DETECTION_PROMPT}\n\n[분석할 블로그 본문]\n{truncated}"
+        prompt = get_prompt(platform)
+        full_prompt = f"{prompt}\n\n[분석할 본문]\n{truncated}"
 
         # 사용자가 직접 키를 제공한 경우 → 해당 키로만 1회 호출 후 폐기
         if api_key:
