@@ -33,9 +33,7 @@ const Home: React.FC = () => {
               ></textarea>
               <div className="flex items-center justify-between mt-4 border-t border-gray-50 pt-4">
                 <div className="flex gap-4">
-                  <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">attach_file</span>
-                  <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">image</span>
-                  <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">link</span>
+                  {/* 향후 기능 추가 시 구현 예정 */}
                 </div>
                 <button 
                   type="button"
