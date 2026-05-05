@@ -1,24 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { mockAnalysisService } from '../services/mockApi';
 
 const Analysis: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [progress, setProgress] = useState(0);
+  const inputText = location.state?.text || '';
 
   useEffect(() => {
+    // 텍스트가 없으면 홈으로 리다이렉트 (직접 접근 방지)
+    if (!inputText) {
+      navigate('/');
+      return;
+    }
+
+    // 분석 프로세스 시작
+    const startAnalysis = async () => {
+      try {
+        const result = await mockAnalysisService.analyze({ text: inputText });
+        // 분석 완료 후 결과 페이지로 이동 (ID 전달)
+        navigate(`/result?id=${result.id}`);
+      } catch (error) {
+        console.error('Analysis failed:', error);
+        alert('분석 중 오류가 발생했습니다.');
+        navigate('/');
+      }
+    };
+
+    startAnalysis();
+
+    // 프로그레스 바 애니메이션
     const interval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          navigate('/result');
-          return 100;
-        }
+        if (prev >= 95) return 95; // 실제 데이터 완료 전까지는 95%에서 대기
         return prev + 5;
       });
-    }, 300); // 300ms * 20 = 6 seconds to complete
+    }, 100);
 
     return () => clearInterval(interval);
-  }, [navigate]);
+  }, [inputText, navigate]);
 
   return (
     <div className="flex-grow pt-32 pb-20 px-6 max-w-4xl mx-auto w-full">
@@ -78,61 +99,11 @@ const Analysis: React.FC = () => {
           <h3 className="font-headline-md text-[24px] font-semibold text-on-surface mb-6">분석 중인 리뷰 원문</h3>
           
           <div className="font-body-lg text-[16px] text-on-surface leading-relaxed space-y-4">
-            <p>
-              이번에 새로 출시된 <span className="bg-secondary-fixed/50 px-1 rounded">스마트워치 S7</span>은 디자인이 정말 미쳤네요. 
-              처음 박스를 깠을 때 그 <span className="bg-primary-fixed/40 px-1 rounded decoration-primary-container decoration-2 underline-offset-4 underline">영롱한 광택</span>이... 
-              진짜 이건 무조건 사야 합니다. 
-            </p>
-            <p>
-              근데 사용하다 보니까 <span className="bg-tertiary-fixed/50 px-1 rounded text-on-tertiary-fixed">배터리가 생각보다 빨리 닳아요</span>. 
-              하루를 못 버티는 느낌? 그리고 <span className="bg-secondary-fixed/50 px-1 rounded">UI 반응 속도</span>는 빠르지만 가끔 <span className="bg-error-container/40 text-on-error-container px-1 rounded italic">버벅임</span>이 있네요. 
-            </p>
-            <p className="pulse-slow border-l-4 border-primary-container pl-4 italic text-on-surface-variant">
-              "광고성 수식어(영롱한, 무조건 사야 함)를 탐지하여 필터링하는 중..."
-            </p>
-            <p>
-              그래도 <span className="bg-primary-fixed/40 px-1 rounded">가성비 면에서는 나쁘지 않은 선택</span>인 것 같습니다. 
-              특히 <span className="border-b-2 border-secondary-container">수면 추적 기능</span>은 꽤 정확하게 측정되는 느낌이라 만족스러워요.
+            <p className="whitespace-pre-wrap">{inputText}</p>
+            <p className="pulse-slow border-l-4 border-primary-container pl-4 italic text-on-surface-variant mt-4">
+              "AI가 문맥을 파악하여 광고성 패턴을 분석하고 있습니다..."
             </p>
           </div>
-
-          {/* Subtle Decorative Element */}
-          <div className="mt-8 pt-6 border-t border-gray-100 flex gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-primary-fixed"></div>
-              <span className="font-label-sm text-[12px] text-on-surface-variant">긍정 포인트</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-tertiary-fixed"></div>
-              <span className="font-label-sm text-[12px] text-on-surface-variant">부정/개선점</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-secondary-fixed"></div>
-              <span className="font-label-sm text-[12px] text-on-surface-variant">핵심 키워드</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Floating Context Info */}
-      <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-6 bg-primary/5 p-6 rounded-2xl border border-primary/10">
-        <div className="flex items-center gap-4">
-          <div className="bg-primary text-white p-3 rounded-xl">
-            <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>security</span>
-          </div>
-          <div>
-            <h4 className="font-headline-sm text-[18px] font-semibold text-on-primary-container">가짜 리뷰를 걸러내고 있습니다</h4>
-            <p className="font-body-md text-[14px] text-on-primary-container/80">No-Click 알고리즘이 중복 패턴과 상업적 키워드를 추적합니다.</p>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button 
-            type="button"
-            onClick={() => navigate('/')}
-            className="px-6 py-2 border border-outline rounded-xl font-semibold text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
-          >
-            중단하기
-          </button>
         </div>
       </div>
     </div>

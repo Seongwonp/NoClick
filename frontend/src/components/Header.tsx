@@ -14,33 +14,33 @@ const Header: React.FC = () => {
         </Link>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-10">
           <Link
             to="/"
-            className={`font-semibold pb-1 transition-colors duration-200 ${
+            className={`font-semibold py-1 transition-all duration-200 hover:text-emerald-600 ${
               location.pathname === '/'
-                ? 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500'
-                : 'text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-300'
+                ? 'text-emerald-600 border-b-2 border-emerald-500'
+                : 'text-gray-500'
             }`}
           >
             Home
           </Link>
           <Link
             to="/history"
-            className={`font-medium transition-colors duration-200 ${
+            className={`font-medium py-1 transition-all duration-200 hover:text-emerald-600 ${
               location.pathname === '/history'
-                ? 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 pb-1'
-                : 'text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-300'
+                ? 'text-emerald-600 border-b-2 border-emerald-500'
+                : 'text-gray-500'
             }`}
           >
             My History
           </Link>
           <Link
             to="/how-it-works"
-            className={`font-medium transition-colors duration-200 ${
+            className={`font-medium py-1 transition-all duration-200 hover:text-emerald-600 ${
               location.pathname === '/how-it-works'
-                ? 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 pb-1'
-                : 'text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-300'
+                ? 'text-emerald-600 border-b-2 border-emerald-500'
+                : 'text-gray-500'
             }`}
           >
             How it Works
