@@ -20,7 +20,7 @@
 - **Backend**: FastAPI (Python 3.11+), SQLAlchemy, Alembic.
 - **Frontend**: React (Vite) + TS, Tailwind CSS v4.
 - **AI Engines**: 
-  - **Gemini 3.0 Flash-preview** (Main Analysis)
+  - **gemini-3-flash-preview** (Main Analysis)
   - **EXAONE 3.5** (HuggingFace comparison)
   - **Claude 3.5 Sonnet** (Advanced Reasoning & Prompt Tuning)
 - **Storage**: SQLite (MVP)

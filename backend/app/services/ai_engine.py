@@ -9,7 +9,7 @@ from app.core.prompts import AD_DETECTION_PROMPT
 logger = logging.getLogger(__name__)
 
 MAX_INPUT_CHARS = 3000
-GEMINI_MODEL = "gemini-3.0-flash-preview"
+GEMINI_MODEL = "gemini-3-flash-preview"
 
 
 class AIEngine:
