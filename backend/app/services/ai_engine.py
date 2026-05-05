@@ -1,4 +1,5 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import json
 import logging
 from typing import Dict, Any, Optional
@@ -53,12 +54,12 @@ class AIEngine:
 
     async def _call_gemini(self, prompt: str, api_key: str) -> Dict[str, Any]:
         try:
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel(GEMINI_MODEL)
+            client = genai.Client(api_key=api_key)
 
-            response = await model.generate_content_async(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
+            response = await client.aio.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                 ),
             )
