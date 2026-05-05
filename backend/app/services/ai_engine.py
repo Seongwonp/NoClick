@@ -11,8 +11,8 @@ class AIEngine:
     def __init__(self):
         if settings.GEMINI_API_KEY:
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            # 최신 Flash 모델 사용 (Gemini 1.5 Flash는 빠르고 경제적입니다)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            # 최신 Gemini 3.0 Flash-preview 모델 사용
+            self.model = genai.GenerativeModel('gemini-3.0-flash-preview-001')
         else:
             logger.warning("GEMINI_API_KEY가 설정되지 않았습니다.")
             self.model = None
