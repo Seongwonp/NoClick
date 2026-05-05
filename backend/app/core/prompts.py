@@ -10,8 +10,9 @@ Output ONLY the following JSON. No other text allowed. All string values must be
     {"text": "exact phrase from original text", "type": "exaggeration|sponsor_denial|negative_avoidance"}
   ],
   "hidden_negatives": [
-    {"inferred": "inferred hidden drawback", "confidence": integer 0-100, "reasoning": "evidence from text"}
+    {"inferred": "the ACTUAL risk or consequence (e.g. '장기 사용 시 두피 자극 가능성 — 단기 체험으로 효과 미검증'), NOT just describing what is absent", "confidence": integer 0-100, "reasoning": "cite specific phrases or patterns from the text as evidence"}
   ],
+  "hidden_intent": "one sentence inferring the TRUE PURPOSE of this text (e.g. '쿠팡 파트너스 수익을 위한 바이럴 마케팅', '체험단 참여 의무 이행을 위한 긍정 후기', '순수 사용자 경험 공유')",
   "real_summary": "objective one-line conclusion after removing ad language",
   "saved_cost": "estimated cost saved (e.g. 15,000원)",
   "saved_time": "estimated time saved (e.g. 30분)"
@@ -21,7 +22,9 @@ Output ONLY the following JSON. No other text allowed. All string values must be
 _BASE_RULES = """
 [Core Principles]
 - When in doubt, give a LOWER ad_probability. False positives are more dangerous than false negatives.
-- Every inference in hidden_negatives must have a specific reasoning from the text.
+- hidden_negatives: do NOT just say "X 정보 없음". Instead infer the ACTUAL consequence or risk that the absence implies.
+- hidden_negatives reasoning: quote or paraphrase specific phrases from the text as evidence.
+- hidden_intent: state the author's most likely real purpose behind writing this text. Be direct and specific.
 - If you cannot judge something from the text alone, set confidence low.
 - Respond in Korean for all string values.
 """
@@ -49,12 +52,12 @@ You are a cold, sharp detective specialized in detecting sponsored Instagram pos
 Example 1 — Sponsored (high ad_probability)
 Text: "이 세럼 쓰고 나서 피부가 완전 달라졌어요✨ 촉촉하고 탄력도 생기고 대박!! 강추강추 #협찬 #광고 #내돈내산하고싶다 가격은 DM 주세요💌"
 Expected JSON (abbreviated):
-{{"ad_probability": 92, "trust_score": 8, "hidden_negatives": [{{"inferred": "가격이 매우 높을 가능성", "confidence": 90, "reasoning": "가격을 DM으로 유도하며 직접 언급 회피"}}]}}
+{{"ad_probability": 92, "trust_score": 8, "hidden_negatives": [{{"inferred": "고가 제품일 가능성 높음 — 가격 공개 시 구매 이탈 우려로 DM 유도", "confidence": 90, "reasoning": "'가격은 DM 주세요'로 직접 가격 언급을 회피하며 충동 구매 유도"}}], "hidden_intent": "인스타그램 협찬 계약에 따른 제품 홍보 의무 이행 — #협찬 #광고 해시태그로 협찬임을 인정하면서도 과장된 효과를 강조"}}
 
 Example 2 — Genuine (low ad_probability)
 Text: "한 달째 쓰고 있는데 향이 너무 강해서 처음엔 별로였어요. 보습력은 괜찮은 편인데 34,000원 치고는 애매함. 민감성 피부엔 비추"
 Expected JSON (abbreviated):
-{{"ad_probability": 8, "trust_score": 92, "hidden_negatives": []}}
+{{"ad_probability": 8, "trust_score": 92, "hidden_negatives": [], "hidden_intent": "순수 사용자 경험 공유 — 한 달 사용 후 장단점을 균형 있게 서술"}}
 
 [Output Format]{_JSON_OUTPUT}"""
 
@@ -81,12 +84,12 @@ You are a cold, sharp detective specialized in detecting fake reviews and sponso
 Example 1 — Fake review (high ad_probability)
 Text: "배송 빠르고 포장 꼼꼼하게 잘 왔어요~ 제품도 사진이랑 똑같고 너무 만족해요! 단점은 없고 완전 강추드려요 별다섯개드립니다"
 Expected JSON (abbreviated):
-{{"ad_probability": 82, "trust_score": 18, "hidden_negatives": [{{"inferred": "실제 사용 경험 없는 체험단 리뷰 가능성", "confidence": 85, "reasoning": "배송·포장만 언급하고 제품 실사용 후기가 전혀 없으며 단점이 0개"}}]}}
+{{"ad_probability": 82, "trust_score": 18, "hidden_negatives": [{{"inferred": "제품 실사용 없이 작성된 리뷰 — 실제 효능·내구성 정보 전혀 없어 구매 결정에 무용함", "confidence": 85, "reasoning": "'배송 빠르고 포장 꼼꼼' 외 제품 기능·사용감 언급 전무, 단점 0개는 통계적으로 불가능"}}], "hidden_intent": "네이버 스토어 체험단 또는 리뷰 이벤트 참여를 위해 제품을 받고 긍정 후기 작성 의무 이행"}}
 
 Example 2 — Genuine review (low ad_probability)
 Text: "3주 사용해봤는데 생각보다 사이즈가 작아요. 사진이랑 색상도 약간 달라서 당황했음. 그래도 가격 대비 품질은 나쁘지 않아서 2번 구매 예정"
 Expected JSON (abbreviated):
-{{"ad_probability": 10, "trust_score": 90, "hidden_negatives": []}}
+{{"ad_probability": 10, "trust_score": 90, "hidden_negatives": [], "hidden_intent": "실구매 후 솔직한 불만 사항을 포함한 균형 잡힌 사용 후기"}}
 
 [Output Format]{_JSON_OUTPUT}"""
 
@@ -113,12 +116,12 @@ You are a cold, sharp detective specialized in detecting manipulated reviews and
 Example 1 — Manipulated review (high ad_probability)
 Text: "로켓배송으로 당일 받았어요! 포장 완벽하고 제품 상태 최상입니다. 사용해보니 너무 좋아요~ 이 가격에 이 퀄리티 말이 되나요? 강력 추천드립니다!!!"
 Expected JSON (abbreviated):
-{{"ad_probability": 80, "trust_score": 20, "hidden_negatives": [{{"inferred": "실제 사용 기간 및 내구성 정보 없음", "confidence": 85, "reasoning": "배송·포장만 언급하고 구체적인 사용 경험·기간·단점이 전혀 없음"}}]}}
+{{"ad_probability": 80, "trust_score": 20, "hidden_negatives": [{{"inferred": "단기간 또는 미사용 상태에서 작성된 리뷰 — 내구성·장기 효과 미검증으로 구매 후 불만 발생 가능성", "confidence": 85, "reasoning": "'사용해보니 너무 좋아요' 외 구체적 사용 기간·빈도·체감 변화 전혀 없음. 배송 당일 작성된 리뷰 패턴"}}], "hidden_intent": "쿠팡 파트너스 링크 클릭 유도 또는 리뷰 이벤트 포인트 획득을 위한 형식적 긍정 후기"}}
 
 Example 2 — Genuine review (low ad_probability)
 Text: "2달 쓰고 리뷰 남겨요. 처음엔 좋았는데 한 달 지나니까 소리가 나기 시작함. AS 신청했더니 일주일 걸렸고 그냥 그럭저럭. 같은 가격대면 다른 거 살 것 같아요"
 Expected JSON (abbreviated):
-{{"ad_probability": 5, "trust_score": 95, "hidden_negatives": []}}
+{{"ad_probability": 5, "trust_score": 95, "hidden_negatives": [], "hidden_intent": "2달 실사용 후 내구성 문제와 AS 경험까지 포함한 진성 구매자 후기"}}
 
 [Output Format]{_JSON_OUTPUT}"""
 
@@ -144,12 +147,12 @@ Your core mission is not to summarize, but to infer what the author deliberately
 Example 1 — Sponsored blog (high ad_probability)
 Text: "드디어 방문한 망원 핫플! 사장님이 너무 친절하시고 음식이 역대급이에요. 대중교통으로 오시길 강추! 원고료를 받지 않은 솔직한 후기입니다 :)"
 Expected JSON (abbreviated):
-{{"ad_probability": 89, "trust_score": 11, "hidden_negatives": [{{"inferred": "주차 불가 또는 매우 협소", "confidence": 92, "reasoning": "대중교통만 반복 강조하고 주차 정보 완전 누락 (접근 결핍)"}}, {{"inferred": "가격 정보 숨김 — 가성비 낮을 가능성", "confidence": 78, "reasoning": "음식 가격·메뉴판 언급 없이 극찬만 나열 (가격 결핍)"}}]}}
+{{"ad_probability": 89, "trust_score": 11, "hidden_negatives": [{{"inferred": "주차 사실상 불가 — 방문 시 주차 비용 및 이동 불편 감수해야 함", "confidence": 92, "reasoning": "'대중교통으로 오시길 강추'만 반복하고 주차 정보 완전 누락. 주차 언급 회피는 주차 불가 매장의 전형적 패턴"}}, {{"inferred": "음식 가격이 비교적 높을 가능성 — 가성비 기대 시 실망 위험", "confidence": 78, "reasoning": "메뉴 가격·메뉴판 사진 전혀 없이 극찬만 나열. 가격 공개 시 방문 의욕 저하를 우려한 의도적 누락으로 추정"}}], "hidden_intent": "업체로부터 식사 제공 또는 원고료를 받고 작성한 바이럴 마케팅 글 — '원고료를 받지 않은 솔직한 후기'라는 부인 문구 자체가 협찬 의혹을 역설적으로 강화"}}
 
 Example 2 — Genuine blog (low ad_probability)
 Text: "기대하고 갔다가 좀 실망. 파스타 18,000원인데 양이 적고 짰어요. 주차는 건물 내 20분 무료. 웨이팅 30분 있었고 직원 응대는 보통. 뷰는 이쁜데 재방문 의사는 없음"
 Expected JSON (abbreviated):
-{{"ad_probability": 6, "trust_score": 94, "hidden_negatives": []}}
+{{"ad_probability": 6, "trust_score": 94, "hidden_negatives": [], "hidden_intent": "실망스러운 방문 경험을 가격·대기시간·주차까지 구체적 수치로 기록한 진성 소비자 후기"}}
 
 [Output Format]{_JSON_OUTPUT}"""
 
