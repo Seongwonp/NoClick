@@ -1,5 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional, List
+from pathlib import Path
+
+# config.py 위치 기준으로 backend/.env 절대경로
+_ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "No-Click"
@@ -18,7 +22,7 @@ class Settings(BaseSettings):
     NAVER_CLIENT_ID: Optional[str] = None
     NAVER_CLIENT_SECRET: Optional[str] = None
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
+    model_config = SettingsConfigDict(env_file=str(_ENV_FILE), case_sensitive=True, extra="ignore")
 
     @property
     def gemini_api_keys(self) -> List[str]:
