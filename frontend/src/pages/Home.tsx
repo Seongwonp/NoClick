@@ -140,6 +140,8 @@ const Home: React.FC = () => {
         </section>
       </div>
 
+
+
       {/* Background Decorative Elements */}
       <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-100/20 rounded-full blur-[120px] -z-10 animate-pulse"></div>
       <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-100/20 rounded-full blur-[120px] -z-10 pulse-slow"></div>
