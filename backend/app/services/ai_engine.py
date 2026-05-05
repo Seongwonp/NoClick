@@ -8,7 +8,7 @@ from app.core.prompts import AD_DETECTION_PROMPT
 logger = logging.getLogger(__name__)
 
 MAX_INPUT_CHARS = 3000
-GEMINI_MODEL = "gemini-3.0-flash-preview-001"
+GEMINI_MODEL = "gemini-3.0-flash-preview"
 
 
 class AIEngine:
@@ -32,7 +32,10 @@ class AIEngine:
 
         # 사용자가 직접 키를 제공한 경우 → 해당 키로만 1회 호출 후 폐기
         if api_key:
-            return await self._call_gemini(full_prompt, api_key)
+            result = await self._call_gemini(full_prompt, api_key)
+            if result.get("_rate_limited"):
+                return {"error": "제공하신 API 키의 사용량이 초과되었거나 모델에 접근할 수 없습니다."}
+            return result
 
         # 서버 키 로테이션
         while True:
@@ -67,11 +70,10 @@ class AIEngine:
 
         except Exception as e:
             error_str = str(e)
+            logger.error(f"Gemini 호출 오류 (전체): {error_str}")
             if "429" in error_str or "quota" in error_str.lower() or "rate" in error_str.lower():
-                logger.warning(f"Rate limit 감지: {error_str}")
                 return {"_rate_limited": True}
-            logger.error(f"AI 분석 오류: {error_str}")
-            return {"error": f"AI 분석 중 오류가 발생했습니다: {error_str}"}
+            return {"error": f"AI 분석 중 오류: {error_str}"}
 
 
 ai_engine = AIEngine()
