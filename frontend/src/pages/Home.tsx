@@ -1,17 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SiNaver, SiInstagram } from 'react-icons/si';
+import { FaShoppingCart, FaGlobe } from 'react-icons/fa';
+
+const platforms = [
+  { id: 'naver', name: '네이버', icon: <SiNaver className="text-[#03C75A]" /> },
+  { id: 'insta', name: '인스타', icon: <SiInstagram className="text-[#E1306C]" /> },
+  { id: 'coupang', name: '쿠팡', icon: <FaShoppingCart className="text-[#CB1400]" /> },
+  { id: 'other', name: '기타', icon: <FaGlobe className="text-gray-500" /> },
+];
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
+  const [platform, setPlatform] = useState(platforms[0]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleStartAnalysis = () => {
     if (!inputText.trim()) {
       alert('분석할 내용을 입력해주세요!');
       return;
     }
-    // 분석 페이지로 텍스트 전달 (state 사용)
-    navigate('/analysis', { state: { text: inputText } });
+    // 분석 페이지로 텍스트 및 플랫폼 전달 (state 사용)
+    navigate('/analysis', { state: { text: inputText, platform: platform.id } });
   };
 
   return (
@@ -30,17 +52,47 @@ const Home: React.FC = () => {
           {/* Input Area Integrated into Hero */}
           <div id="analysis-input" className="relative max-w-3xl mx-auto group scroll-mt-32">
             <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-[2rem] blur opacity-15 group-focus-within:opacity-30 transition duration-500"></div>
-            <div className="relative bg-white rounded-[2rem] border border-emerald-50 custom-shadow overflow-hidden">
+            <div className="relative z-10 bg-white rounded-[2rem] border border-emerald-50 custom-shadow overflow-visible">
               <textarea 
                 className="w-full h-56 p-8 border-none focus:ring-0 text-on-surface text-[18px] placeholder-outline bg-transparent resize-none font-body-md outline-none" 
                 placeholder="분석하고 싶은 리뷰 내용을 이곳에 붙여넣어주세요..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
               ></textarea>
-              <div className="flex items-center justify-between px-8 py-5 bg-emerald-50/30 border-t border-emerald-50">
-                <span className="text-[14px] text-on-surface-variant font-medium">
-                  {inputText.length}자 입력됨
-                </span>
+              <div className="flex items-center justify-between px-8 py-5 bg-emerald-50/30 border-t border-emerald-50 rounded-b-[2rem]">
+                <div className="flex items-center gap-4">
+                  <div className="relative" ref={dropdownRef}>
+                    <div 
+                      className="flex items-center gap-2 bg-white border border-emerald-100 text-on-surface text-[14px] rounded-xl px-4 py-2 hover:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 font-medium cursor-pointer shadow-sm transition-colors"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                      <div className="text-[16px]">{platform.icon}</div>
+                      <span>{platform.name}</span>
+                      <span className={`material-symbols-outlined text-[18px] transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                    </div>
+                    
+                    {isDropdownOpen && (
+                      <div className="absolute top-full left-0 mt-2 w-full bg-white border border-emerald-100 rounded-xl shadow-lg z-50 overflow-hidden">
+                        {platforms.map((p) => (
+                          <div 
+                            key={p.id}
+                            className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-emerald-50 transition-colors ${platform.id === p.id ? 'bg-emerald-50/50 text-emerald-700' : 'text-on-surface'}`}
+                            onClick={() => {
+                              setPlatform(p);
+                              setIsDropdownOpen(false);
+                            }}
+                          >
+                            <div className="text-[16px]">{p.icon}</div>
+                            <span className="font-medium text-[14px]">{p.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[14px] text-on-surface-variant font-medium hidden sm:inline-block">
+                    {inputText.length}자 입력됨
+                  </span>
+                </div>
                 <button 
                   type="button"
                   onClick={handleStartAnalysis}
