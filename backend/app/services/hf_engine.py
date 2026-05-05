@@ -9,7 +9,7 @@ from app.core.prompts import get_prompt
 
 logger = logging.getLogger(__name__)
 
-HF_MODEL = "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct"
+HF_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 MAX_INPUT_CHARS = 3000
 MAX_RETRIES = 3
 RETRY_DELAY = 5  # 콜드 스타트 대기 (초)
