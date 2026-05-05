@@ -27,7 +27,13 @@ class AIEngine:
         self._exhausted_keys.add(key)
         logger.warning(f"Gemini 키 소진 처리 (끝 4자리: ...{key[-4:]})")
 
-    async def analyze_blog_content(self, content: str, platform: str = "general", api_key: Optional[str] = None) -> Dict[str, Any]:
+    async def analyze_blog_content(self, content: str, platform: str = "general", model: str = "gemini", api_key: Optional[str] = None) -> Dict[str, Any]:
+        # 사용자가 HuggingFace 선택 시 바로 전환
+        if model == "huggingface":
+            logger.info("사용자 선택: HuggingFace(EXAONE) 모드")
+            from app.services.hf_engine import hf_engine
+            return await hf_engine.analyze_blog_content(content, platform)
+
         truncated = content[:MAX_INPUT_CHARS]
         prompt = get_prompt(platform)
         full_prompt = f"{prompt}\n\n[분석할 본문]\n{truncated}"
@@ -43,7 +49,10 @@ class AIEngine:
         while True:
             key = self._next_key()
             if not key:
-                return {"error": "모든 Gemini API 키의 일일 한도가 초과되었습니다. HuggingFace 모드를 이용해주세요."}
+                # 모든 Gemini 키 소진 → HuggingFace 자동 전환
+                logger.warning("Gemini 키 전부 소진 → HuggingFace(EXAONE)로 자동 전환")
+                from app.services.hf_engine import hf_engine
+                return await hf_engine.analyze_blog_content(content, platform)
 
             result = await self._call_gemini(full_prompt, key)
 

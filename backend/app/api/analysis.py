@@ -17,6 +17,7 @@ async def analyze_blog(request: AnalysisRequest, db: Session = Depends(get_db)) 
         analysis_data = await ai_engine.analyze_blog_content(
             content=request.content,
             platform=request.platform,
+            model=request.model,
             api_key=request.api_key,
         )
         
