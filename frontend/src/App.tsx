@@ -1,54 +1,77 @@
 import { useState } from 'react'
 
 function App() {
+  const [content, setContent] = useState('')
   const [url, setUrl] = useState('')
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans">
-      <div className="max-w-2xl w-full space-y-8 text-center">
-        {/* Logo & Hero */}
-        <div className="space-y-2">
-          <h1 className="text-5xl font-black text-slate-900 tracking-tight">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center py-12 px-4 font-sans text-slate-900">
+      <div className="max-w-3xl w-full space-y-10">
+        {/* Header Section */}
+        <div className="text-center space-y-3">
+          <h1 className="text-6xl font-black tracking-tighter">
             No<span className="text-blue-600">-</span>Click
           </h1>
-          <p className="text-lg text-slate-600 font-medium">
-            블로그 광고 뒤에 숨겨진 '진짜' 정보를 찾아냅니다.
+          <p className="text-xl text-slate-500 font-medium">
+            블로그 본문을 붙여넣으세요. AI가 광고 뒤의 진실을 수사합니다.
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative group">
-          <input
-            type="text"
-            placeholder="네이버 블로그 URL을 입력하세요"
-            className="w-full px-6 py-4 text-lg bg-white border-2 border-slate-200 rounded-2xl shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <button className="absolute right-2 top-2 bottom-2 px-6 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors">
-            분석하기
-          </button>
+        {/* Main Input Section */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+          <div className="p-8 space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1">
+                Blog URL (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="https://blog.naver.com/..."
+                className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:outline-none focus:border-blue-500 transition-all text-sm"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1">
+                Blog Content (Required)
+              </label>
+              <textarea
+                placeholder="분석할 블로그 본문 전체를 복사해서 붙여넣으세요..."
+                className="w-full h-64 px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 transition-all resize-none text-base leading-relaxed"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+              />
+            </div>
+
+            <button className="w-full py-5 bg-slate-900 text-white text-xl font-bold rounded-2xl hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 transition-all transform active:scale-[0.98]">
+              X-ray 분석 시작하기 🔍
+            </button>
+          </div>
         </div>
 
-        {/* Features Preview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
-            <span className="text-2xl mb-2 block">🔍</span>
-            <span className="font-bold text-slate-800">광고 패턴 탐지</span>
+        {/* Feature Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-2">
+            <div className="text-3xl">🕵️‍♂️</div>
+            <h3 className="font-bold text-blue-900">결핍 추론</h3>
+            <p className="text-sm text-blue-700/70 leading-snug">작성자가 의도적으로 언급하지 않은 단점을 찾아냅니다.</p>
           </div>
-          <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
-            <span className="text-2xl mb-2 block">💡</span>
-            <span className="font-bold text-slate-800">숨겨진 단점 추론</span>
+          <div className="p-6 bg-purple-50/50 rounded-2xl border border-purple-100 space-y-2">
+            <div className="text-3xl">🖍️</div>
+            <h3 className="font-bold text-purple-900">광고 하이라이트</h3>
+            <p className="text-sm text-purple-700/70 leading-snug">교묘한 바이럴 문구를 형광펜으로 즉시 표시합니다.</p>
           </div>
-          <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
-            <span className="text-2xl mb-2 block">📝</span>
-            <span className="font-bold text-slate-800">탈광고 요약</span>
+          <div className="p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100 space-y-2">
+            <div className="text-3xl">✨</div>
+            <h3 className="font-bold text-emerald-900">클린 요약</h3>
+            <p className="text-sm text-emerald-700/70 leading-snug">광고 수식어를 걷어낸 핵심 팩트만 제공합니다.</p>
           </div>
         </div>
 
-        {/* Footer info */}
-        <div className="pt-8 text-slate-400 text-xs">
-          © 2026 No-Click Project Team 성원, 아미, 예솔
+        <div className="text-center text-slate-300 text-sm font-medium pt-4">
+          © 2026 No-Click Project Team • AI Detective Agency
         </div>
       </div>
     </div>
