@@ -11,7 +11,8 @@ class HiddenNegative(BaseModel):
     reasoning: str
 
 class AnalysisRequest(BaseModel):
-    url: HttpUrl
+    content: str = Field(..., min_length=10, description="블로그 본문 텍스트")
+    url: Optional[HttpUrl] = Field(None, description="참고용 URL (선택사항)")
 
 class AnalysisResponse(BaseModel):
     ad_probability: int = Field(..., ge=0, le=100)
@@ -21,7 +22,7 @@ class AnalysisResponse(BaseModel):
     real_summary: str
     saved_cost: str
     saved_time: str
-    original_url: str
+    original_url: Optional[str] = None
     blog_title: str
 
 class AnalysisResult(BaseModel):
