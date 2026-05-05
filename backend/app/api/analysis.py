@@ -29,6 +29,7 @@ async def analyze_blog(request: AnalysisRequest, db: Session = Depends(get_db)) 
         response_data = AnalysisResponse(
             **analysis_data,
             blog_title=blog_title,
+            original_content=request.content,
         )
         
         # TODO: 분석 결과를 DB에 저장 (CRUD 활용)
