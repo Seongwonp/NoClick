@@ -32,8 +32,8 @@ const Home: React.FC = () => {
       alert('분석할 내용을 입력해주세요!');
       return;
     }
-    // 분석 페이지로 텍스트 및 플랫폼 전달 (state 사용)
-    navigate('/analysis', { state: { text: inputText, platform: platform.id } });
+    // 결과 페이지로 직접 이동 (Analysis 중간 페이지 생략)
+    navigate('/result', { state: { text: inputText, platform: platform.id } });
   };
 
   return (
@@ -51,7 +51,12 @@ const Home: React.FC = () => {
 
           {/* Input Area Integrated into Hero */}
           <div id="analysis-input" className="relative max-w-3xl mx-auto group scroll-mt-32">
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-[2rem] blur opacity-15 group-focus-within:opacity-30 transition duration-500"></div>
+            <div className={`absolute -inset-1.5 bg-gradient-to-r ${
+              platform.id === 'naver' ? 'from-emerald-400 to-green-400' :
+              platform.id === 'insta' ? 'from-fuchsia-400 to-pink-400' :
+              platform.id === 'coupang' ? 'from-rose-400 to-orange-400' :
+              'from-emerald-400 to-blue-400'
+            } rounded-[2rem] blur opacity-15 group-focus-within:opacity-30 transition-all duration-700`}></div>
             <div className="relative z-10 bg-white rounded-[2rem] border border-emerald-50 custom-shadow overflow-visible">
               <textarea 
                 className="w-full h-56 p-8 border-none focus:ring-0 text-on-surface text-[18px] placeholder-outline bg-transparent resize-none font-body-md outline-none" 
