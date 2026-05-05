@@ -1,0 +1,23 @@
+[project]
+name = "no-click-backend"
+version = "0.1.0"
+description = "No-Click Backend API"
+authors = [
+    {name = "Park Seongwon"}
+]
+requires-python = "^3.11"
+dependencies = [
+    "fastapi (>=0.136.1,<0.137.0)",
+    "uvicorn (>=0.46.0,<0.47.0)",
+    "pydantic-settings (>=2.14.0,<3.0.0)",
+    "google-generativeai (>=0.8.6,<0.9.0)",
+    "anthropic (>=0.98.1,<0.99.0)",
+    "requests (>=2.33.1,<3.0.0)",
+    "beautifulsoup4 (>=4.14.3,<5.0.0)",
+    "python-multipart (>=0.0.27,<0.0.28)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
