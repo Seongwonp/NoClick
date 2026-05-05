@@ -10,8 +10,6 @@ from app.core.prompts import get_prompt
 logger = logging.getLogger(__name__)
 
 HF_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-MAX_INPUT_CHARS = 3000
-MAX_RETRIES = 3
 RETRY_DELAY = 5  # 콜드 스타트 대기 (초)
 
 
@@ -46,23 +44,28 @@ def _extract_json(text: str) -> Dict[str, Any]:
 class HuggingFaceEngine:
     def __init__(self):
         self._api_key = settings.HUGGINGFACE_API_KEY
+        self._client: AsyncInferenceClient | None = None
+        self._semaphore = asyncio.Semaphore(max(1, settings.AI_CONCURRENCY_LIMIT))
 
     def _get_client(self) -> AsyncInferenceClient:
-        return AsyncInferenceClient(api_key=self._api_key)
+        if self._client is None:
+            self._client = AsyncInferenceClient(api_key=self._api_key)
+        return self._client
 
     async def analyze_blog_content(self, content: str, platform: str = "general") -> Dict[str, Any]:
         if not self._api_key:
             return {"error": "HUGGINGFACE_API_KEY가 설정되지 않았습니다."}
 
-        truncated = content[:MAX_INPUT_CHARS]
+        truncated = content[:settings.AI_MAX_INPUT_CHARS]
         prompt = get_prompt(platform)
         full_prompt = f"{prompt}\n\n[분석할 본문]\n{truncated}"
 
-        for attempt in range(1, MAX_RETRIES + 1):
+        max_attempts = max(1, settings.AI_MAX_RETRIES + 1)
+        for attempt in range(1, max_attempts + 1):
             result = await self._call_hf(full_prompt, attempt)
 
             if result.get("_cold_start"):
-                logger.warning(f"콜드 스타트 감지, {RETRY_DELAY}초 후 재시도 ({attempt}/{MAX_RETRIES})")
+                logger.warning(f"콜드 스타트 감지, {RETRY_DELAY}초 후 재시도 ({attempt}/{max_attempts})")
                 await asyncio.sleep(RETRY_DELAY)
                 continue
 
@@ -73,13 +76,18 @@ class HuggingFaceEngine:
     async def _call_hf(self, prompt: str, attempt: int) -> Dict[str, Any]:
         try:
             client = self._get_client()
+            timeout = max(1, settings.AI_REQUEST_TIMEOUT_SECONDS)
 
-            response = await client.chat.completions.create(
-                model=HF_MODEL,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=1024,
-                temperature=0.3,  # 낮을수록 JSON 형식 준수율 올라감
-            )
+            async with self._semaphore:
+                response = await asyncio.wait_for(
+                    client.chat.completions.create(
+                        model=HF_MODEL,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=800,
+                        temperature=0.2,
+                    ),
+                    timeout=timeout,
+                )
 
             raw_text = response.choices[0].message.content
             return _extract_json(raw_text)

@@ -17,6 +17,15 @@ class Settings(BaseSettings):
     CLAUDE_API_KEY: Optional[str] = None
     HUGGINGFACE_API_KEY: Optional[str] = None
 
+    # AI 호출 안정화/성능 튜닝
+    AI_MAX_INPUT_CHARS: int = 3000
+    AI_REQUEST_TIMEOUT_SECONDS: int = 25
+    AI_MAX_RETRIES: int = 2
+    AI_RETRY_BASE_DELAY_SECONDS: float = 0.7
+    AI_CONCURRENCY_LIMIT: int = 8
+    AI_CACHE_TTL_SECONDS: int = 300
+    GEMINI_KEY_COOLDOWN_SECONDS: int = 120
+
     DATABASE_URL: str = "sqlite:///./noclick.db"
 
     NAVER_CLIENT_ID: Optional[str] = None
