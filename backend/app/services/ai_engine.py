@@ -1,52 +1,77 @@
 import google.generativeai as genai
 import json
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from app.core.config import settings
 from app.core.prompts import AD_DETECTION_PROMPT
 
 logger = logging.getLogger(__name__)
 
+MAX_INPUT_CHARS = 3000
+GEMINI_MODEL = "gemini-3.0-flash-preview-001"
+
+
 class AIEngine:
     def __init__(self):
-        if settings.GEMINI_API_KEY:
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            # 최신 Gemini 3.0 Flash-preview 모델 사용
-            self.model = genai.GenerativeModel('gemini-3.0-flash-preview-001')
-        else:
-            logger.warning("GEMINI_API_KEY가 설정되지 않았습니다.")
-            self.model = None
+        self._keys = settings.gemini_api_keys
+        self._exhausted_keys: set = set()
 
-    async def analyze_blog_content(self, content: str) -> Dict[str, Any]:
-        """
-        블로그 본문을 Gemini API로 분석하여 결과를 반환합니다.
-        """
-        if not self.model:
-            return {"error": "AI 엔진이 구성되지 않았습니다. API 키를 확인해주세요."}
+    def _next_key(self) -> Optional[str]:
+        for key in self._keys:
+            if key not in self._exhausted_keys:
+                return key
+        return None
 
+    def _exhaust_key(self, key: str):
+        self._exhausted_keys.add(key)
+        logger.warning(f"Gemini 키 소진 처리 (끝 4자리: ...{key[-4:]})")
+
+    async def analyze_blog_content(self, content: str, api_key: Optional[str] = None) -> Dict[str, Any]:
+        truncated = content[:MAX_INPUT_CHARS]
+        full_prompt = f"{AD_DETECTION_PROMPT}\n\n[분석할 블로그 본문]\n{truncated}"
+
+        # 사용자가 직접 키를 제공한 경우 → 해당 키로만 1회 호출 후 폐기
+        if api_key:
+            return await self._call_gemini(full_prompt, api_key)
+
+        # 서버 키 로테이션
+        while True:
+            key = self._next_key()
+            if not key:
+                return {"error": "모든 Gemini API 키의 일일 한도가 초과되었습니다. HuggingFace 모드를 이용해주세요."}
+
+            result = await self._call_gemini(full_prompt, key)
+
+            if result.get("_rate_limited"):
+                self._exhaust_key(key)
+                continue
+
+            return result
+
+    async def _call_gemini(self, prompt: str, api_key: str) -> Dict[str, Any]:
         try:
-            # 프롬프트와 본문 결합
-            full_prompt = f"{AD_DETECTION_PROMPT}\n\n[분석할 블로그 본문]\n{content}"
-            
-            # 비동기 호출 (Gemini SDK의 경우 지원 여부에 따라 threading이나 전용 비동기 client 사용 가능)
-            # 여기서는 가장 표준적인 generate_content를 사용합니다.
-            response = self.model.generate_content(
-                full_prompt,
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel(GEMINI_MODEL)
+
+            response = await model.generate_content_async(
+                prompt,
                 generation_config=genai.types.GenerationConfig(
-                    response_mime_type="application/json", # JSON 출력 강제
-                )
+                    response_mime_type="application/json",
+                ),
             )
-            
-            # JSON 파싱
-            if response.text:
-                return json.loads(response.text)
-            else:
+
+            if not response.text:
                 return {"error": "AI 응답이 비어있습니다."}
 
-        except Exception as e:
-            logger.error(f"AI 분석 중 오류 발생: {str(e)}")
-            # 429 에러 등 발생 시 처리 로직을 여기에 추가하거나 상위에서 핸들링
-            return {"error": f"AI 분석 중 오류가 발생했습니다: {str(e)}"}
+            return json.loads(response.text)
 
-# 싱글톤 패턴으로 엔진 인스턴스 생성
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str or "quota" in error_str.lower() or "rate" in error_str.lower():
+                logger.warning(f"Rate limit 감지: {error_str}")
+                return {"_rate_limited": True}
+            logger.error(f"AI 분석 오류: {error_str}")
+            return {"error": f"AI 분석 중 오류가 발생했습니다: {error_str}"}
+
+
 ai_engine = AIEngine()
