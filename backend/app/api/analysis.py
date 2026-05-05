@@ -22,14 +22,11 @@ async def analyze_blog(request: AnalysisRequest, db: Session = Depends(get_db)) 
         if "error" in analysis_data:
             return AnalysisResult(status="error", error=analysis_data["error"])
 
-        # blog_title, original_url은 별도 처리 후 나머지 AI 응답으로 구성
         blog_title = analysis_data.pop("blog_title", "제목 추론 불가")
-        analysis_data.pop("original_url", None)
 
         response_data = AnalysisResponse(
             **analysis_data,
             blog_title=blog_title,
-            original_url=str(request.url) if request.url else None,
         )
         
         # TODO: 분석 결과를 DB에 저장 (CRUD 활용)

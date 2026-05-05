@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl, Field
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class HighlightedPhrase(BaseModel):
@@ -12,7 +12,6 @@ class HiddenNegative(BaseModel):
 
 class AnalysisRequest(BaseModel):
     content: str = Field(..., min_length=10, description="블로그 본문 텍스트")
-    url: Optional[HttpUrl] = Field(None, description="참고용 URL (선택사항)")
     api_key: Optional[str] = Field(None, exclude=True, description="사용자 Gemini API 키 (선택사항, 사용 후 즉시 폐기)")
 
 class AnalysisResponse(BaseModel):
@@ -23,7 +22,6 @@ class AnalysisResponse(BaseModel):
     real_summary: str
     saved_cost: str
     saved_time: str
-    original_url: Optional[str] = None
     blog_title: str
 
 class AnalysisResult(BaseModel):
