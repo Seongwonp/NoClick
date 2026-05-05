@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-primary-fixed": "#002113",
+                  "on-tertiary-fixed": "#410005",
+                  "secondary-fixed": "#d8e2ff",
+                  "outline": "#6c7a71",
+                  "surface-tint": "#006c49",
+                  "on-secondary-container": "#fefcff",
+                  "on-tertiary-fixed-variant": "#842225",
+                  "outline-variant": "#bbcabf",
+                  "error-container": "#ffdad6",
+                  "primary": "#006c49",
+                  "on-tertiary-container": "#711419",
+                  "secondary-fixed-dim": "#adc6ff",
+                  "primary-fixed": "#6ffbbe",
+                  "on-error-container": "#93000a",
+                  "secondary": "#0058be",
+                  "tertiary": "#a43a3a",
+                  "surface-bright": "#f8f9fa",
+                  "surface-dim": "#d9dadb",
+                  "surface-variant": "#e1e3e4",
+                  "secondary-container": "#2170e4",
+                  "surface-container-low": "#f3f4f5",
+                  "on-error": "#ffffff",
+                  "on-background": "#191c1d",
+                  "inverse-surface": "#2e3132",
+                  "primary-fixed-dim": "#4edea3",
+                  "on-surface": "#191c1d",
+                  "on-secondary-fixed": "#001a42",
+                  "inverse-primary": "#4edea3",
+                  "on-primary": "#ffffff",
+                  "on-secondary": "#ffffff",
+                  "on-secondary-fixed-variant": "#004395",
+                  "tertiary-fixed-dim": "#ffb3af",
+                  "surface-container-highest": "#e1e3e4",
+                  "error": "#ba1a1a",
+                  "tertiary-fixed": "#ffdad7",
+                  "surface-container": "#edeeef",
+                  "tertiary-container": "#fc7c78",
+                  "surface-container-high": "#e7e8e9",
+                  "background": "#f8f9fa",
+                  "primary-container": "#10b981",
+                  "surface-container-lowest": "#ffffff",
+                  "on-primary-container": "#00422b",
+                  "inverse-on-surface": "#f0f1f2",
+                  "on-tertiary": "#ffffff",
+                  "on-primary-fixed-variant": "#005236",
+                  "surface": "#f8f9fa",
+                  "on-surface-variant": "#3c4a42"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "lg": "48px",
+                  "sm": "12px",
+                  "gutter": "16px",
+                  "xl": "80px",
+                  "base": "8px",
+                  "xs": "4px",
+                  "md": "24px",
+                  "margin": "24px"
+          },
+          "fontFamily": {
+                  "headline-sm": ["Plus Jakarta Sans"],
+                  "body-md": ["Plus Jakarta Sans"],
+                  "body-lg": ["Plus Jakarta Sans"],
+                  "display-lg": ["Plus Jakarta Sans"],
+                  "headline-md": ["Plus Jakarta Sans"],
+                  "label-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+                  "headline-sm": ["18px", {"lineHeight": "1.5", "fontWeight": "600"}],
+                  "body-md": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                  "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                  "display-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "headline-md": ["24px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "label-sm": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+    .glass-effect {
+      backdrop-filter: blur(8px);
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen text-on-surface">
+<!-- TopAppBar Section -->
+<header class="fixed top-0 w-full z-50 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm font-plus-jakarta-sans antialiased">
+<div class="flex justify-between items-center h-16 px-6 max-w-7xl mx-auto">
+<div class="text-xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400">No-Click</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a class="text-emerald-600 dark:text-emerald-400 font-semibold border-b-2 border-emerald-500 pb-1 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-200" href="#">Home</a>
+<a class="text-gray-500 dark:text-gray-400 font-medium hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-200" href="#">My History</a>
+<a class="text-gray-500 dark:text-gray-400 font-medium hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-200" href="#">How it Works</a>
+</nav>
+<button class="bg-primary-container text-on-primary-container px-5 py-2 rounded-xl font-bold active:scale-95 transition-transform duration-150 hover:bg-emerald-600 hover:text-white">
+        Start Analysis
+      </button>
+</div>
+</header>
+<main class="flex-grow pt-32 pb-20 px-6">
+<div class="max-w-4xl mx-auto text-center">
+<!-- Hero Section -->
+<section class="mb-12">
+<h1 class="font-display-lg text-display-lg text-on-background mb-4">
+          리뷰의 진실, <span class="text-primary">No-Click</span>이 찾아드릴게요
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+          네이버, 쿠팡, 인스타그램 등 어디든 텍스트만 붙여넣으세요. 
+          광고에 지친 당신을 위해 AI가 진짜 리뷰를 골라냅니다.
+        </p>
+</section>
+<!-- Input Area -->
+<section class="mb-20">
+<div class="relative max-w-3xl mx-auto group">
+<div class="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-3xl blur opacity-10 group-focus-within:opacity-25 transition duration-500"></div>
+<div class="relative bg-white rounded-3xl border border-gray-100 custom-shadow p-6">
+<textarea class="w-full h-64 border-none focus:ring-0 text-on-surface text-body-lg placeholder-outline bg-transparent resize-none font-body-md" placeholder="분석하고 싶은 리뷰 내용을 이곳에 붙여넣어주세요..."></textarea>
+<div class="flex items-center justify-between mt-4 border-t border-gray-50 pt-4">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">attach_file</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">image</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">link</span>
+</div>
+<button class="bg-primary-container text-on-primary-container px-8 py-3 rounded-xl font-bold flex items-center gap-2 active:scale-95 transition-all shadow-md hover:shadow-emerald-100">
+                진실 확인하기
+                <span class="material-symbols-outlined">analytics</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Cards (Asymmetric/Modern Layout) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+<div class="bg-white p-8 rounded-3xl border border-gray-100 custom-shadow hover:translate-y-[-4px] transition-transform duration-300">
+<div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined" data-weight="fill">shield</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-3">광고 패턴 감지</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            인공지능이 수천 개의 광고 데이터를 기반으로 협찬 문구와 숨겨진 광고 패턴을 완벽하게 분석합니다.
+          </p>
+</div>
+<div class="bg-white p-8 rounded-3xl border border-gray-100 custom-shadow hover:translate-y-[-4px] transition-transform duration-300">
+<div class="w-12 h-12 bg-blue-50 text-secondary rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined" data-weight="fill">visibility</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-3">숨겨진 단점 복원</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            좋은 말로만 가득 찬 리뷰 사이에서 실제 사용자가 느낀 미묘한 불편함과 단점을 놓치지 않고 찾아냅니다.
+          </p>
+</div>
+<div class="bg-white p-8 rounded-3xl border border-gray-100 custom-shadow hover:translate-y-[-4px] transition-transform duration-300">
+<div class="w-12 h-12 bg-purple-50 text-tertiary rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined" data-weight="fill">edit_note</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-3">탈광고 재작성</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            수식어는 빼고 팩트만 남겨서 한눈에 읽기 쉽게 요약해드립니다. 광고 제거 후 핵심만 파악하세요.
+          </p>
+</div>
+</section>
+</div>
+<!-- Background Decorative Elements -->
+<div class="fixed top-20 right-[10%] w-64 h-64 bg-emerald-100/30 rounded-full blur-3xl -z-10"></div>
+<div class="fixed bottom-20 left-[5%] w-96 h-96 bg-blue-100/30 rounded-full blur-3xl -z-10"></div>
+</main>
+<!-- Footer Section -->
+<footer class="w-full py-12 px-6 mt-auto border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 font-plus-jakarta-sans text-sm">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
+<div class="flex flex-col items-center md:items-start gap-2">
+<div class="text-lg font-bold text-gray-900 dark:text-white">No-Click</div>
+<p class="text-gray-500 dark:text-gray-400">Made with Love by No-Click</p>
+</div>
+<div class="flex gap-8">
+<a class="text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-300 underline underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-300 underline underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="text-gray-500 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-300 underline underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">Help Center</a>
+</div>
+</div>
+</footer>
+</body></html>

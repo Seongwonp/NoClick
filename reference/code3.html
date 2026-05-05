@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>No-Click | Analysis in Progress</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002113",
+                    "on-tertiary-fixed": "#410005",
+                    "secondary-fixed": "#d8e2ff",
+                    "outline": "#6c7a71",
+                    "surface-tint": "#006c49",
+                    "on-secondary-container": "#fefcff",
+                    "on-tertiary-fixed-variant": "#842225",
+                    "outline-variant": "#bbcabf",
+                    "error-container": "#ffdad6",
+                    "primary": "#006c49",
+                    "on-tertiary-container": "#711419",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "primary-fixed": "#6ffbbe",
+                    "on-error-container": "#93000a",
+                    "secondary": "#0058be",
+                    "tertiary": "#a43a3a",
+                    "surface-bright": "#f8f9fa",
+                    "surface-dim": "#d9dadb",
+                    "surface-variant": "#e1e3e4",
+                    "secondary-container": "#2170e4",
+                    "surface-container-low": "#f3f4f5",
+                    "on-error": "#ffffff",
+                    "on-background": "#191c1d",
+                    "inverse-surface": "#2e3132",
+                    "primary-fixed-dim": "#4edea3",
+                    "on-surface": "#191c1d",
+                    "on-secondary-fixed": "#001a42",
+                    "inverse-primary": "#4edea3",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#004395",
+                    "tertiary-fixed-dim": "#ffb3af",
+                    "surface-container-highest": "#e1e3e4",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffdad7",
+                    "surface-container": "#edeeef",
+                    "tertiary-container": "#fc7c78",
+                    "surface-container-high": "#e7e8e9",
+                    "background": "#f8f9fa",
+                    "primary-container": "#10b981",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#00422b",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#005236",
+                    "surface": "#f8f9fa",
+                    "on-surface-variant": "#3c4a42"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "48px",
+                    "sm": "12px",
+                    "gutter": "16px",
+                    "xl": "80px",
+                    "base": "8px",
+                    "xs": "4px",
+                    "md": "24px",
+                    "margin": "24px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-sm": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-sm": ["18px", {"lineHeight": "1.5", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8f9fa; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 border-b bg-white/80 backdrop-blur-md border-gray-100 shadow-sm">
+<div class="flex justify-between items-center h-16 px-6 max-w-7xl mx-auto">
+<div class="text-xl font-extrabold tracking-tight text-emerald-600">No-Click</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-emerald-600 font-semibold border-b-2 border-emerald-500 pb-1" href="#">Home</a>
+<a class="text-gray-500 font-medium hover:text-emerald-500 transition-colors duration-200" href="#">My History</a>
+<a class="text-gray-500 font-medium hover:text-emerald-500 transition-colors duration-200" href="#">How it Works</a>
+</div>
+<button class="bg-primary-container text-on-primary-container px-5 py-2 rounded-xl font-semibold active:scale-95 transition-transform duration-150">Start Analysis</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-32 pb-20 px-6 max-w-4xl mx-auto w-full">
+<!-- Progress Header -->
+<header class="text-center mb-12">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-4">AI가 리뷰를 꼼꼼히 읽고 있어요...</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">잠시만 기다려 주세요. 꼼꼼하게 분석 중입니다.</p>
+</header>
+<!-- Bento Layout for Analysis -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Left: Live Log & Progress -->
+<div class="md:col-span-1 flex flex-col gap-6">
+<!-- Progress Card -->
+<div class="bg-white p-md rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-gray-100">
+<div class="flex justify-between items-end mb-4">
+<span class="font-label-sm text-label-sm text-primary uppercase">Current Progress</span>
+<span class="font-headline-md text-headline-md text-on-surface">65%</span>
+</div>
+<div class="w-full bg-surface-container h-3 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full w-[65%] rounded-full transition-all duration-700 ease-out"></div>
+</div>
+</div>
+<!-- Friendly Activity Logs -->
+<div class="bg-white p-md rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-gray-100 flex-grow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">실시간 분석 로그</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<p class="font-body-md text-body-md">전체 텍스트 스캔 완료</p>
+</div>
+<div class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-secondary text-lg pulse-slow" style="font-variation-settings: 'FILL' 1;">search</span>
+<p class="font-body-md text-body-md">광고성 수식어를 찾았어요 🔍</p>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant opacity-70">
+<span class="material-symbols-outlined text-tertiary-container text-lg">auto_awesome</span>
+<p class="font-body-md text-body-md">숨겨진 맥락을 파악 중입니다 ✨</p>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant opacity-40">
+<span class="material-symbols-outlined text-gray-400 text-lg">verified</span>
+<p class="font-body-md text-body-md">최종 신뢰 점수 산출 예정</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Real-time Highlighting Text Area -->
+<div class="md:col-span-2 bg-white p-lg rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="font-label-sm text-label-sm bg-surface-container px-3 py-1 rounded-full text-outline">LIVE ANALYSIS</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">분석 중인 리뷰 원문</h3>
+<div class="font-body-lg text-body-lg text-on-surface leading-relaxed space-y-4">
+<p>
+                        이번에 새로 출시된 <span class="bg-secondary-fixed/50 px-1 rounded">스마트워치 S7</span>은 디자인이 정말 미쳤네요. 
+                        처음 박스를 깠을 때 그 <span class="bg-primary-fixed/40 px-1 rounded decoration-primary-container decoration-2 underline-offset-4 underline">영롱한 광택</span>이... 
+                        진짜 이건 무조건 사야 합니다. 
+                    </p>
+<p>
+                        근데 사용하다 보니까 <span class="bg-tertiary-fixed/50 px-1 rounded text-on-tertiary-fixed">배터리가 생각보다 빨리 닳아요</span>. 
+                        하루를 못 버티는 느낌? 그리고 <span class="bg-secondary-fixed/50 px-1 rounded">UI 반응 속도</span>는 빠르지만 가끔 <span class="bg-error-container/40 text-on-error-container px-1 rounded italic">버벅임</span>이 있네요. 
+                    </p>
+<p class="pulse-slow border-l-4 border-primary-container pl-4 italic text-on-surface-variant">
+                        "광고성 수식어(영롱한, 무조건 사야 함)를 탐지하여 필터링하는 중..."
+                    </p>
+<p>
+                        그래도 <span class="bg-primary-fixed/40 px-1 rounded">가성비 면에서는 나쁘지 않은 선택</span>인 것 같습니다. 
+                        특히 <span class="border-b-2 border-secondary-container">수면 추적 기능</span>은 꽤 정확하게 측정되는 느낌이라 만족스러워요.
+                    </p>
+</div>
+<!-- Subtle Decorative Element -->
+<div class="mt-8 pt-6 border-t border-gray-100 flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary-fixed"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">긍정 포인트</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-tertiary-fixed"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">부정/개선점</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary-fixed"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">핵심 키워드</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Context Info (Replacement for FAB if suppressed by context) -->
+<div class="mt-xl flex flex-col md:flex-row items-center justify-between gap-6 bg-primary/5 p-md rounded-2xl border border-primary/10">
+<div class="flex items-center gap-4">
+<div class="bg-primary text-white p-3 rounded-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-primary-container">가짜 리뷰를 걸러내고 있습니다</h4>
+<p class="font-body-md text-body-md text-on-primary-container/80">No-Click 알고리즘이 중복 패턴과 상업적 키워드를 추적합니다.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2 border border-outline rounded-xl font-semibold text-on-surface hover:bg-surface-container-low transition-colors">중단하기</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-6 mt-auto bg-gray-50 border-t border-gray-100 font-plus-jakarta-sans text-sm">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
+<div class="text-lg font-bold text-gray-900">No-Click</div>
+<div class="text-gray-500 font-medium">Made with Love by No-Click</div>
+<div class="flex gap-6">
+<a class="text-gray-500 hover:text-emerald-500 underline underline-offset-4 transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-gray-500 hover:text-emerald-500 underline underline-offset-4 transition-opacity opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-gray-500 hover:text-emerald-500 underline underline-offset-4 transition-opacity opacity-80 hover:opacity-100" href="#">Help Center</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-primary-fixed": "#002113",
+                "on-tertiary-fixed": "#410005",
+                "secondary-fixed": "#d8e2ff",
+                "outline": "#6c7a71",
+                "surface-tint": "#006c49",
+                "on-secondary-container": "#fefcff",
+                "on-tertiary-fixed-variant": "#842225",
+                "outline-variant": "#bbcabf",
+                "error-container": "#ffdad6",
+                "primary": "#006c49",
+                "on-tertiary-container": "#711419",
+                "secondary-fixed-dim": "#adc6ff",
+                "primary-fixed": "#6ffbbe",
+                "on-error-container": "#93000a",
+                "secondary": "#0058be",
+                "tertiary": "#a43a3a",
+                "surface-bright": "#f8f9fa",
+                "surface-dim": "#d9dadb",
+                "surface-variant": "#e1e3e4",
+                "secondary-container": "#2170e4",
+                "surface-container-low": "#f3f4f5",
+                "on-error": "#ffffff",
+                "on-background": "#191c1d",
+                "inverse-surface": "#2e3132",
+                "primary-fixed-dim": "#4edea3",
+                "on-surface": "#191c1d",
+                "on-secondary-fixed": "#001a42",
+                "inverse-primary": "#4edea3",
+                "on-primary": "#ffffff",
+                "on-secondary": "#ffffff",
+                "on-secondary-fixed-variant": "#004395",
+                "tertiary-fixed-dim": "#ffb3af",
+                "surface-container-highest": "#e1e3e4",
+                "error": "#ba1a1a",
+                "tertiary-fixed": "#ffdad7",
+                "surface-container": "#edeeef",
+                "tertiary-container": "#fc7c78",
+                "surface-container-high": "#e7e8e9",
+                "background": "#f8f9fa",
+                "primary-container": "#10b981",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-container": "#00422b",
+                "inverse-on-surface": "#f0f1f2",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed-variant": "#005236",
+                "surface": "#f8f9fa",
+                "on-surface-variant": "#3c4a42"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "lg": "48px",
+                "sm": "12px",
+                "gutter": "16px",
+                "xl": "80px",
+                "base": "8px",
+                "xs": "4px",
+                "md": "24px",
+                "margin": "24px"
+            },
+            "fontFamily": {
+                "headline-sm": ["Plus Jakarta Sans"],
+                "body-md": ["Plus Jakarta Sans"],
+                "body-lg": ["Plus Jakarta Sans"],
+                "display-lg": ["Plus Jakarta Sans"],
+                "headline-md": ["Plus Jakarta Sans"],
+                "label-sm": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                "headline-sm": ["18px", {"lineHeight": "1.5", "fontWeight": "600"}],
+                "body-md": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "display-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-md": ["24px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "label-sm": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .progress-ring__circle {
+        transition: stroke-dashoffset 0.35s;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+      }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm">
+<div class="flex justify-between items-center h-16 px-6 max-w-7xl mx-auto">
+<div class="text-xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400 font-headline-md">No-Click</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-gray-500 dark:text-gray-400 font-medium hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-200 font-body-lg" href="#">Home</a>
+<a class="text-emerald-600 dark:text-emerald-400 font-semibold border-b-2 border-emerald-500 pb-1 font-body-lg" href="#">My History</a>
+<a class="text-gray-500 dark:text-gray-400 font-medium hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-200 font-body-lg" href="#">How it Works</a>
+</nav>
+<button class="bg-primary-container text-on-primary-container px-5 py-2 rounded-xl font-semibold active:scale-95 transition-transform duration-150 font-body-md">Start Analysis</button>
+</div>
+</header>
+<main class="flex-grow pt-24 pb-12 px-6 max-w-7xl mx-auto w-full">
+<!-- Score Section -->
+<section class="mb-xl flex flex-col md:flex-row items-center justify-between bg-white rounded-3xl p-lg shadow-[0_4px_20px_rgba(0,0,0,0.04)] gap-md">
+<div class="flex-1 text-center md:text-left">
+<h1 class="font-display-lg text-display-lg mb-4 text-on-surface">분석 완료! 🔍</h1>
+<p class="font-headline-md text-headline-md text-on-surface-variant">이 리뷰의 진실 지수는 <span class="text-tertiary">35%</span>입니다.</p>
+<p class="mt-4 text-outline font-body-lg">일부 광고성 표현과 과장된 문구가 발견되었습니다. 구매 전 신중하게 고려하세요.</p>
+</div>
+<div class="relative flex items-center justify-center">
+<svg class="w-48 h-48">
+<circle class="text-surface-container stroke-current" cx="96" cy="96" fill="transparent" r="70" stroke-width="12"></circle>
+<circle class="text-tertiary-container stroke-current progress-ring__circle" cx="96" cy="96" fill="transparent" r="70" stroke-linecap="round" stroke-width="12" style="stroke-dasharray: 440; stroke-dashoffset: calc(440 - (440 * 35) / 100);"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-extrabold text-tertiary">35%</span>
+<span class="text-label-sm font-label-sm text-outline">TRUTH SCORE</span>
+</div>
+</div>
+</section>
+<!-- Comparison Section -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-md mb-xl">
+<!-- Original Review -->
+<div class="bg-white rounded-3xl p-md shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-gray-50">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-outline">history</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">원본 리뷰</h3>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md leading-relaxed font-body-lg text-on-surface-variant">
+                    진짜 인생 맛집이에요! <span class="bg-error-container text-on-error-container rounded px-1">사장님도 너무 친절하시고</span> 분위기까지 미쳤어요.. ✨ 
+                    스테이크 입에서 살살 녹아요 <span class="bg-orange-100 text-orange-800 rounded px-1">웨이팅 하나도 안 아깝고 꼭 가보세요 강추!!!</span>
+<span class="bg-error-container text-on-error-container rounded px-1">#광고 #협찬아님</span> 소문내고 싶지 않은데 넘 맛있어서 올려요.
+                </div>
+<div class="mt-md flex flex-wrap gap-2">
+<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-label-sm font-label-sm">🚨 광고성 의심</span>
+<span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-label-sm font-label-sm">⚠️ 과장된 감정</span>
+</div>
+</div>
+<!-- AI Rewrite -->
+<div class="bg-primary-container/5 rounded-3xl p-md shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-primary-container/20">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">AI 재작성 (객관적 사실)</h3>
+</div>
+<div class="bg-white rounded-xl p-md leading-relaxed font-body-lg text-on-surface border border-primary-container/10">
+                    직원들의 응대가 친절한 편이며, 매장 분위기가 세련되어 데이트 장소로 적합합니다. 
+                    스테이크의 육질은 부드러운 편이나, 주말 점심 시간대에는 평균 40분 이상의 긴 대기 시간이 발생할 수 있습니다. 
+                    전반적인 만족도는 높지만 홍보용 문구가 섞인 리뷰임을 참고하시기 바랍니다.
+                </div>
+<div class="mt-md">
+<div class="flex items-center gap-2 text-primary font-label-sm">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>중립적 관점으로 정제되었습니다</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Restored Weaknesses -->
+<section class="mb-xl">
+<h3 class="font-headline-md text-headline-md mb-sm px-2">복원된 단점 🧐</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="bg-white p-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex items-start gap-4 hover:translate-y-[-2px] transition-transform duration-200">
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-outline">event_seat</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-1 text-on-surface">좁은 좌석</h4>
+<p class="text-outline font-body-md">테이블 간격이 좁아 주변 소음이 큰 편입니다.</p>
+</div>
+</div>
+<div class="bg-white p-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex items-start gap-4 hover:translate-y-[-2px] transition-transform duration-200">
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-outline">payments</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-1 text-on-surface">비싼 가격대</h4>
+<p class="text-outline font-body-md">양에 비해 가격이 다소 높게 책정되어 있습니다.</p>
+</div>
+</div>
+<div class="bg-white p-md rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex items-start gap-4 hover:translate-y-[-2px] transition-transform duration-200">
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-outline">timer</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-1 text-on-surface">긴 대기 시간</h4>
+<p class="text-outline font-body-md">예약 없이는 최소 30분 이상의 대기가 필수입니다.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Actions -->
+<section class="flex flex-col sm:flex-row items-center justify-center gap-md">
+<button class="w-full sm:w-auto bg-primary text-on-primary px-xl py-4 rounded-2xl font-headline-sm shadow-lg hover:shadow-xl active:scale-95 transition-all duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">search</span>
+                다른 리뷰도 분석하기
+            </button>
+<button class="w-full sm:w-auto bg-white text-on-surface border border-outline-variant px-xl py-4 rounded-2xl font-headline-sm hover:bg-gray-50 active:scale-95 transition-all duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">share</span>
+                결과 공유하기
+            </button>
+</section>
+<!-- Product Image Section (Visual Anchor) -->
+<section class="mt-xl rounded-3xl overflow-hidden h-64 relative group">
+<img alt="Restaurant interior" class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" data-alt="A clean, minimalist restaurant interior with soft ambient lighting and modern furniture. The scene is shot in high-key light mode with a focus on serene atmosphere and elegant architectural lines. The color palette features neutral tones with subtle green plant accents, reflecting the brand's aesthetic of clarity and truth. The image has a professional, high-end consumer lifestyle vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC13ocAYdfrx8fPm36ZXHETFn8CjyrMKCj7KT5OVnOOSXMsqdKPH-wpQqEpYMAFerZDckE5UIzUm0XD2xtZjgwwQsQYmf2aM2kxdCSHouGqnDTrgluRNV7OSOHXOC53Bpivgf90133P0ptwvSPuSCQ9JKnJbHaQo6U8GD1j-JDHeTwp2Dd2YoM8Xm_oP0NbIf-oYLJW-GqP5hP_JwePk-2og8ZaDSy989OwWH8Fkv0pJQ-0nzh8mz1SV1HxYVxbFPew2ZqwXlxwEzxm"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-lg">
+<div class="text-white">
+<p class="font-headline-md text-headline-md">분석된 장소: '더 스테이크 하우스'</p>
+<p class="font-body-md opacity-80">서울시 강남구 논현동 인근</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-6 mt-auto bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
+<div class="text-lg font-bold text-gray-900 dark:text-white font-headline-sm">No-Click</div>
+<div class="flex gap-6">
+<a class="text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-emerald-500 dark:hover:text-emerald-300 underline underline-offset-4 transition-opacity font-body-md" href="#">Privacy Policy</a>
+<a class="text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-emerald-500 dark:hover:text-emerald-300 underline underline-offset-4 transition-opacity font-body-md" href="#">Terms of Service</a>
+<a class="text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-emerald-500 dark:hover:text-emerald-300 underline underline-offset-4 transition-opacity font-body-md" href="#">Help Center</a>
+</div>
+<div class="text-gray-500 dark:text-gray-400 text-sm font-body-md">Made with Love by No-Click</div>
+</div>
+</footer>
+</body></html>
