@@ -86,10 +86,7 @@ Expected JSON (abbreviated):
   "blog_title": "한 달 사용 후 향 단점과 가격 아쉬움을 적은 후기",
   "ad_probability": 5,
   "trust_score": 95,
-  "highlighted_phrases": [{{
-    "text": "34,000원 치고는 애매함",
-    "type": "negative_avoidance"
-  }}],
+  "highlighted_phrases": [],
   "hidden_negatives": [],
   "hidden_intent": "실사용 기간과 구체적 단점을 포함한 진성 구매자 정보 공유",
   "overall_verdict": "사용 기간, 가격, 불호 요소를 함께 제시해 검증 가능한 소비자 경험 구조를 갖추고 있습니다. 광고 개입보다 자발적 공유 해석이 타당하며 신뢰도 높은 참고 후기로 판단됩니다.",

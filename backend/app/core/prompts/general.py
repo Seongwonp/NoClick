@@ -88,10 +88,7 @@ Expected JSON (abbreviated):
   "blog_title": "가격·주차·웨이팅을 수치로 남긴 실방문 후기",
   "ad_probability": 6,
   "trust_score": 94,
-  "highlighted_phrases": [{{
-    "text": "파스타 18,000원인데 양이 적고 짰어요",
-    "type": "negative_avoidance"
-  }}],
+  "highlighted_phrases": [],
   "hidden_negatives": [],
   "hidden_intent": "실망스러운 방문 경험을 가격·대기시간·주차까지 구체적 수치로 기록한 진성 소비자 후기",
   "overall_verdict": "가격, 주차 시간, 웨이팅, 재방문 의사까지 불리한 정보가 함께 제시되어 자기일관성이 높습니다. 광고 개입 위험은 낮고 신뢰도는 높으므로 방문 결정 시 참고 가치가 충분합니다.",

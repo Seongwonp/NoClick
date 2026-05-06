@@ -86,10 +86,7 @@ Expected JSON (abbreviated):
   "blog_title": "3주 사용 후 사이즈·색상 단점을 밝힌 후기",
   "ad_probability": 10,
   "trust_score": 90,
-  "highlighted_phrases": [{{
-    "text": "생각보다 사이즈가 작아요",
-    "type": "negative_avoidance"
-  }}],
+  "highlighted_phrases": [],
   "hidden_negatives": [],
   "hidden_intent": "실구매 후 솔직한 불만 사항을 포함한 균형 잡힌 사용 후기",
   "overall_verdict": "사용 기간과 구체 단점을 함께 제시해 검증 가능한 소비자 경험으로 해석됩니다. 광고 개입 위험은 낮으며, 제시된 단점을 감안해 조건부 구매 판단 자료로 활용할 가치가 있습니다.",

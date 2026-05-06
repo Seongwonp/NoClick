@@ -38,6 +38,12 @@ BASE_RULES = """
 - `trust_score` is influenced by "explicit flaws" (e.g., "delivery was slow", "material feels cheap").
 - High frequency of emotional superlatives decreases `trust_score`.
 
+3. highlighted_phrases Usage:
+- ONLY tag phrases that are AD SIGNALS: exaggeration, sponsor denial, or negative avoidance.
+- `negative_avoidance` = author mentions a flaw but immediately minimizes it (e.g., "주차가 좀 그렇긴 한데 그래도 괜찮아요").
+- Direct complaints (e.g., "양이 적고 짰어요", "사이즈가 작아요") are NOT negative_avoidance — they are honest negatives. Do NOT tag them.
+- In a genuine review with no ad signals, `highlighted_phrases` must be `[]`.
+
 3. Calculation Standards:
 - `saved_time`: 5 minutes per review analysis.
 - `saved_cost`: If `ad_probability` > 70%, 10% of the estimated product price as a "risk-avoidance" value. If price is unknown, use "정밀 분석 필요".

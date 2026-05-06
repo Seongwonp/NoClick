@@ -83,10 +83,7 @@ Expected JSON (abbreviated):
   "blog_title": "포장 파손과 재질·소음 단점을 밝힌 실사용 후기",
   "ad_probability": 10,
   "trust_score": 90,
-  "highlighted_phrases": [{{
-    "text": "박스가 다 찌그러져서 왔어요",
-    "type": "negative_avoidance"
-  }}],
+  "highlighted_phrases": [],
   "hidden_negatives": [],
   "hidden_intent": "배송 불만과 제품의 외관적 단점을 가감 없이 드러낸 실사용자의 솔직한 후기",
   "overall_verdict": "포장 손상, 저급 재질감, 소음이라는 불리한 정보를 직접 제시해 자기모순 없는 실사용 패턴을 보입니다. 광고 개입 위험은 낮고 신뢰도는 높으므로 단점을 감수 가능한 경우에 한해 구매 판단 근거로 활용할 수 있습니다.",
