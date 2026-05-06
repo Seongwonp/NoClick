@@ -3,13 +3,29 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import type { AnalysisResult, PhraseType } from '../types/analysis';
 import { mockAnalysisService } from '../services/mockApi';
 import MockPlatformViewer from '../components/MockPlatformViewer';
+import { SiNaver, SiInstagram } from 'react-icons/si';
+import { FaShoppingCart, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaShieldAlt, FaMagic, FaSearch, FaHistory } from 'react-icons/fa';
 
-const PHRASE_CONFIG: Record<PhraseType, { label: string; color: string; bg: string }> = {
-  sponsor_denial:     { label: '광고 부인 패턴', color: 'text-red-700',    bg: 'bg-red-100' },
-  exaggeration:       { label: '과장 표현',       color: 'text-amber-700',  bg: 'bg-amber-100' },
-  negative_avoidance: { label: '단점 회피',       color: 'text-orange-700', bg: 'bg-orange-100' },
-  ad_pattern:         { label: '광고 패턴',       color: 'text-red-700',    bg: 'bg-red-100' },
-  neutral:            { label: '중립',             color: 'text-gray-600',   bg: 'bg-gray-100' },
+const PHRASE_CONFIG: Record<PhraseType, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
+  sponsor_denial:     { label: '광고 부인', color: 'text-red-600',    bg: 'bg-red-50',    icon: <FaTimesCircle className="text-[10px]" /> },
+  exaggeration:       { label: '과장 표현', color: 'text-amber-600',  bg: 'bg-amber-50',  icon: <FaExclamationTriangle className="text-[10px]" /> },
+  negative_avoidance: { label: '단점 회피', color: 'text-orange-600', bg: 'bg-orange-50', icon: <FaShieldAlt className="text-[10px]" /> },
+  ad_pattern:         { label: '광고 패턴', color: 'text-red-600',    bg: 'bg-red-50',    icon: <FaTimesCircle className="text-[10px]" /> },
+  neutral:            { label: '중립',      color: 'text-gray-500',   bg: 'bg-gray-50',   icon: <FaCheckCircle className="text-[10px]" /> },
+};
+
+const PLATFORM_ICONS: Record<string, React.ReactNode> = {
+  naver: <SiNaver className="text-[#03C75A]" />,
+  insta: <SiInstagram className="text-[#E1306C]" />,
+  coupang: <FaShoppingCart className="text-[#CB1400]" />,
+  other: <span className="material-symbols-outlined text-gray-500 text-[18px]">public</span>,
+};
+
+const PLATFORM_NAMES: Record<string, string> = {
+  naver: '네이버',
+  insta: '인스타그램',
+  coupang: '쿠팡',
+  other: '기타',
 };
 
 const Result: React.FC = () => {
@@ -49,12 +65,18 @@ const Result: React.FC = () => {
 
   if (!result && isAnalyzing) {
     return (
-      <div className="flex-grow pt-24 pb-20 px-4 max-w-3xl mx-auto w-full bg-[#f5f6f8] min-h-screen">
-        <div className="flex flex-col gap-5 animate-pulse">
-          <div className="h-10 bg-white border border-[#e8e9ec] rounded-xl" />
-          <div className="h-56 bg-[#1c1e2e] rounded-2xl opacity-20" />
-          <div className="h-32 bg-white border border-[#e8e9ec] rounded-xl" />
-          <div className="h-48 bg-white border border-[#e8e9ec] rounded-xl" />
+      <div className="flex-grow pt-32 pb-20 px-6 max-w-4xl mx-auto w-full min-h-screen flex flex-col gap-8">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-48 bg-gray-100 rounded-2xl animate-pulse" />
+          <div className="flex items-center gap-2 text-[14px] text-emerald-600 font-medium">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse inline-block" />
+            AI가 리뷰를 분석하고 있어요...
+          </div>
+        </div>
+        <div className="h-[400px] bg-white rounded-[2.5rem] border border-gray-100 shadow-sm animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="h-40 bg-white rounded-[2rem] border border-gray-100 animate-pulse" />
+          <div className="h-40 bg-white rounded-[2rem] border border-gray-100 animate-pulse" />
         </div>
       </div>
     );
@@ -62,157 +84,178 @@ const Result: React.FC = () => {
 
   const score = result?.trust_score ?? 0;
   const trustLevel = score >= 70 ? 'safe' : score >= 40 ? 'warning' : 'danger';
-  const trustBadge = {
-    safe:    { label: '신뢰 가능', bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' },
-    warning: { label: '주의 필요', bg: 'bg-amber-100',   text: 'text-amber-700',   dot: 'bg-amber-500' },
-    danger:  { label: '광고 의심', bg: 'bg-red-100',     text: 'text-red-700',     dot: 'bg-red-500' },
+  const trustTheme = {
+    safe:    { label: '신뢰 가능', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', icon: <FaCheckCircle /> },
+    warning: { label: '주의 필요', color: 'text-amber-600',   bg: 'bg-amber-50',   border: 'border-amber-100',   icon: <FaExclamationTriangle /> },
+    danger:  { label: '광고 의심', color: 'text-red-600',     bg: 'bg-red-50',     border: 'border-red-100',     icon: <FaTimesCircle /> },
   }[trustLevel];
 
   return (
-    <div className="flex-grow pt-20 pb-12 px-4 bg-[#f5f6f8] min-h-screen">
-      <div className="max-w-3xl mx-auto flex flex-col gap-6 animate-fade-in">
+    <div className="flex-grow pt-24 pb-20 px-6 min-h-screen relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-100/10 rounded-full blur-[120px] -z-10"></div>
+      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-100/10 rounded-full blur-[120px] -z-10"></div>
 
-        {/* ── 헤더: 플랫폼 + 신뢰도 뱃지 (작게) ── */}
-        <header className="flex items-center justify-between pt-4">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-[#9095a3] capitalize">{platform}</span>
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${trustBadge.bg}`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${trustBadge.dot}`} />
-              <span className={`text-xs font-bold ${trustBadge.text}`}>{trustBadge.label}</span>
-              <span className={`text-xs font-black ${trustBadge.text} opacity-70`}>{score}점</span>
+      <div className="max-w-4xl mx-auto flex flex-col gap-10 animate-fade-in-up">
+        
+        {/* ── 헤더: 플랫폼 + 액션 ── */}
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl shadow-sm">
+              <div className="text-[16px]">{PLATFORM_ICONS[platform]}</div>
+              <span className="text-[14px] font-bold text-on-surface">{PLATFORM_NAMES[platform] ?? platform}</span>
+            </div>
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${trustTheme.bg} ${trustTheme.border}`}>
+              <div className={trustTheme.color}>{trustTheme.icon}</div>
+              <span className={`text-[14px] font-bold ${trustTheme.color}`}>{trustTheme.label}</span>
+              <span className={`text-[14px] font-black ${trustTheme.color} opacity-60 ml-1`}>{score}점</span>
             </div>
           </div>
           <button
             onClick={() => navigate('/')}
-            className="text-sm text-[#9095a3] hover:text-[#5b6cf4] font-medium transition-colors flex items-center gap-1"
+            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-[14px] font-bold text-on-surface-variant hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 cursor-pointer shadow-sm"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 15 }}>arrow_back</span>
+            <FaArrowLeft className="text-[12px]" />
             다시 분석하기
           </button>
         </header>
 
-        {/* ── 1. 광고를 걷어내면 (히어로, 가장 먼저) ── */}
-        <section className="bg-[#1c1e2e] rounded-2xl overflow-hidden">
-          <div className="px-7 pt-7 pb-5">
-            <div className="flex items-center gap-2 mb-5">
-              <span className="material-symbols-outlined text-[#5b6cf4]" style={{ fontSize: 16 }}>auto_fix_high</span>
-              <span className="text-[11px] font-black text-[#5b6cf4] uppercase tracking-[0.15em]">
-                광고를 걷어내면
-              </span>
-            </div>
-
-            <blockquote className="text-[17px] font-medium leading-[1.85] text-white/88 mb-6">
-              "{result?.rewritten_text}"
-            </blockquote>
-
-            <div className="border-t border-white/8 pt-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-white/25" style={{ fontSize: 13 }}>info</span>
-              <p className="text-xs text-white/30 font-medium">
-                광고성 수식어를 제거하고 실제 경험만 추출한 AI 재작성 버전
-              </p>
-            </div>
-          </div>
-
-          {/* AI 한줄 요약 - 다크 카드 내 구분선 아래 */}
-          <div className="bg-white/5 border-t border-white/8 px-7 py-4">
-            <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-[#8b90c8] mt-0.5" style={{ fontSize: 15 }}>summarize</span>
-              <p className="text-sm text-white/55 leading-relaxed">{result?.real_summary}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── 2. 리뷰가 가리고 있던 것들 ── */}
-        {result?.hidden_negatives && result.hidden_negatives.length > 0 && (
-          <section>
-            <h2 className="text-[13px] font-black text-[#1c1e24] mb-3 flex items-center gap-2 uppercase tracking-wide">
-              <span className="material-symbols-outlined text-red-500" style={{ fontSize: 16 }}>visibility_off</span>
-              이 리뷰가 가리고 있던 것들
-            </h2>
-            <div className="flex flex-col gap-2.5">
-              {result.hidden_negatives.map((neg, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-xl border border-[#e8e9ec] p-5 flex items-start gap-5 shadow-sm"
-                >
-                  <span className="text-3xl font-black text-gray-100 leading-none select-none flex-shrink-0 w-7 text-center">
-                    {idx + 1}
-                  </span>
-                  <div className="flex-grow min-w-0">
-                    <p className="text-[15px] font-bold text-[#1c1e24] mb-1">{neg.inferred}</p>
-                    <p className="text-sm text-gray-500 leading-relaxed">{neg.reasoning}</p>
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-2xl font-black text-red-400 leading-none">{neg.confidence}</p>
-                    <p className="text-[10px] text-gray-400 font-bold mt-0.5">% 신뢰</p>
-                  </div>
+        {/* ── 1. AI 분석 하이라이트 (재작성 텍스트) ── */}
+        <section className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-75 transition duration-1000"></div>
+          <div className="relative bg-white/80 backdrop-blur-xl border border-white rounded-[2.5rem] custom-shadow overflow-hidden">
+            <div className="p-10 md:p-12">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                  <FaMagic className="text-[18px]" />
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── 3. 어떻게 발견했나 (증거) ── */}
-        <section>
-          <h2 className="text-[13px] font-black text-[#1c1e24] mb-3 flex items-center gap-2 uppercase tracking-wide">
-            <span className="material-symbols-outlined text-amber-500" style={{ fontSize: 16 }}>search</span>
-            어떻게 발견했나
-          </h2>
-
-          {/* 감지된 패턴 뱃지 */}
-          {result?.highlighted_phrases && result.highlighted_phrases.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {result.highlighted_phrases.map((phrase, idx) => {
-                const cfg = PHRASE_CONFIG[phrase.type] ?? PHRASE_CONFIG.neutral;
-                return (
-                  <div key={idx} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${cfg.bg}`}>
-                    <span className={`text-xs font-bold ${cfg.color}`}>"{phrase.text}"</span>
-                    <span className={`text-[10px] ${cfg.color} opacity-60`}>· {cfg.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* 원본 리뷰 뷰어 */}
-          <div className="bg-white rounded-xl border border-[#e8e9ec] overflow-hidden shadow-sm">
-            <div className="px-4 py-2.5 border-b border-[#e8e9ec] bg-[#f8f9fb] flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
+                <div>
+                  <span className="text-[12px] font-black text-emerald-600 uppercase tracking-widest block leading-none mb-1">AI Truth Extraction</span>
+                  <h2 className="text-[20px] font-bold text-on-surface">광고를 걷어낸 진짜 이야기</h2>
+                </div>
               </div>
-              <span className="text-[11px] font-bold text-[#b0b4bf] uppercase tracking-wider">
-                원본 리뷰 — 광고 표현 하이라이트
-              </span>
-            </div>
-            <div style={{ height: 240 }}>
-              {result && (
-                <MockPlatformViewer
-                  platform={platform}
-                  originalText={result.original_text}
-                  highlightedPhrases={result.highlighted_phrases}
-                  onComplete={() => {}}
-                />
-              )}
+
+              <div className="relative">
+                <span className="absolute -top-6 -left-4 text-[80px] font-serif text-emerald-100 select-none leading-none opacity-50">"</span>
+                <p className="text-[20px] md:text-[24px] font-medium leading-[1.7] text-on-surface mb-8 relative z-10 break-keep">
+                  {result?.rewritten_text}
+                </p>
+                <span className="absolute -bottom-12 -right-4 text-[80px] font-serif text-emerald-100 select-none leading-none opacity-50 rotate-180">"</span>
+              </div>
+
+              <div className="pt-8 border-t border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3 text-on-surface-variant/70 italic text-[14px]">
+                  <FaHistory className="text-[14px]" />
+                  <span>{result?.real_summary}</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg text-[11px] text-on-surface-variant/60 font-medium whitespace-nowrap">
+                  <span className="material-symbols-outlined text-[14px]">info</span>
+                  AI가 실제 경험 수치와 팩트만을 추출하여 재구성했습니다.
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ── 4. 절약 정보 ── */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-xl border border-[#e8e9ec] p-5 text-center shadow-sm">
-            <p className="text-xs text-gray-400 font-medium mb-1.5">절약한 예상 비용</p>
-            <p className="text-2xl font-black text-[#5b6cf4]">{result?.saved_cost}</p>
+        {/* ── 2. 숨겨진 리스크 & 절약 정보 ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 flex flex-col gap-6">
+             <h3 className="text-[15px] font-black text-on-surface flex items-center gap-2 ml-2">
+                <FaExclamationTriangle className="text-amber-500" />
+                이 리뷰가 숨기고 있었을 불편함
+             </h3>
+             <div className="flex flex-col gap-4">
+               {result?.hidden_negatives?.map((neg, idx) => (
+                 <div key={idx} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex gap-5">
+                    <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center flex-shrink-0 text-[18px] font-black text-gray-300">
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <h4 className="text-[17px] font-bold text-on-surface mb-2">{neg.inferred}</h4>
+                      <p className="text-[14px] text-on-surface-variant leading-relaxed mb-3">{neg.reasoning}</p>
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 flex-grow bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-400 rounded-full" style={{ width: `${neg.confidence}%` }}></div>
+                        </div>
+                        <span className="text-[11px] font-bold text-amber-600">{neg.confidence}% 신뢰</span>
+                      </div>
+                    </div>
+                 </div>
+               ))}
+             </div>
           </div>
-          <div className="bg-white rounded-xl border border-[#e8e9ec] p-5 text-center shadow-sm">
-            <p className="text-xs text-gray-400 font-medium mb-1.5">절약한 예상 시간</p>
-            <p className="text-2xl font-black text-[#5b6cf4]">{result?.saved_time}</p>
+
+          <div className="flex flex-col gap-6">
+            <h3 className="text-[15px] font-black text-on-surface flex items-center gap-2 ml-2">
+                <FaShieldAlt className="text-emerald-500" />
+                No-Click 절약 리포트
+             </h3>
+             <div className="bg-white p-8 rounded-[2rem] border border-emerald-50 shadow-sm flex flex-col gap-8 h-full">
+                <div className="text-center">
+                  <p className="text-[13px] text-on-surface-variant mb-2">절약한 예상 비용</p>
+                  <p className="text-[32px] font-black text-emerald-600">{result?.saved_cost}</p>
+                </div>
+                <div className="h-px bg-gray-50"></div>
+                <div className="text-center">
+                  <p className="text-[13px] text-on-surface-variant mb-2">절약한 예상 시간</p>
+                  <p className="text-[32px] font-black text-emerald-600">{result?.saved_time}</p>
+                </div>
+                <div className="mt-auto pt-6 text-center">
+                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-lg text-[11px] font-bold text-emerald-700">
+                      <FaCheckCircle /> Good Decision
+                   </div>
+                </div>
+             </div>
           </div>
         </div>
 
-        <footer className="text-center text-[11px] text-[#c8cad4] font-medium border-t border-gray-200 pt-6 pb-2">
-          No-Click X-ray Engine — Real-time Review Forensics Powered by AI
+        {/* ── 3. 원본 리뷰 분석 뷰어 ── */}
+        <section className="flex flex-col gap-6">
+           <h3 className="text-[15px] font-black text-on-surface flex items-center gap-2 ml-2">
+              <FaSearch className="text-blue-500" />
+              어떻게 광고인 것을 알아냈나요?
+           </h3>
+
+           <div className="bg-white rounded-[2.5rem] border border-gray-100 custom-shadow overflow-hidden">
+              <div className="px-8 py-5 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+                <div className="flex items-center gap-4">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                    <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                  </div>
+                  <span className="text-[12px] font-bold text-on-surface-variant/50 uppercase tracking-widest">Review Forensics</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {result?.highlighted_phrases?.slice(0, 3).map((phrase, idx) => {
+                    const cfg = PHRASE_CONFIG[phrase.type] ?? PHRASE_CONFIG.neutral;
+                    return (
+                      <div key={idx} className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border ${cfg.bg} ${cfg.color.replace('text-', 'border-').replace('-600', '-100')} ${cfg.color} text-[10px] font-bold`}>
+                        {cfg.icon}
+                        {cfg.label}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              <div style={{ height: 320 }}>
+                {result && (
+                  <MockPlatformViewer
+                    platform={platform}
+                    originalText={result.original_text}
+                    highlightedPhrases={result.highlighted_phrases}
+                    onComplete={() => {}}
+                  />
+                )}
+              </div>
+           </div>
+        </section>
+
+        <footer className="text-center pt-10">
+          <p className="text-[12px] text-on-surface-variant/40 font-medium tracking-wide">
+            No-Click X-ray Engine — Real-time Review Forensics Powered by AI
+          </p>
         </footer>
 
       </div>
@@ -221,3 +264,4 @@ const Result: React.FC = () => {
 };
 
 export default Result;
+

@@ -88,5 +88,14 @@
 - **아미 (Frontend)**: 결과 시각화 UI, 형광펜 애니메이션 구현.
 - **예솔 (UI/UX & Frontend)**: 사용자 경험 설계 및 프론트엔드 구현.
 
+
+
+**Platform Enum (플랫폼 구분값)**: 백엔드 요청 시 사용하는 플랫폼 식별자입니다.
+    - `naver`: 네이버 블로그/지도 등
+    - `insta`: 인스타그램
+    - `coupang`: 쿠팡
+    - `other`: 기타 플랫폼
+
+
 ---
 © 2026 No-Click Project Team (성원, 아미, 예솔). All Rights Reserved.

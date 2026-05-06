@@ -6,7 +6,7 @@ const HowItWorks: React.FC = () => {
     {
       icon: 'content_paste',
       title: '1. 리뷰 입력',
-      description: '분석하고 싶은 네이버 블로그 URL을 복사해서 붙여넣거나, 리뷰 텍스트를 직접 입력하세요.',
+      description: '네이버 블로그, 인스타그램, 쿠팡 등에서 분석하고 싶은 리뷰 텍스트를 복사해서 홈 화면에 그대로 붙여넣으세요.',
       color: 'bg-emerald-50 text-emerald-600'
     },
     {

@@ -9,11 +9,14 @@ const platforms = [
   { id: 'other', name: '기타', icon: <span className="material-symbols-outlined text-gray-500 text-[16px]">public</span> },
 ];
 
+const EXAMPLE_REVIEW = `정말 완벽한 제품이에요! 협찬 받았지만 솔직하게 리뷰해요 :) 피부가 엄청 촉촉해지고 화사해졌어요. 주변 친구들도 다 피부 좋아졌다고 물어봐요. 향도 너무 좋고 발림도 너무 좋아서 이제 이것만 쓸 것 같아요. 단점을 찾기가 너무 힘들 정도로 완벽한 제품!`;
+
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [platform, setPlatform] = useState(platforms[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [inputError, setInputError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,10 +31,9 @@ const Home: React.FC = () => {
 
   const handleStartAnalysis = () => {
     if (!inputText.trim()) {
-      alert('분석할 내용을 입력해주세요!');
+      setInputError(true);
       return;
     }
-    // 결과 페이지로 직접 이동 (Analysis 중간 페이지 생략)
     navigate('/result', { state: { text: inputText, platform: platform.id } });
   };
 
@@ -56,17 +58,23 @@ const Home: React.FC = () => {
               platform.id === 'coupang' ? 'from-rose-400 to-orange-400' :
               'from-emerald-400 to-blue-400'
             } rounded-[2rem] blur opacity-15 group-focus-within:opacity-30 transition-all duration-700`}></div>
-            <div className="relative z-10 bg-white rounded-[2rem] border border-emerald-50 custom-shadow overflow-visible">
-              <textarea 
-                className="w-full h-56 p-8 border-none focus:ring-0 text-on-surface text-[18px] placeholder-outline bg-transparent resize-none font-body-md outline-none" 
-                placeholder="분석하고 싶은 리뷰 내용을 이곳에 붙여넣어주세요..."
+            <div className={`relative z-10 bg-white rounded-[2rem] border custom-shadow overflow-visible transition-colors ${inputError ? 'border-red-300' : 'border-emerald-50'}`}>
+              <textarea
+                className="w-full h-56 p-8 border-none focus:ring-0 text-on-surface text-[18px] placeholder-outline bg-transparent resize-none font-body-md outline-none"
+                placeholder="네이버 블로그, 인스타그램, 쿠팡 등의 리뷰 텍스트를 그대로 복사해서 붙여넣어주세요..."
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={(e) => { setInputText(e.target.value); setInputError(false); }}
               ></textarea>
+              {inputError && (
+                <p className="px-8 pb-3 text-[13px] text-red-500 font-medium flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[16px]">error</span>
+                  분석할 리뷰 내용을 입력해주세요.
+                </p>
+              )}
               <div className="flex items-center justify-between px-8 py-5 bg-emerald-50/30 border-t border-emerald-50 rounded-b-[2rem]">
                 <div className="flex items-center gap-4">
-                  <div className="relative" ref={dropdownRef}>
-                    <div 
+                  <div className="relative group/platform" ref={dropdownRef}>
+                    <div
                       className="flex items-center gap-2 bg-white border border-emerald-100 text-on-surface text-[14px] rounded-xl px-4 py-2 hover:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 font-medium cursor-pointer shadow-sm transition-colors"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
@@ -75,6 +83,11 @@ const Home: React.FC = () => {
                       <span className={`material-symbols-outlined text-[18px] transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}>expand_more</span>
                     </div>
                     
+                    {/* 툴팁 */}
+                    <div className="absolute bottom-full left-0 mb-2 w-44 bg-gray-800 text-white text-[11px] px-3 py-2 rounded-lg opacity-0 group-hover/platform:opacity-100 transition-opacity pointer-events-none z-50 leading-relaxed">
+                      플랫폼 특성에 맞게 광고 패턴을 분석합니다
+                    </div>
+
                     {isDropdownOpen && (
                       <div className="absolute top-full left-0 mt-2 w-full bg-white border border-emerald-100 rounded-xl shadow-lg z-50 overflow-hidden">
                         {platforms.map((p) => (
@@ -93,9 +106,19 @@ const Home: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <span className="text-[14px] text-on-surface-variant font-medium hidden sm:inline-block">
-                    {inputText.length}자 입력됨
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { setInputText(EXAMPLE_REVIEW); setInputError(false); setPlatform(platforms[0]); }}
+                    className="text-[13px] text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 transition-colors hidden sm:flex"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">edit_note</span>
+                    예시 넣어보기
+                  </button>
+                  {inputText.length > 0 && (
+                    <span className="text-[13px] text-on-surface-variant font-medium hidden sm:inline-block">
+                      {inputText.length}자
+                    </span>
+                  )}
                 </div>
                 <button 
                   type="button"
