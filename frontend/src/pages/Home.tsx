@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SiNaver, SiInstagram } from 'react-icons/si';
-import { FaShoppingCart, FaGlobe } from 'react-icons/fa';
-
+import { FaShoppingCart } from 'react-icons/fa';
 const platforms = [
   { id: 'naver', name: '네이버', icon: <SiNaver className="text-[#03C75A]" /> },
   { id: 'insta', name: '인스타', icon: <SiInstagram className="text-[#E1306C]" /> },
   { id: 'coupang', name: '쿠팡', icon: <FaShoppingCart className="text-[#CB1400]" /> },
-  { id: 'other', name: '기타', icon: <FaGlobe className="text-gray-500" /> },
+  { id: 'other', name: '기타', icon: <span className="material-symbols-outlined text-gray-500 text-[16px]">public</span> },
 ];
 
 const Home: React.FC = () => {
