@@ -29,6 +29,13 @@ const PLATFORM_NAMES: Record<string, string> = {
   other: '기타',
 };
 
+const LOADING_MESSAGES = [
+  "플랫폼 특성을 분석하고 있어요...",
+  "광고 패턴을 매칭하는 중이에요...",
+  "의도적으로 숨겨진 단점을 추론하고 있어요...",
+  "과장을 덜어내고 진짜 리뷰로 재작성 중이에요..."
+];
+
 const Result: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,6 +46,15 @@ const Result: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [platform, setPlatform] = useState(location.state?.platform || 'other');
   const [inputText] = useState(location.state?.text || '');
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
+
+  useEffect(() => {
+    if (!isAnalyzing) return;
+    const interval = setInterval(() => {
+      setLoadingMsgIdx(prev => (prev + 1) % LOADING_MESSAGES.length);
+    }, 2000); // 2초마다 메시지 변경
+    return () => clearInterval(interval);
+  }, [isAnalyzing]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -68,13 +84,18 @@ const Result: React.FC = () => {
     return (
       <div className="flex-grow pt-32 pb-20 px-6 max-w-4xl mx-auto w-full min-h-screen flex flex-col gap-8">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-48 bg-gray-100 rounded-2xl animate-pulse" />
-          <div className="flex items-center gap-2 text-[14px] text-emerald-600 font-medium">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse inline-block" />
-            AI가 리뷰를 분석하고 있어요...
+          <div className="h-12 w-32 bg-gray-100 rounded-2xl animate-pulse" />
+          <div className="flex items-center gap-3 text-[15px] text-emerald-700 font-bold bg-emerald-50 px-5 py-2.5 rounded-xl border border-emerald-100 shadow-sm transition-all">
+            <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping inline-block" />
+            <span className="animate-fade-in-up" key={loadingMsgIdx}>{LOADING_MESSAGES[loadingMsgIdx]}</span>
           </div>
         </div>
-        <div className="h-[400px] bg-white rounded-[2.5rem] border border-gray-100 shadow-sm animate-pulse" />
+        <div className="h-[400px] bg-white rounded-[2.5rem] border border-gray-100 shadow-sm animate-pulse flex items-center justify-center">
+           <div className="text-gray-400 flex flex-col items-center gap-4">
+              <span className="material-symbols-outlined text-[48px] animate-spin text-emerald-200">sync</span>
+              <p className="font-medium text-[15px]">리뷰 텍스트를 X-ray 스캔 중입니다...</p>
+           </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="h-40 bg-white rounded-[2rem] border border-gray-100 animate-pulse" />
           <div className="h-40 bg-white rounded-[2rem] border border-gray-100 animate-pulse" />
