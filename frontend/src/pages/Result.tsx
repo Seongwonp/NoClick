@@ -4,7 +4,8 @@ import type { AnalysisResult, PhraseType } from '../types/analysis';
 import { mockAnalysisService } from '../services/mockApi';
 import MockPlatformViewer from '../components/MockPlatformViewer';
 import { SiNaver, SiInstagram } from 'react-icons/si';
-import { FaShoppingCart, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaShieldAlt, FaMagic, FaSearch, FaHistory } from 'react-icons/fa';
+import { FaShoppingCart, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaShieldAlt, FaMagic, FaSearch, FaHistory, FaChartPie } from 'react-icons/fa';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 const PHRASE_CONFIG: Record<PhraseType, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
   sponsor_denial:     { label: '광고 부인', color: 'text-red-600',    bg: 'bg-red-50',    icon: <FaTimesCircle className="text-[10px]" /> },
@@ -89,6 +90,14 @@ const Result: React.FC = () => {
     warning: { label: '주의 필요', color: 'text-amber-600',   bg: 'bg-amber-50',   border: 'border-amber-100',   icon: <FaExclamationTriangle /> },
     danger:  { label: '광고 의심', color: 'text-red-600',     bg: 'bg-red-50',     border: 'border-red-100',     icon: <FaTimesCircle /> },
   }[trustLevel];
+
+  const radarData = [
+    { subject: '진정성', value: score, fullMark: 100 },
+    { subject: '정보성', value: Math.min(100, score + 10), fullMark: 100 },
+    { subject: '상세함', value: Math.min(100, Math.max(0, score - 5)), fullMark: 100 },
+    { subject: '광고패턴', value: result?.ad_probability ?? (100 - score), fullMark: 100 },
+    { subject: '과장성', value: Math.min(100, 100 - score + 15), fullMark: 100 },
+  ];
 
   return (
     <div className="flex-grow pt-24 pb-20 px-6 min-h-screen relative overflow-hidden">
@@ -208,6 +217,45 @@ const Result: React.FC = () => {
              </div>
           </div>
         </div>
+
+        {/* ── 2.5. AI 다차원 성분 분석 차트 ── */}
+        <section className="flex flex-col gap-6">
+           <h3 className="text-[15px] font-black text-on-surface flex items-center gap-2 ml-2">
+              <FaChartPie className="text-purple-500" />
+              리뷰 다차원 성분 분석
+           </h3>
+           <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-8">
+              <div className="w-full md:w-1/2 h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                    <PolarGrid stroke="#f3f4f6" />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 12, fontWeight: 700 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}
+                      itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
+                    />
+                    <Radar
+                      name="리뷰 특성"
+                      dataKey="value"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                      fill="#34d399"
+                      fillOpacity={0.4}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="w-full md:w-1/2 flex flex-col gap-4">
+                <h4 className="text-[18px] font-bold text-on-surface">종합 평가 결과</h4>
+                <p className="text-[14.5px] text-on-surface-variant leading-relaxed break-keep">
+                  다차원 특성 분석 결과, 현재 <strong className="text-emerald-600 mx-1">{trustTheme.label}</strong> 수준입니다. 
+                  <br className="hidden md:block" />
+                  특히 <strong className="text-emerald-600 mx-1">{[...radarData].sort((a,b)=>b.value - a.value)[0].subject}</strong> 지표가 가장 두드러지게 나타납니다.
+                </p>
+              </div>
+           </div>
+        </section>
 
         {/* ── 3. 원본 리뷰 분석 뷰어 ── */}
         <section className="flex flex-col gap-6">

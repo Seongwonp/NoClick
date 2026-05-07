@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 const ANALYSIS_STEPS = [
-  { id: 1, label: '문맥 및 의도 파악', icon: 'auto_stories' },
-  { id: 2, label: '광고 패턴 대조 분석', icon: 'fact_check' },
-  { id: 3, label: '결핍 정보 추론', icon: 'find_in_page' },
-  { id: 4, label: '신뢰 점수 산출', icon: 'verified' },
+  { id: 1, label: '리뷰 데이터 수집 중...', subLabel: '대상 상품의 전체 리뷰 스크래핑 및 연동', icon: 'downloading' },
+  { id: 2, label: '자연어 처리 알고리즘 적용 중...', subLabel: '형태소 분석 및 문맥 의도 파악', icon: 'smart_toy' },
+  { id: 3, label: '어뷰징 패턴 정밀 분석 중...', subLabel: '반복 키워드, 특정 시간대 몰림 현상 추적', icon: 'troubleshoot' },
+  { id: 4, label: '숨겨진 단점 추출 완료!', subLabel: '최종 신뢰도 스코어 산출 중', icon: 'verified' },
 ];
 
 const LoadingState: React.FC = () => {
@@ -84,14 +84,21 @@ const LoadingState: React.FC = () => {
                 index < currentStep ? 'opacity-30 -translate-y-1 scale-95' : 'opacity-10 translate-y-2 scale-90'
               }`}
             >
-              <div className={`w-2 h-2 rounded-full transition-all duration-500 ${
+              <div className={`w-2 h-2 shrink-0 rounded-full transition-all duration-500 ${
                 index <= currentStep ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-gray-200'
               }`}></div>
-              <span className={`text-[15px] font-bold tracking-tight break-keep ${
-                index === currentStep ? 'text-emerald-700' : 'text-on-surface-variant'
-              }`}>
-                {step.label}
-              </span>
+              <div className="flex flex-col text-left">
+                <span className={`text-[15px] font-bold tracking-tight break-keep ${
+                  index === currentStep ? 'text-emerald-700' : 'text-on-surface-variant'
+                }`}>
+                  {step.label}
+                </span>
+                {index === currentStep && (
+                  <span className="text-[12px] font-medium tracking-tight mt-0.5 text-emerald-600/70 animate-fade-in">
+                    {step.subLabel}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>

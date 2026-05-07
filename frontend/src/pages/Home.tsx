@@ -133,6 +133,54 @@ const Home: React.FC = () => {
           </div>
         </section>
 
+        {/* Persona Story Section */}
+        <section className="mb-24 pt-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <h2 className="text-[32px] md:text-[36px] font-extrabold text-on-surface mb-12 tracking-tight">
+            이런 경험, <span className="text-emerald-600">누구나 한 번쯤 있으시죠?</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            
+            {/* Persona 1 */}
+            <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-[2rem] border border-gray-100 shadow-sm text-left relative overflow-hidden group hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[24px] shadow-sm flex-shrink-0">
+                  💸
+                </div>
+                <div>
+                  <h3 className="text-[17px] font-bold text-on-surface">김호갱 <span className="text-[13px] font-medium text-gray-400 ml-1">24세, 대학생</span></h3>
+                  <p className="text-[13px] text-emerald-600 font-bold mb-3">#리뷰_500개_읽고도_실패</p>
+                  <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm inline-block">
+                    <p className="text-[14px] text-on-surface-variant leading-relaxed break-keep">
+                      "별점 5점짜리 <strong>협찬 리뷰에 속아서</strong> 또 돈 날렸어요."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Persona 2 */}
+            <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-[2rem] border border-gray-100 shadow-sm text-left relative overflow-hidden group hover:shadow-md hover:-translate-y-1 transition-all duration-300" style={{ animationDelay: '300ms' }}>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-100/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[24px] shadow-sm flex-shrink-0">
+                  😡
+                </div>
+                <div>
+                  <h3 className="text-[17px] font-bold text-on-surface">이지윤 <span className="text-[13px] font-medium text-gray-400 ml-1">29세, 직장인</span></h3>
+                  <p className="text-[13px] text-rose-500 font-bold mb-3">#내돈내산_이라며</p>
+                  <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm inline-block">
+                    <p className="text-[14px] text-on-surface-variant leading-relaxed break-keep">
+                      "1시간 웨이팅해서 먹었는데, 알고보니 <strong>교묘하게 숨긴 광고</strong>였어요."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
         {/* Feature Cards */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left mt-16">
           <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
