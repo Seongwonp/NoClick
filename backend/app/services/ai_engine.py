@@ -4,12 +4,40 @@ import json
 import logging
 import asyncio
 import hashlib
+import re
 from time import monotonic
 from typing import Dict, Any, Optional, Tuple
 from app.core.config import settings
 from app.core.prompts import get_prompt
 
 logger = logging.getLogger(__name__)
+
+_EMOJI_RE = re.compile(
+    "[\U0001F300-\U0001F9FF"
+    "\U00002600-\U000027BF"
+    "\U0001FA00-\U0001FAFF"
+    "\U00002702-\U000027B0"
+    "\U0000FE00-\U0000FE0F"
+    "\U00020000-\U0002FFFF"
+    "]+",
+    flags=re.UNICODE,
+)
+_STANDALONE_JAMO_RE = re.compile(r"[ㄱ-ㅣ]")
+
+GIBBERISH_ERROR = "오타인 것 같네요! 분석할 수 있는 내용을 입력해 주세요."
+
+
+def _strip_emojis(text: str) -> str:
+    return _EMOJI_RE.sub("", text)
+
+
+def _is_gibberish(text: str) -> bool:
+    stripped = text.strip()
+    if not stripped:
+        return True
+    jamo_count = len(_STANDALONE_JAMO_RE.findall(stripped))
+    # 독립 자음/모음 비율이 40% 초과면 키보드 난타로 판단
+    return jamo_count / len(stripped) > 0.4
 
 GEMINI_MODEL = "gemini-3-flash-preview"
 
@@ -64,6 +92,10 @@ class AIEngine:
         self._cache[key] = (expires_at, dict(payload))
 
     async def analyze_blog_content(self, content: str, platform: str = "general", model: str = "gemini", api_key: Optional[str] = None) -> Dict[str, Any]:
+        content = _strip_emojis(content)
+        if _is_gibberish(content):
+            return {"error": GIBBERISH_ERROR}
+
         # 사용자가 HuggingFace 선택 시 바로 전환
         if model == "huggingface":
             logger.info("사용자 선택: HuggingFace(EXAONE) 모드")
