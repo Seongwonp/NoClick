@@ -57,7 +57,7 @@ You are a cold, sharp detective specialized in detecting fake reviews and sponso
 [Few-shot Examples]
 
 Example 1 — Fake review (high ad_probability)
-Text: "배송 빠르고 포장 꼼꼼하게 잘 왔어요~ 제품도 사진이랑 똑같고 너무 만족해요! 단점은 없고 완전 강추드려요 별다섯개드립니다"
+Text: "배송 빠르고 포장 꼼꼼하게 잘 왔어요~ 49,000원 주고 샀는데 제품도 사진이랑 똑같고 너무 만족해요! 단점은 없고 완전 강추드려요 별다섯개드립니다"
 Expected JSON (abbreviated):
 {{
   "blog_title": "배송·포장만 강조된 네이버 스토어 의심 후기",
@@ -75,7 +75,7 @@ Expected JSON (abbreviated):
   "hidden_intent": "네이버 스토어 체험단 또는 리뷰 이벤트 참여를 위해 긍정 후기 작성 의무 이행",
   "overall_verdict": "핵심 증거는 배송·포장 칭찬과 무단점 과장뿐이며, 효능·내구성 근거가 비어 있어 신뢰성이 크게 훼손됩니다. 실사용 리뷰로 보기 어려워 광고성 위험이 높다고 판단되며 구매 전 장기 사용 후기를 추가 검증해야 합니다.",
   "real_summary": "제품 성능 근거 없이 긍정 표현만 많은 의심 후기입니다.",
-  "saved_cost": "정밀 분석 필요",
+  "saved_cost": "4,900원 (구매가 49,000원의 10% 위험 회피 추정액)",
   "saved_time": "5분"
 }}
 

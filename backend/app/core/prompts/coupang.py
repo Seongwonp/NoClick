@@ -92,4 +92,31 @@ Expected JSON (abbreviated):
   "saved_time": "5분"
 }}
 
+Example 3 — Ambiguous review (mid ad_probability)
+Text: "2주 정도 써봤어요. 배송 빠르고 포장은 깔끔했습니다. 색이 사진이랑 조금 다른데 뭐 쓸 만은 해요. 기능은 전반적으로 무난하고 이 가격이면 나쁘지 않은 것 같아요. 다음에도 살 것 같아요~"
+Expected JSON (abbreviated):
+{{
+  "blog_title": "2주 사용 언급하나 기능 세부 없는 애매한 쿠팡 후기",
+  "ad_probability": 52,
+  "trust_score": 48,
+  "highlighted_phrases": [{{
+    "text": "뭐 쓸 만은 해요",
+    "type": "negative_avoidance"
+  }}],
+  "hidden_negatives": [{{
+    "inferred": "2주 사용 주장에도 기능적 세부 경험 없음 — 실사용 깊이 부족 또는 단기 체험단 가능성",
+    "confidence": 60,
+    "reasoning": "'2주 사용'을 언급했지만 구체적 기능·사용 시나리오가 전무하고 배송·포장·색상에만 언급이 집중됨."
+  }}, {{
+    "inferred": "동일 가격대 대안 대비 가성비 열위 가능성 — 비교 기준 없이 '나쁘지 않다'는 주관적 판단만 제시",
+    "confidence": 50,
+    "reasoning": "경쟁 제품이나 이전 구매 경험과의 비교가 없어 '이 가격이면 나쁘지 않다'는 주장의 근거가 약함."
+  }}],
+  "hidden_intent": "중립적 표현 뒤에 부정적 경험을 희석시킨 온건한 광고성 후기 가능성",
+  "overall_verdict": "사용 기간이 명시됐지만 기능 세부 경험 없이 배송·포장 중심의 무난한 호평이 이어지고, 색상 차이를 즉시 축소한 점이 광고성 개입의 약한 신호입니다. 단정할 수는 없으나 중간 위험 수준으로 판단되며 구매 전 동일 가격대 제품의 장기 사용 후기를 추가 확인하는 것이 권장됩니다.",
+  "real_summary": "긍정·부정 신호가 혼재하는 중간 신뢰도 후기입니다.",
+  "saved_cost": "0원",
+  "saved_time": "5분"
+}}
+
 [Output Format]{JSON_OUTPUT}"""

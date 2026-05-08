@@ -44,11 +44,11 @@ BASE_RULES = """
 - Direct complaints (e.g., "양이 적고 짰어요", "사이즈가 작아요") are NOT negative_avoidance — they are honest negatives. Do NOT tag them.
 - In a genuine review with no ad signals, `highlighted_phrases` must be `[]`.
 
-3. Calculation Standards:
+4. Calculation Standards:
 - `saved_time`: 5 minutes per review analysis.
 - `saved_cost`: If `ad_probability` > 70%, 10% of the estimated product price as a "risk-avoidance" value. If price is unknown, use "정밀 분석 필요".
 
-4. Language & Tone:
+5. Language & Tone:
 - MANDATORY: All string values in the JSON must be in KOREAN.
 - Tone: Cold, decisive, and professional (Detective persona). Use endings like "판단됩니다", "주의가 필요합니다".
 """
