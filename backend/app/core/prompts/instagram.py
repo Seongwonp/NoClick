@@ -93,4 +93,28 @@ Expected JSON (abbreviated):
   "saved_time": "5분"
 }}
 
+Example 3 — Ambiguous post (mid ad_probability)
+Text: "요즘 매일 쓰는 선크림🌞 발림성 좋고 백탁도 별로 없어서 마음에 들어요. 28,000원인데 용량이 좀 적은 건 아쉬워요. 피부 자극은 없었어요. #선크림추천 #일상 #데일리뷰티"
+Expected JSON (abbreviated):
+{{
+  "blog_title": "가격 공개하나 사용 기간·피부 타입 미명시 선크림 인스타 후기",
+  "ad_probability": 50,
+  "trust_score": 50,
+  "highlighted_phrases": [],
+  "hidden_negatives": [{{
+    "inferred": "사용 기간 불명확 — '요즘 매일'이 장기 검증 없는 단기 사용일 가능성",
+    "confidence": 60,
+    "reasoning": "'요즘'이라는 표현이 단기 사용을 암시하며 구체적 사용 기간 명시가 없어 지속 효과 검증 불가"
+  }}, {{
+    "inferred": "피부 타입 미명시 — 민감성·지성 피부 적합성 정보 부재로 부작용 판단 불가",
+    "confidence": 55,
+    "reasoning": "'피부 자극 없었다'는 진술이 어떤 피부 타입에서 확인된 것인지 알 수 없어 개인화된 구매 판단이 어려움"
+  }}],
+  "hidden_intent": "가격과 단점 일부를 공개하여 신뢰감을 높인 온건한 홍보성 후기 가능성 배제 불가",
+  "overall_verdict": "가격 공개와 용량 단점 언급은 진성 신호이나 사용 기간이 불명확하고 피부 타입 정보가 없어 정보 완결성이 낮습니다. 광고성 태그가 없어 단정할 수 없으나 중간 위험 수준으로 판단되며 구매 전 피부 타입과 사용 기간이 명시된 추가 후기 확인을 권장합니다.",
+  "real_summary": "가격과 단점 일부를 공개한 중간 신뢰도 인스타 후기입니다.",
+  "saved_cost": "0원",
+  "saved_time": "5분"
+}}
+
 [Output Format]{JSON_OUTPUT}"""

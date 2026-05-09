@@ -95,4 +95,31 @@ Expected JSON (abbreviated):
   "saved_time": "5분"
 }}
 
+Example 3 — Ambiguous review (mid ad_probability)
+Text: "2주 정도 써봤어요. 배송 빠르고 포장도 괜찮았어요. 색상이 사진이랑 살짝 달랐는데 실물도 나쁘지 않아요. 기능은 전반적으로 무난하고 이 가격이면 그냥 쓸만 한 것 같아요. 내구성은 좀 더 써봐야 알 것 같네요~"
+Expected JSON (abbreviated):
+{{
+  "blog_title": "2주 사용 언급하나 기능 세부 없는 네이버 스토어 중간 후기",
+  "ad_probability": 47,
+  "trust_score": 53,
+  "highlighted_phrases": [{{
+    "text": "색상이 사진이랑 살짝 달랐는데 실물도 나쁘지 않아요",
+    "type": "negative_avoidance"
+  }}],
+  "hidden_negatives": [{{
+    "inferred": "2주 사용 주장에도 기능 세부 경험 전무 — 실사용 깊이 부족 또는 단기 체험단 가능성",
+    "confidence": 58,
+    "reasoning": "'2주 정도 써봤어요'라고 했으나 구체적 기능·사용 시나리오 언급 없이 배송·포장에만 내용이 집중됨"
+  }}, {{
+    "inferred": "내구성 미검증 — 장기 사용 시 품질 저하 위험 정보 부재",
+    "confidence": 65,
+    "reasoning": "작성자 스스로 '내구성은 좀 더 써봐야 알 것 같다'고 인정해 내구성 판단 근거가 없음"
+  }}],
+  "hidden_intent": "중립적 표현으로 부정적 경험을 완화하되 내구성 검증 전 작성된 온건한 후기",
+  "overall_verdict": "색상 차이를 솔직히 언급한 점은 진성 신호이나, 2주 사용을 주장하면서도 기능 세부 경험이 없고 내구성을 스스로 미확인으로 남겨 둔 점이 신뢰도를 낮춥니다. 광고성 개입을 단정하기 어려우나 동일 가격대 장기 사용 후기를 추가 확인한 후 구매를 결정하는 것이 권장됩니다.",
+  "real_summary": "진성 신호와 광고성 신호가 혼재하는 중간 신뢰도 후기입니다.",
+  "saved_cost": "0원",
+  "saved_time": "5분"
+}}
+
 [Output Format]{JSON_OUTPUT}"""

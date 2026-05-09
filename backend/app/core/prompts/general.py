@@ -97,4 +97,31 @@ Expected JSON (abbreviated):
   "saved_time": "5분"
 }}
 
+Example 3 — Ambiguous blog (mid ad_probability)
+Text: "오랜만에 친구들이랑 홍대 카페 방문했어요! 아메리카노가 5,500원인데 맛은 진짜 괜찮더라고요. 인테리어도 예쁘고 사진 찍기 딱 좋은 분위기예요. 좌석이 좀 좁긴 한데 그래도 전체적으로 분위기가 좋아서 만족했어요. 주말엔 웨이팅 있을 수도 있다고 하더라고요~"
+Expected JSON (abbreviated):
+{{
+  "blog_title": "가격 언급하나 좌석 협소를 즉시 희석한 홍대 카페 후기",
+  "ad_probability": 53,
+  "trust_score": 47,
+  "highlighted_phrases": [{{
+    "text": "좌석이 좀 좁긴 한데 그래도 전체적으로 분위기가 좋아서 만족했어요",
+    "type": "negative_avoidance"
+  }}],
+  "hidden_negatives": [{{
+    "inferred": "주말 웨이팅 실제 경험 없이 전달 — 방문 계획 시 실제 대기 시간 추가 확인 필요",
+    "confidence": 62,
+    "reasoning": "'주말엔 웨이팅 있을 수도 있다고 하더라고요'는 전언(傳言)으로 직접 경험 없음"
+  }}, {{
+    "inferred": "주차 정보 완전 누락 — 자가용 방문 시 주차 비용 및 이동 불편 발생 가능",
+    "confidence": 58,
+    "reasoning": "대중교통 또는 주차 관련 언급이 전혀 없어 주차 여건 판단 불가"
+  }}],
+  "hidden_intent": "긍정 경험을 전달하되 단점을 최소화한 온건한 후기로 광고성 개입 가능성 배제 불가",
+  "overall_verdict": "가격 공개라는 신뢰 신호가 있으나 좌석 협소를 즉시 희석하고 주차·웨이팅 실경험 정보가 누락돼 있어 완전한 진성 후기로 보기에는 근거가 부족합니다. 광고성 개입을 단정하기엔 증거가 약하나 방문 전 주차 여건과 웨이팅 시간을 별도 확인하는 것이 권장됩니다.",
+  "real_summary": "긍정·부정 신호가 혼재하는 중간 신뢰도 카페 후기입니다.",
+  "saved_cost": "0원",
+  "saved_time": "5분"
+}}
+
 [Output Format]{JSON_OUTPUT}"""
