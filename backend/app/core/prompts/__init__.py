@@ -10,5 +10,13 @@ PROMPTS = {
     "general": GENERAL_PROMPT,
 }
 
+# 프론트엔드 enum 값 → 내부 프롬프트 키 매핑
+_ALIASES = {
+    "naver": "naver_store",
+    "insta": "instagram",
+    "other": "general",
+}
+
 def get_prompt(platform: str) -> str:
-    return PROMPTS.get(platform, GENERAL_PROMPT)
+    resolved = _ALIASES.get(platform, platform)
+    return PROMPTS.get(resolved, GENERAL_PROMPT)

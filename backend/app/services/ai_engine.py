@@ -23,8 +23,28 @@ _EMOJI_RE = re.compile(
     flags=re.UNICODE,
 )
 _STANDALONE_JAMO_RE = re.compile(r"[ㄱ-ㅣ]")
+_URL_ONLY_RE = re.compile(r"^https?://\S*$")
+_REPEAT_RE = re.compile(r"(.{2,})\1{5,}")
+
+# 프롬프트 인젝션 탐지 패턴
+_INJECTION_RE = re.compile(
+    r"(무시\s*하고|이전\s*지시|지시를\s*무시|시스템\s*프롬프트|위의\s*모든"
+    r"|새로운\s*역할|역할극\s*시작|넌\s*이제|너는\s*이제|당신은\s*이제"
+    r"|api\s*키|비밀\s*키|ignore\s+previous|ignore\s+all|forget\s+previous"
+    r"|you\s+are\s+now|act\s+as|jailbreak|dan\s+mode|developer\s+mode"
+    r"|system\s*prompt|print\s+your\s+prompt|reveal\s+your|disregard"
+    r"|override\s+instructions|새\s*지시사항|탈옥)",
+    flags=re.IGNORECASE,
+)
+
+MIN_MEANINGFUL_CHARS = 20
 
 GIBBERISH_ERROR = "오타인 것 같네요! 분석할 수 있는 내용을 입력해 주세요."
+TOO_SHORT_ERROR = f"내용이 너무 짧아요! {MIN_MEANINGFUL_CHARS}자 이상 입력해 주세요."
+URL_ERROR = "URL이 아닌 리뷰 본문 텍스트를 붙여넣어 주세요."
+REPEAT_ERROR = "반복된 내용은 분석할 수 없어요! 실제 리뷰 텍스트를 입력해 주세요."
+NO_KOREAN_ERROR = "한국어 리뷰 텍스트를 입력해 주세요."
+INJECTION_ERROR = "리뷰 본문만 입력해 주세요."
 
 
 def _strip_emojis(text: str) -> str:
@@ -38,6 +58,30 @@ def _is_gibberish(text: str) -> bool:
     jamo_count = len(_STANDALONE_JAMO_RE.findall(stripped))
     # 독립 자음/모음 비율이 40% 초과면 키보드 난타로 판단
     return jamo_count / len(stripped) > 0.4
+
+
+def _is_too_short(text: str) -> bool:
+    return len(text.strip()) < MIN_MEANINGFUL_CHARS
+
+
+def _is_url_only(text: str) -> bool:
+    return bool(_URL_ONLY_RE.match(text.strip()))
+
+
+def _is_repetitive(text: str) -> bool:
+    return bool(_REPEAT_RE.search(text.strip()))
+
+
+def _has_no_korean(text: str) -> bool:
+    stripped = text.strip()
+    if not stripped:
+        return False
+    korean_count = len(re.findall(r"[가-힣]", stripped))
+    return korean_count / len(stripped) < 0.05
+
+
+def _is_injection(text: str) -> bool:
+    return bool(_INJECTION_RE.search(text))
 
 GEMINI_MODEL = "gemini-3-flash-preview"
 
@@ -93,8 +137,19 @@ class AIEngine:
 
     async def analyze_blog_content(self, content: str, platform: str = "general", model: str = "gemini", api_key: Optional[str] = None) -> Dict[str, Any]:
         content = _strip_emojis(content)
+        if _is_url_only(content):
+            return {"error": URL_ERROR}
+        if _is_injection(content):
+            logger.warning("프롬프트 인젝션 시도 감지 (앞 50자): %s", content[:50])
+            return {"error": INJECTION_ERROR}
         if _is_gibberish(content):
             return {"error": GIBBERISH_ERROR}
+        if _is_too_short(content):
+            return {"error": TOO_SHORT_ERROR}
+        if _is_repetitive(content):
+            return {"error": REPEAT_ERROR}
+        if _has_no_korean(content):
+            return {"error": NO_KOREAN_ERROR}
 
         # 사용자가 HuggingFace 선택 시 바로 전환
         if model == "huggingface":
