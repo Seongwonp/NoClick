@@ -1,0 +1,330 @@
+# No-Click 개발 변경 기록
+
+> 새 작업 완료 시 아래 형식으로 추가해주세요:
+> ```
+> ## YYYY-MM-DD | 이름 (역할)
+> ### 카테고리 (🤖 AI / 🎨 UI / 🗄️ DB / 🔒 보안 / 📄 문서 / 🔧 백엔드)
+> - **작업 제목**: 상세 설명
+> ```
+
+---
+
+## 2026-05-09 | 성원 (AI & Backend)
+
+### 🤖 AI 엔진
+- **프롬프트 중간 케이스 3개 추가** (`general`, `naver_store`, `instagram`)
+  - 광고/진성 2단계 → 광고/중간/진성 3단계로 확장 (쿠팡은 기존에 있었음)
+  - 효과: AI가 애매한 글에서 50점대 중간 판정을 안정적으로 내릴 수 있게 됨
+- **플랫폼 alias 버그 수정** (`prompts/__init__.py`)
+  - 기존: 프론트에서 `insta` 보내면 `GENERAL_PROMPT`가 실행되는 버그
+  - 수정: `naver→naver_store`, `insta→instagram`, `other→general` 자동 매핑
+
+### 🔒 보안
+- **입력 검증 5종 추가** (`ai_engine.py`)
+  - URL 전용 입력 차단, 20자 미만 차단, 반복 텍스트 차단, 한국어 없음 차단, 오타/이모지 차단
+- **프롬프트 인젝션 탐지 추가** (`ai_engine.py`)
+  - 한/영 인젝션 패턴 감지 ("무시하고", "ignore previous", "jailbreak" 등)
+  - 감지 시 서버 로그 기록
+
+### 🗄️ DB
+- **DB 모델 재설계** (`models/analysis.py`)
+  - 추가: `original_content`, `platform`, `model_used`, `hidden_intent`, `overall_verdict`, `session_id`
+  - 제거: 사용하지 않던 `url` 컬럼
+- **CRUD 레이어 구현** (`crud/__init__.py`)
+  - `save_analysis()`, `get_analysis()`, `get_history()` 구현
+- **API에 DB 저장 연결** (`api/analysis.py`) — 기존 TODO 완성
+- **스키마에 `session_id` 추가** (`schemas/analysis.py`)
+
+### 📄 문서
+- `README.md` 전면 업데이트
+- `AI_MASTER_CONTEXT.md` 최신화 (JSON 스펙, 플랫폼 표, 보안 섹션 추가)
+- `backend/DB_GUIDE.md` 신규 생성
+
+---
+
+## 2026-05-08 | 성원 (AI & Backend)
+
+### 🤖 AI 엔진
+- **프롬프트 품질 개선** — 번호 중복 수정, 섹션 순서 통일, `saved_cost` 계산 예시 추가
+- **오타/이모지 예외처리 추가** (`ai_engine.py`) — 난타 감지, 이모지 전처리
+
+---
+
+## 2026-05-06 | 성원 (AI & Backend)
+
+### 🤖 AI 엔진
+- **프롬프트 세부화** — `overall_verdict`, `hidden_intent` 필드 추가 및 반영
+
+---
+
+## 2026-05-05 | 성원 (AI & Backend)
+
+### 🤖 AI 엔진
+- **Gemini API 연결** — gemini-3-flash-preview, JSON 강제 출력 적용
+- **프롬프트 플랫폼별 분리** — `general`, `naver_store`, `coupang`, `instagram` 독립 파일
+- **HuggingFace(EXAONE 3.5) 연동** — 비교 모델 연결, Gemini 소진 시 자동 폴백
+
+### 🔧 백엔드
+- **FastAPI 기본 구조** — 라우터, 스키마, 모델, DB 레이어
+- **`POST /api/analysis/analyze`** 엔드포인트 구현
+- **다중 API 키 로테이션**, **SHA-256 캐시**, **exponential backoff** 구현
+
+---
+
+## 프론트 담당자 참고 — API 연동 가이드
+
+> Base URL: `http://localhost:8000`  
+> Swagger UI: `http://localhost:8000/docs`
+
+---
+
+### 📤 요청 (Request)
+
+**Endpoint**: `POST /api/analysis/analyze`
+
+```json
+{
+  "content": "분석할 리뷰 본문 텍스트 (필수, 20자 이상)",
+  "platform": "naver",
+  "model": "gemini",
+  "session_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `content` | string | ✅ | 분석할 리뷰 본문 (20자 이상) |
+| `platform` | string | ❌ | `naver` \| `insta` \| `coupang` \| `other` (기본값: `other`) |
+| `model` | string | ❌ | `gemini` \| `huggingface` (기본값: `gemini`) |
+| `session_id` | string | ❌ | localStorage UUID — 히스토리 추적용 |
+
+---
+
+### 📥 응답 (Response) — 성공
+
+```json
+{
+  "status": "success",
+  "data": {
+    "blog_title": "망원 핫플 극찬 후기",
+    "ad_probability": 89,
+    "trust_score": 11,
+    "highlighted_phrases": [
+      {
+        "text": "원고료를 받지 않은 솔직한 후기",
+        "type": "sponsor_denial"
+      },
+      {
+        "text": "역대급 맛집",
+        "type": "exaggeration"
+      },
+      {
+        "text": "주차가 좀 그렇긴 한데 그래도 괜찮아요",
+        "type": "negative_avoidance"
+      }
+    ],
+    "hidden_negatives": [
+      {
+        "inferred": "주차 사실상 불가 — 방문 시 주차비 및 이동 불편 감수 필요",
+        "confidence": 92,
+        "reasoning": "'대중교통으로 오시길 강추'만 반복하고 주차 정보 완전 누락"
+      },
+      {
+        "inferred": "음식 가격이 높을 가능성 — 가성비 기대 시 실망 위험",
+        "confidence": 78,
+        "reasoning": "메뉴 가격·메뉴판 사진 없이 극찬만 나열"
+      }
+    ],
+    "hidden_intent": "업체로부터 식사 제공 또는 원고료를 받고 작성한 바이럴 마케팅 글",
+    "overall_verdict": "광고성 개입 가능성이 높다고 판단되며 방문 전 메뉴 가격과 주차 조건을 별도 확인해야 합니다.",
+    "real_summary": "핵심 정보가 누락된 과장형 광고 의심 후기입니다.",
+    "saved_cost": "정밀 분석 필요",
+    "saved_time": "5분",
+    "original_content": "드디어 방문한 망원 핫플! 사장님이 너무 친절하시고..."
+  },
+  "error": null
+}
+```
+
+**응답 필드 설명**
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `status` | string | `"success"` \| `"error"` |
+| `data.blog_title` | string | AI가 추론한 글 제목 |
+| `data.ad_probability` | number (0~100) | 광고 확률 — **70 이상이면 광고 판정** |
+| `data.trust_score` | number (0~100) | 신뢰도 점수 |
+| `data.highlighted_phrases` | array | 광고성 문구 목록 |
+| `data.highlighted_phrases[].text` | string | 원문에서 추출한 문구 |
+| `data.highlighted_phrases[].type` | string | `exaggeration` \| `sponsor_denial` \| `negative_avoidance` |
+| `data.hidden_negatives` | array | 숨겨진 단점 목록 |
+| `data.hidden_negatives[].inferred` | string | 추론된 실제 단점 |
+| `data.hidden_negatives[].confidence` | number (0~100) | 추론 신뢰도 |
+| `data.hidden_negatives[].reasoning` | string | 추론 근거 (원문 인용) |
+| `data.hidden_intent` | string | 글의 숨겨진 의도 |
+| `data.overall_verdict` | string | 수사관 종합 판정 |
+| `data.real_summary` | string | 탈광고 한 줄 요약 |
+| `data.saved_cost` | string | 예상 절약 비용 (예: "15,000원") |
+| `data.saved_time` | string | 예상 절약 시간 (예: "5분") |
+| `data.original_content` | string | 입력한 원본 텍스트 |
+
+---
+
+### 📥 응답 (Response) — 실패
+
+```json
+{
+  "status": "error",
+  "data": null,
+  "error": "URL이 아닌 리뷰 본문 텍스트를 붙여넣어 주세요."
+}
+```
+
+**에러 메시지 종류**
+
+| 에러 메시지 | 원인 |
+|------------|------|
+| `"URL이 아닌 리뷰 본문 텍스트를 붙여넣어 주세요."` | URL만 입력함 |
+| `"리뷰 본문만 입력해 주세요."` | 프롬프트 인젝션 시도 감지 |
+| `"오타인 것 같네요! 분석할 수 있는 내용을 입력해 주세요."` | 키보드 난타/오타 |
+| `"내용이 너무 짧아요! 20자 이상 입력해 주세요."` | 20자 미만 입력 |
+| `"반복된 내용은 분석할 수 없어요! 실제 리뷰 텍스트를 입력해 주세요."` | 동일 패턴 반복 |
+| `"한국어 리뷰 텍스트를 입력해 주세요."` | 한국어 없는 텍스트 |
+| `"제공하신 API 키의 사용량이 초과되었거나 모델에 접근할 수 없습니다."` | 사용자 API 키 소진 |
+
+---
+
+### 💻 실제 연동 코드 예시 (TypeScript)
+
+```ts
+// 1. session_id 생성 (앱 최초 실행 시 1회)
+const sessionId = localStorage.getItem('nc_session')
+  ?? (() => {
+    const id = crypto.randomUUID();
+    localStorage.setItem('nc_session', id);
+    return id;
+  })();
+
+// 2. 분석 요청
+const res = await fetch('http://localhost:8000/api/analysis/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    content: reviewText,
+    platform: selectedPlatform,  // "naver" | "insta" | "coupang" | "other"
+    model: 'gemini',
+    session_id: sessionId,
+  }),
+});
+
+const result = await res.json();
+
+if (result.status === 'error') {
+  // 에러 처리
+  alert(result.error);
+  return;
+}
+
+// 3. 성공 시 result.data 사용
+console.log(result.data.ad_probability);   // 광고 확률
+console.log(result.data.hidden_negatives); // 숨겨진 단점 목록
+```
+
+---
+
+### 3. 히스토리 조회 API
+
+```
+GET /api/analysis/history?session_id={sessionId}&limit=20
+```
+
+**응답 예시**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "blog_title": "망원 핫플 극찬 후기",
+      "ad_probability": 89,
+      "trust_score": 11,
+      "real_summary": "핵심 정보가 누락된 과장형 광고 의심 후기입니다.",
+      "..."  : "..."
+    }
+  ],
+  "error": null
+}
+```
+
+| 파라미터 | 타입 | 설명 |
+|---------|------|------|
+| `session_id` | string | 필수. localStorage에서 가져온 UUID |
+| `limit` | number | 선택. 조회 개수 (기본 20, 최대 100) |
+
+---
+
+### 4. 단건 조회 API
+
+```
+GET /api/analysis/{id}
+```
+
+**응답 예시**
+```json
+{
+  "status": "success",
+  "data": {
+    "blog_title": "망원 핫플 극찬 후기",
+    "ad_probability": 89,
+    "..."  : "..."
+  },
+  "error": null
+}
+```
+
+---
+
+### ⚙️ DB 초기화 (최초 1회 실행)
+
+> **백엔드 처음 세팅하거나 DB 날아갔을 때** 아래 명령어 순서대로 실행
+
+```bash
+cd backend
+
+# 1. 의존성 설치
+poetry install
+
+# 2. DB 마이그레이션 실행 (테이블 생성)
+poetry run alembic upgrade head
+
+# 3. 서버 실행
+python main.py
+```
+
+**마이그레이션 관련 명령어 모음**
+
+```bash
+# 현재 마이그레이션 상태 확인
+poetry run alembic current
+
+# 마이그레이션 히스토리 확인
+poetry run alembic history
+
+# DB 초기화 (테이블 전부 삭제) — 주의!
+poetry run alembic downgrade base
+
+# 다시 생성
+poetry run alembic upgrade head
+```
+
+**DB 모델 변경 시 (새 컬럼 추가 등)**
+
+```bash
+# 1. models/analysis.py 수정 후
+# 2. 새 마이그레이션 파일 자동 생성
+poetry run alembic revision --autogenerate -m "변경 내용 설명"
+
+# 3. 마이그레이션 적용
+poetry run alembic upgrade head
+```
+
+> ⚠️ `noclick.db` 파일은 `.gitignore`에 있어서 커밋 안 됨. 각자 로컬에서 `alembic upgrade head` 실행해야 함!
