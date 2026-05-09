@@ -11,16 +11,15 @@ from alembic import context
 sys.path.append(os.path.join(os.getcwd()))
 
 # 2. 우리의 모델과 Base를 임포트
-from app.database import Base
+from app.database import Base, SQLALCHEMY_DATABASE_URL
 from app.models.analysis import Analysis  # 모델을 여기에 등록해야 인식함
-from app.core.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# 3. .env 또는 config에서 DB URL을 가져오도록 설정
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL if hasattr(settings, 'DATABASE_URL') else "sqlite:///./noclick.db")
+# 3. database.py와 동일한 절대경로 DB URL 사용 (상대경로 버그 방지)
+config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
