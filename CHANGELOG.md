@@ -107,7 +107,7 @@
 | `content` | string | ✅ | 분석할 리뷰 본문 (20자 이상) |
 | `platform` | string | ❌ | `naver` \| `insta` \| `coupang` \| `other` (기본값: `other`) |
 | `model` | string | ❌ | `gemini` \| `huggingface` (기본값: `gemini`) |
-| `session_id` | string | ❌ | localStorage UUID — 히스토리 추적용 |
+| `session_id` | string | ❌ | localStorage UUID — 히스토리 추적용 (없으면 히스토리 저장 안 됨) |
 
 ---
 
@@ -202,6 +202,28 @@
 | `"반복된 내용은 분석할 수 없어요! 실제 리뷰 텍스트를 입력해 주세요."` | 동일 패턴 반복 |
 | `"한국어 리뷰 텍스트를 입력해 주세요."` | 한국어 없는 텍스트 |
 | `"제공하신 API 키의 사용량이 초과되었거나 모델에 접근할 수 없습니다."` | 사용자 API 키 소진 |
+
+---
+
+---
+
+### 🔑 session_id 란?
+
+로그인 없이 사용자를 구분하기 위한 **익명 식별자**야.
+
+- 앱 최초 실행 시 `crypto.randomUUID()`로 UUID를 생성해 `localStorage`에 저장
+- 이후 모든 분석 요청에 `session_id`를 같이 보내면, 서버가 DB에 연결해서 저장
+- 히스토리 조회 시 이 `session_id`로 본인 기록만 필터링해서 반환
+- **브라우저 로컬스토리지 기반**이라 같은 브라우저에서만 히스토리가 유지됨 (다른 기기/브라우저에서는 새 세션)
+- `session_id` 없이 분석 요청해도 분석 자체는 되지만, **DB에 저장되지 않아 히스토리 조회 불가**
+
+```
+사용자 첫 방문 → UUID 생성 → localStorage 저장
+     ↓
+분석 요청마다 session_id 포함 → 서버가 DB에 session_id로 저장
+     ↓
+히스토리 탭 → GET /history?session_id=xxx → 내 기록만 반환
+```
 
 ---
 
