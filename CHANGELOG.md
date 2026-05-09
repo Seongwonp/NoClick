@@ -35,10 +35,21 @@
 - **API에 DB 저장 연결** (`api/analysis.py`) — 기존 TODO 완성
 - **스키마에 `session_id` 추가** (`schemas/analysis.py`)
 
+### 🔧 백엔드
+- **Rate Limiting 추가** (`main.py`) — IP당 분당 10회 제한, 초과 시 429 응답
+- **CORS 제한** (`main.py`) — `*` → 환경변수 `ALLOWED_ORIGINS` 기반 허용 도메인 관리
+- **React 빌드 정적 파일 서빙** (`main.py`) — `frontend/dist` 존재 시 FastAPI가 직접 서빙 (단일 서버 배포용)
+- **DB 절대경로 수정** (`database.py`) — `./noclick.db` 상대경로 버그 → `__file__` 기반 절대경로
+- **히스토리 조회 API** `GET /api/analysis/history` 구현
+- **단건 조회 API** `GET /api/analysis/{id}` 구현
+- **Alembic 마이그레이션** `001_init` — 최초 테이블 생성 스크립트
+- **의존성 추가** `pyproject.toml` — `slowapi`, `fastapi-staticfiles`
+
 ### 📄 문서
 - `README.md` 전면 업데이트
 - `AI_MASTER_CONTEXT.md` 최신화 (JSON 스펙, 플랫폼 표, 보안 섹션 추가)
 - `backend/DB_GUIDE.md` 신규 생성
+- `CHANGELOG.md` — 팀원 연동 가이드 전체 작성 (요청/응답 JSON, TypeScript 코드, DB 초기화)
 
 ---
 
@@ -247,8 +258,14 @@ GET /api/analysis/history?session_id={sessionId}&limit=20
       "blog_title": "망원 핫플 극찬 후기",
       "ad_probability": 89,
       "trust_score": 11,
+      "highlighted_phrases": [...],
+      "hidden_negatives": [...],
+      "hidden_intent": "바이럴 마케팅 글",
+      "overall_verdict": "광고성 개입 가능성이 높습니다.",
       "real_summary": "핵심 정보가 누락된 과장형 광고 의심 후기입니다.",
-      "..."  : "..."
+      "saved_cost": "15,000원",
+      "saved_time": "5분",
+      "original_content": "드디어 방문한 망원 핫플!..."
     }
   ],
   "error": null
@@ -259,6 +276,44 @@ GET /api/analysis/history?session_id={sessionId}&limit=20
 |---------|------|------|
 | `session_id` | string | 필수. localStorage에서 가져온 UUID |
 | `limit` | number | 선택. 조회 개수 (기본 20, 최대 100) |
+
+**히스토리 페이지 연동 코드 (TypeScript)**
+
+```ts
+// 히스토리 아이템 타입 정의
+interface AnalysisItem {
+  blog_title: string;
+  ad_probability: number;
+  trust_score: number;
+  highlighted_phrases: { text: string; type: string }[];
+  hidden_negatives: { inferred: string; confidence: number; reasoning: string }[];
+  hidden_intent: string;
+  overall_verdict: string;
+  real_summary: string;
+  saved_cost: string;
+  saved_time: string;
+  original_content: string;
+}
+
+// 히스토리 목록 불러오기
+async function fetchHistory(limit = 20): Promise<AnalysisItem[]> {
+  const sessionId = localStorage.getItem('nc_session');
+  if (!sessionId) return [];
+
+  const res = await fetch(
+    `http://localhost:8000/api/analysis/history?session_id=${sessionId}&limit=${limit}`
+  );
+  const result = await res.json();
+
+  if (result.status === 'error' || !Array.isArray(result.data)) return [];
+  return result.data as AnalysisItem[];
+}
+
+// 사용 예시 (React)
+useEffect(() => {
+  fetchHistory().then(setHistoryList);
+}, []);
+```
 
 ---
 
@@ -275,11 +330,75 @@ GET /api/analysis/{id}
   "data": {
     "blog_title": "망원 핫플 극찬 후기",
     "ad_probability": 89,
-    "..."  : "..."
+    "trust_score": 11,
+    "highlighted_phrases": [...],
+    "hidden_negatives": [...],
+    "hidden_intent": "바이럴 마케팅 글",
+    "overall_verdict": "광고성 개입 가능성이 높습니다.",
+    "real_summary": "핵심 정보가 누락된 과장형 광고 의심 후기입니다.",
+    "saved_cost": "15,000원",
+    "saved_time": "5분",
+    "original_content": "드디어 방문한 망원 핫플!..."
   },
   "error": null
 }
 ```
+
+> ℹ️ 현재 응답에 `id` 필드가 없어서 히스토리 목록에서 클릭 후 단건 조회는 불필요.  
+> 히스토리 목록 응답에 전체 데이터가 포함되므로 **클릭 시 `data[i]`를 그대로 상태에 넣으면 됨**.
+
+**단건 조회 코드 예시 (TypeScript)**
+
+```ts
+async function fetchAnalysisById(id: number): Promise<AnalysisItem | null> {
+  const res = await fetch(`http://localhost:8000/api/analysis/${id}`);
+  const result = await res.json();
+  if (result.status === 'error') return null;
+  return result.data as AnalysisItem;
+}
+```
+
+---
+
+---
+
+### ⚡ 서버 동시성 구조
+
+> **"여러 명이 동시에 분석 요청하면 괜찮나요?"** → 네, 이미 비동기로 처리됩니다.
+
+#### 현재 구조 (해커톤 / 데모 배포)
+
+```
+사용자 A 요청 ──┐
+사용자 B 요청 ──┤  FastAPI (async)  →  Gemini API (await)
+사용자 C 요청 ──┘  단일 uvicorn 프로세스, 비동기 처리
+```
+
+- `async def analyze_blog` + `await ai_engine` 로 **요청마다 블로킹 없이** 처리
+- `AI_CONCURRENCY_LIMIT: 8` — 동시 Gemini 호출 최대 8개로 API 쿼터 보호
+- **지금 구조로 심사 인원이 동시에 눌러도 문제없음**
+
+#### 서버 실행 명령어 (단일 서버 배포)
+
+```bash
+# 개발
+cd backend && python main.py
+
+# 배포 (포트 8000, 단일 프로세스)
+cd backend && poetry run uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+#### 나중에 실제 운영으로 전환한다면 (지금 건드릴 필요 없음)
+
+| 항목 | 지금 | 운영 전환 시 |
+|------|------|-------------|
+| DB | SQLite (파일) | PostgreSQL (멀티 프로세스 안전) |
+| 서버 | uvicorn 단일 | gunicorn + uvicorn 멀티워커 |
+| AI 큐 | asyncio 세마포어 | Celery + Redis |
+| `.env` | `DATABASE_URL=sqlite:///...` | `DATABASE_URL=postgresql://...` |
+
+> ⚠️ SQLite + 멀티워커(`-w 4`)는 write lock 충돌이 나므로 **지금 구조에서는 하지 말 것**.  
+> PostgreSQL로 전환하고 나서야 멀티워커가 의미 있음.
 
 ---
 

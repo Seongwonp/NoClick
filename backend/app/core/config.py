@@ -28,6 +28,12 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "sqlite:///./noclick.db"
 
+    # Rate Limiting
+    RATE_LIMIT: str = "10/minute"
+
+    # CORS (쉼표로 구분, 배포 시 실제 도메인으로 변경)
+    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:4173,http://localhost:3000"
+
     NAVER_CLIENT_ID: Optional[str] = None
     NAVER_CLIENT_SECRET: Optional[str] = None
 

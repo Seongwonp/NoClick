@@ -1,25 +1,30 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from sqlalchemy.orm import Session
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.schemas.analysis import AnalysisRequest, AnalysisResult, AnalysisResponse
 from app.services.ai_engine import ai_engine
 from app.crud import save_analysis, get_analysis, get_history
 from app.database import get_db
+from app.core.config import settings
 from typing import Any, List
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/analyze", response_model=AnalysisResult)
-async def analyze_blog(request: AnalysisRequest, db: Session = Depends(get_db)) -> Any:
+@limiter.limit(settings.RATE_LIMIT)
+async def analyze_blog(request: Request, body: AnalysisRequest, db: Session = Depends(get_db)) -> Any:
     """
     블로그/리뷰 본문 텍스트를 분석하여 광고 패턴 및 숨겨진 단점을 추론합니다.
     """
     try:
         analysis_data = await ai_engine.analyze_blog_content(
-            content=request.content,
-            platform=request.platform,
-            model=request.model,
-            api_key=request.api_key,
+            content=body.content,
+            platform=body.platform,
+            model=body.model,
+            api_key=body.api_key,
         )
 
         if "error" in analysis_data:
@@ -30,15 +35,15 @@ async def analyze_blog(request: AnalysisRequest, db: Session = Depends(get_db)) 
         response_data = AnalysisResponse(
             **analysis_data,
             blog_title=blog_title,
-            original_content=request.content,
+            original_content=body.content,
         )
 
         save_analysis(
             db=db,
             response=response_data,
-            platform=request.platform,
-            model_used=request.model,
-            session_id=request.session_id,
+            platform=body.platform,
+            model_used=body.model,
+            session_id=body.session_id,
         )
 
         return AnalysisResult(status="success", data=response_data)
