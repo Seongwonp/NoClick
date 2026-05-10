@@ -1,37 +1,122 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import type { AnalysisResult } from '../types/analysis';
-import { mockAnalysisService } from '../services/mockApi';
+import type { AnalysisResponse } from '../types/analysis';
+import { apiService } from '../services/api';
 import MockPlatformViewer from '../components/MockPlatformViewer';
 
 const Result: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const platform = location.state?.platform || 'other';
-  const inputText = location.state?.text || '';
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(true);
+  const queryParams = new URLSearchParams(location.search);
+  
+  const idFromUrl = queryParams.get('id');
+  const idFromState = location.state?.id;
+  const resultFromState = location.state?.result as AnalysisResponse;
+  const analysisId = idFromUrl || idFromState;
+  
+  const [result, setResult] = useState<AnalysisResponse | null>(resultFromState || null);
+  const [isAnalyzing, setIsAnalyzing] = useState(!resultFromState);
+  const hasLoaded = React.useRef(false);
+
+  const platform = result?.platform || location.state?.platform || 'other';
+  const inputText = result?.original_content || location.state?.text || '';
+
+  // 플랫폼별 테마 색상 설정
+  const getThemeConfig = () => {
+    switch(platform) {
+      case 'naver':
+        return { 
+          bg: 'bg-[#059669]', // emerald-600
+          text: 'text-[#059669]', 
+          border: 'border-[#059669]/20', 
+          hover: 'hover:bg-[#047857]', // emerald-700
+          light: 'bg-[#059669]/5',
+          btnBg: 'bg-[#059669]',
+          btnHover: 'hover:bg-[#047857]',
+          badgeBg: 'bg-[#059669]'
+        };
+      case 'coupang':
+        return { 
+          bg: 'bg-[#0076f5]', 
+          text: 'text-[#0076f5]', 
+          border: 'border-[#0076f5]/20', 
+          hover: 'hover:bg-[#0066dc]',
+          light: 'bg-[#0076f5]/5',
+          btnBg: 'bg-[#cb1400]', // 쿠팡 요청: 빨간색
+          btnHover: 'hover:bg-[#b01200]',
+          badgeBg: 'bg-[#cb1400]' // 쿠팡 요청: 빨간색
+        };
+      case 'insta':
+        return { 
+          bg: 'bg-[#262626]', 
+          text: 'text-[#262626]', 
+          border: 'border-[#262626]/20', 
+          hover: 'hover:bg-[#000000]',
+          light: 'bg-[#262626]/5',
+          btnBg: 'bg-[#262626]',
+          btnHover: 'hover:bg-[#000000]',
+          badgeBg: 'bg-[#262626]'
+        };
+      default: // other
+        return { 
+          bg: 'bg-[#333333]', 
+          text: 'text-[#333333]', 
+          border: 'border-[#333333]/20', 
+          hover: 'hover:bg-[#111111]',
+          light: 'bg-[#333333]/5',
+          btnBg: 'bg-[#333333]',
+          btnHover: 'hover:bg-[#111111]',
+          badgeBg: 'bg-[#333333]'
+        };
+    }
+  };
+
+  const theme = getThemeConfig();
+
+  // 애니메이션 완료 콜백 (useCallback으로 최적화)
+  const handleAnalysisComplete = React.useCallback(() => {
+    setIsAnalyzing(false);
+  }, []);
 
   // 초기 데이터 로딩 처리
   useEffect(() => {
-    if (!inputText) {
-      navigate('/');
-      return;
-    }
-
-    const startAnalysis = async () => {
+    const loadData = async () => {
       try {
-        const data = await mockAnalysisService.analyze({ text: inputText });
-        setResult(data);
+        if (hasLoaded.current) return;
+        
+        // 이미 결과 데이터가 전달된 경우 (Analysis -> Result 이동 시)
+        if (resultFromState) {
+          hasLoaded.current = true;
+          setResult(resultFromState);
+          setIsAnalyzing(false);
+          return;
+        }
+
+        if (analysisId) {
+          // ID가 있으면 기존 결과 조회 (중복 생성 안됨)
+          hasLoaded.current = true;
+          const data = await apiService.getById(Number(analysisId));
+          setResult(data);
+          setIsAnalyzing(false);
+        } else if (inputText && !idFromUrl && !idFromState) {
+          // ID가 아예 없고 텍스트만 처음 들어온 경우에만 분석 실행
+          hasLoaded.current = true;
+          const data = await apiService.analyze(inputText, platform);
+          setResult(data);
+          setIsAnalyzing(false);
+        } else {
+          // ID도 없고 텍스트도 없으면 홈으로
+          navigate('/');
+        }
       } catch (error) {
-        console.error('Analysis failed:', error);
-        alert('분석 중 오류가 발생했습니다.');
+        console.error('Data loading failed:', error);
+        alert('데이터를 불러오는 중 오류가 발생했습니다: ' + (error instanceof Error ? error.message : String(error)));
         navigate('/');
       }
     };
 
-    startAnalysis();
-  }, [inputText, navigate]);
+    loadData();
+  }, [analysisId, inputText, platform, navigate, resultFromState, idFromUrl, idFromState]);
 
   return (
     <div className="flex-grow pt-32 pb-12 px-6 max-w-7xl mx-auto w-full transition-all duration-1000">
@@ -48,11 +133,11 @@ const Result: React.FC = () => {
           
           <div className="flex flex-1 items-end">
             <div className="bg-white px-6 py-2.5 rounded-t-xl border-t border-x border-gray-200 flex items-center gap-2 min-w-[200px] shadow-[0_-2px_5px_rgba(0,0,0,0.02)] relative z-10">
-              <span className="material-symbols-outlined text-[18px] text-primary">
-                {platform === 'naver' ? 'shopping_bag' : platform === 'insta' ? 'photo_camera' : 'shopping_cart'}
+              <span className={`material-symbols-outlined text-[18px] ${theme.text}`}>
+                {platform === 'naver' ? 'shopping_bag' : platform === 'insta' ? 'photo_camera' : platform === 'coupang' ? 'shopping_cart' : 'article'}
               </span>
               <span className="text-sm font-bold text-gray-700 truncate">
-                {platform === 'naver' ? '네이버 쇼핑' : platform === 'insta' ? 'Instagram' : '쿠팡 쇼핑'} - 분석 중
+                {platform === 'naver' ? '네이버 쇼핑' : platform === 'insta' ? 'Instagram' : platform === 'coupang' ? '쿠팡 쇼핑' : '일반 리뷰'} - {result ? result.blog_title : '분석 중'}
               </span>
               <span className="material-symbols-outlined text-[14px] text-gray-400 ml-auto">close</span>
             </div>
@@ -68,7 +153,7 @@ const Result: React.FC = () => {
           </div>
           <div className="flex-grow bg-[#f1f3f4] rounded-full px-4 py-1.5 flex items-center gap-2 text-xs text-gray-500 border border-gray-200/50">
             <span className="material-symbols-outlined text-[14px] text-gray-400">lock</span>
-            <span className="truncate">https://{platform}.com/analysis/target_review</span>
+            <span className="truncate">https://{platform}.com/analysis/{result ? encodeURIComponent(result.blog_title) : 'target_review'}</span>
           </div>
           <div className="flex items-center gap-3 text-gray-400">
             <span className="material-symbols-outlined text-[20px]">more_vert</span>
@@ -82,9 +167,10 @@ const Result: React.FC = () => {
             {result ? (
               <MockPlatformViewer 
                 platform={platform} 
-                originalText={result.original_text} 
+                originalText={result.original_content} 
                 highlightedPhrases={result.highlighted_phrases}
-                onComplete={() => setIsAnalyzing(false)}
+                onComplete={handleAnalysisComplete}
+                trustScore={result.trust_score}
               />
             ) : (
               <div className="w-full h-full bg-gray-50 animate-pulse flex items-center justify-center">
@@ -98,8 +184,8 @@ const Result: React.FC = () => {
             {isAnalyzing || !result ? (
               /* Phase 1: Browsing Instruction */
               <div className="flex-grow flex flex-col items-center justify-center p-8 text-center bg-white">
-                <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center mb-6 animate-bounce">
-                  <span className="material-symbols-outlined text-primary text-3xl">location_searching</span>
+                <div className={`w-16 h-16 ${theme.light} rounded-2xl flex items-center justify-center mb-6 animate-bounce`}>
+                  <span className={`material-symbols-outlined ${theme.text} text-3xl`}>location_searching</span>
                 </div>
                 <h3 className="text-lg font-bold text-on-surface mb-2">리뷰 데이터 추적 중</h3>
                 <p className="text-xs text-outline leading-relaxed max-w-[240px] break-keep">
@@ -107,7 +193,7 @@ const Result: React.FC = () => {
                 </p>
                 <div className="mt-8 flex gap-1.5">
                   {[0, 1, 2].map(i => (
-                    <div key={i} className="w-1 h-1 rounded-full bg-primary/40 animate-pulse" style={{ animationDelay: `${i * 200}ms` }}></div>
+                    <div key={i} className={`w-1 h-1 rounded-full ${theme.bg} opacity-40 animate-pulse`} style={{ animationDelay: `${i * 200}ms` }}></div>
                   ))}
                 </div>
               </div>
@@ -116,7 +202,7 @@ const Result: React.FC = () => {
               <div className="p-6 sm:p-8 flex-grow overflow-y-auto custom-scrollbar animate-fade-in flex flex-col gap-8">
                 {/* 1. Final Result Card */}
                 <div className={`rounded-[28px] p-6 sm:p-8 relative overflow-hidden border shadow-xl flex-shrink-0 ${
-                  result.trust_score < 40 ? 'bg-tertiary/5 border-tertiary/20 shadow-tertiary/5' : 'bg-primary/5 border-primary/20 shadow-primary/5'
+                  result.trust_score < 40 ? 'bg-tertiary/5 border-tertiary/20 shadow-tertiary/5' : `${theme.light} ${theme.border} shadow-black/5`
                 }`}>
                   <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none scale-150">
                     <span className="material-symbols-outlined text-[100px]">analytics</span>
@@ -125,7 +211,7 @@ const Result: React.FC = () => {
                   <div className="relative z-10">
                     <div className="flex items-center mb-6">
                       <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase flex items-center gap-2 ${
-                        result.trust_score < 40 ? 'bg-tertiary text-white' : 'bg-primary text-white'
+                        result.trust_score < 40 ? 'bg-tertiary text-white' : `${theme.badgeBg} text-white`
                       }`}>
                         <span className="material-symbols-outlined text-[12px]">verified</span>
                         판독 완료: {result.trust_score < 40 ? '의심' : '신뢰'}
@@ -135,7 +221,7 @@ const Result: React.FC = () => {
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-grow min-w-0">
                         <h2 className="text-[26px] sm:text-[30px] font-black leading-tight text-on-surface break-keep">
-                          리뷰 X-ray <br/><span className={result.trust_score < 40 ? 'text-tertiary' : 'text-primary'}>최종 판독</span>
+                          리뷰 X-ray <br/><span className={result.trust_score < 40 ? 'text-tertiary' : theme.text}>최종 판독</span>
                         </h2>
                       </div>
 
@@ -143,7 +229,7 @@ const Result: React.FC = () => {
                         <svg className="w-24 h-24 sm:w-28 sm:h-24">
                           <circle className="text-gray-100 stroke-current" cx="48" cy="48" fill="transparent" r="40" strokeWidth="8"></circle>
                           <circle 
-                            className={`${result.trust_score < 40 ? 'text-tertiary' : 'text-primary'} stroke-current transition-all duration-1000`} 
+                            className={`${result.trust_score < 40 ? 'text-tertiary' : theme.text} stroke-current transition-all duration-1000`} 
                             cx="48" cy="48" fill="transparent" r="40" strokeLinecap="round" strokeWidth="8" 
                             style={{ 
                               strokeDasharray: 251, 
@@ -154,7 +240,7 @@ const Result: React.FC = () => {
                           ></circle>
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className={`text-2xl font-black ${result.trust_score < 40 ? 'text-tertiary' : 'text-primary'}`}>{result.trust_score}%</span>
+                          <span className={`text-2xl font-black ${result.trust_score < 40 ? 'text-tertiary' : theme.text}`}>{result.trust_score}%</span>
                         </div>
                       </div>
                     </div>
@@ -177,10 +263,10 @@ const Result: React.FC = () => {
                   {/* AI Summary */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 px-1">
-                      <span className="material-symbols-outlined text-primary text-[18px]">auto_awesome</span>
+                      <span className={`material-symbols-outlined ${theme.text} text-[18px]`}>auto_awesome</span>
                       <h3 className="font-bold text-[16px] text-on-surface">AI 팩트 체크 요약</h3>
                     </div>
-                    <div className="bg-primary/5 rounded-2xl p-5 border border-primary/10 relative">
+                    <div className={`${theme.light} rounded-2xl p-5 border ${theme.border} relative`}>
                       <div className="leading-relaxed text-[14px] text-on-surface-variant font-medium break-keep">
                         {result.real_summary}
                       </div>
@@ -241,7 +327,7 @@ const Result: React.FC = () => {
                 className={`px-6 py-2.5 rounded-xl font-bold text-[12px] transition-all flex items-center gap-2 shadow-lg active:scale-95 ${
                   isAnalyzing 
                   ? 'bg-gray-50 text-gray-300 cursor-not-allowed' 
-                  : 'bg-primary text-white hover:bg-emerald-700 shadow-primary/10'
+                  : `${theme.btnBg} text-white ${theme.btnHover} shadow-black/5`
                 }`}
               >
                 <span className="material-symbols-outlined text-[16px]">

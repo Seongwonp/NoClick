@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { mockAnalysisService } from '../services/mockApi';
+import { apiService } from '../services/api';
 
 const Analysis: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [progress, setProgress] = useState(0);
   const inputText = location.state?.text || '';
+  const platform = location.state?.platform || 'general';
+  const hasStarted = React.useRef(false);
 
   useEffect(() => {
     // 텍스트가 없으면 홈으로 리다이렉트 (직접 접근 방지)
@@ -15,12 +17,15 @@ const Analysis: React.FC = () => {
       return;
     }
 
+    if (hasStarted.current) return;
+    hasStarted.current = true;
+
     // 분석 프로세스 시작
     const startAnalysis = async () => {
       try {
-        const result = await mockAnalysisService.analyze({ text: inputText });
+        const result = await apiService.analyze(inputText, platform);
         // 분석 완료 후 결과 페이지로 이동 (ID 전달)
-        navigate(`/result?id=${result.id}`);
+        navigate(`/result?id=${result.id}`, { state: { id: result.id, text: inputText, platform } });
       } catch (error) {
         console.error('Analysis failed:', error);
         alert('분석 중 오류가 발생했습니다.');

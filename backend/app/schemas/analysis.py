@@ -18,6 +18,8 @@ class AnalysisRequest(BaseModel):
     api_key: Optional[str] = Field(None, exclude=True, description="사용자 Gemini API 키 (선택사항, 사용 후 즉시 폐기)")
 
 class AnalysisResponse(BaseModel):
+    id: Optional[int] = None
+    platform: str = "general"
     original_content: str
     ad_probability: int = Field(..., ge=0, le=100)
     trust_score: int = Field(..., ge=0, le=100)
@@ -29,6 +31,7 @@ class AnalysisResponse(BaseModel):
     saved_cost: str
     saved_time: str
     blog_title: str
+    created_at: Optional[str] = None
 
 class AnalysisResult(BaseModel):
     status: str

@@ -36,15 +36,19 @@ async def analyze_blog(request: Request, body: AnalysisRequest, db: Session = De
             **analysis_data,
             blog_title=blog_title,
             original_content=body.content,
+            platform=body.platform,
         )
 
-        save_analysis(
+        db_record = save_analysis(
             db=db,
             response=response_data,
             platform=body.platform,
             model_used=body.model,
             session_id=body.session_id,
         )
+        
+        response_data.id = db_record.id
+        response_data.created_at = db_record.created_at.isoformat() if db_record.created_at else None
 
         return AnalysisResult(status="success", data=response_data)
     except Exception as e:
@@ -64,6 +68,7 @@ def get_analysis_history(
         records = get_history(db=db, session_id=session_id, limit=limit)
         history = [
             AnalysisResponse(
+                id=r.id,
                 blog_title=r.blog_title or "제목 없음",
                 ad_probability=r.ad_probability,
                 trust_score=r.trust_score,
@@ -75,6 +80,8 @@ def get_analysis_history(
                 saved_cost=r.saved_cost or "",
                 saved_time=r.saved_time or "",
                 original_content=r.original_content or "",
+                platform=r.platform or "general",
+                created_at=r.created_at.isoformat() if r.created_at else None,
             )
             for r in records
         ]
@@ -97,6 +104,7 @@ def get_analysis_by_id(
             return AnalysisResult(status="error", error="해당 분석 결과를 찾을 수 없습니다.")
 
         response_data = AnalysisResponse(
+            id=record.id,
             blog_title=record.blog_title or "제목 없음",
             ad_probability=record.ad_probability,
             trust_score=record.trust_score,
@@ -108,6 +116,8 @@ def get_analysis_by_id(
             saved_cost=record.saved_cost or "",
             saved_time=record.saved_time or "",
             original_content=record.original_content or "",
+            platform=record.platform or "general",
+            created_at=record.created_at.isoformat() if record.created_at else None,
         )
         return AnalysisResult(status="success", data=response_data)
     except Exception as e:

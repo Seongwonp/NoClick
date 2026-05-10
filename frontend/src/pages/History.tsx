@@ -1,16 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { AnalysisResult } from '../types/analysis';
-import { mockAnalysisService } from '../services/mockApi';
+import type { AnalysisResponse } from '../types/analysis';
+import { apiService } from '../services/api';
 
 const History: React.FC = () => {
   const navigate = useNavigate();
-  const [history, setHistory] = useState<AnalysisResult[]>([]);
+  const [history, setHistory] = useState<AnalysisResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // 마운트 시 히스토리 로드
-    setHistory(mockAnalysisService.getHistory());
+    const loadHistory = async () => {
+      try {
+        const data = await apiService.getHistory();
+        setHistory(data);
+      } catch (error) {
+        console.error('Failed to load history:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadHistory();
   }, []);
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <div className="flex-grow pt-32 pb-20 px-6">
@@ -30,19 +47,24 @@ const History: React.FC = () => {
           </button>
         </header>
 
-        {history.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-20">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-on-surface-variant font-medium">히스토리를 불러오는 중...</p>
+          </div>
+        ) : history.length > 0 ? (
           <div className="space-y-4">
             {history.map((item) => (
               <div 
                 key={item.id}
-                onClick={() => navigate(`/result?id=${item.id}`)}
+                onClick={() => navigate(`/result`, { state: { text: item.original_content, id: item.id } })}
                 className="bg-white p-6 rounded-2xl border border-gray-100 custom-shadow hover:translate-y-[-2px] transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1 overflow-hidden mr-4">
-                    <p className="text-sm text-primary font-semibold mb-1">{item.url || '직접 입력'}</p>
+                    <p className="text-sm text-primary font-semibold mb-1">{item.blog_title}</p>
                     <h3 className="font-semibold text-lg text-on-surface truncate group-hover:text-primary transition-colors">
-                      {item.original_text}
+                      {item.original_content}
                     </h3>
                   </div>
                   <div className="text-right shrink-0">
@@ -52,7 +74,7 @@ const History: React.FC = () => {
                         {item.trust_score}%
                       </span>
                     </div>
-                    <p className="text-xs text-on-surface-variant">{item.created_at}</p>
+                    <p className="text-xs text-on-surface-variant">{formatDate(item.created_at)}</p>
                   </div>
                 </div>
                 <div className="flex gap-4 pt-4 border-t border-gray-50">

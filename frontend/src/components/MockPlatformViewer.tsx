@@ -1,45 +1,64 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { HighlightedPhrase } from '../types/analysis';
-
 interface Props {
   platform: string;
   originalText: string;
   highlightedPhrases: HighlightedPhrase[];
   onComplete: () => void;
+  trustScore: number;
 }
 
 const HighlightedText: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: boolean }> = ({ text, phrases, active }) => {
-  let result: React.ReactNode[] = [text];
 
-  phrases.forEach((phrase, idx) => {
-    const newResult: React.ReactNode[] = [];
-    result.forEach((node) => {
-      if (typeof node === 'string') {
-        const parts = node.split(phrase.text);
-        parts.forEach((part, i) => {
-          newResult.push(part);
-          if (i < parts.length - 1) {
-            newResult.push(
-              <mark
-                key={`${idx}-${i}`}
-                className={`transition-all duration-[1500ms] ease-in-out px-1 rounded ${
-                  active ? 'bg-yellow-300 text-black shadow-[0_0_8px_rgba(253,224,71,0.8)]' : 'bg-transparent text-inherit'
-                }`}
-                title={phrase.reason}
-              >
-                {phrase.text}
-              </mark>
-            );
-          }
+  if (!phrases || phrases.length === 0) return <span className="whitespace-pre-wrap">{text}</span>;
+
+  // 긴 문구부터 매칭되도록 정렬
+  const sortedPhrases = [...phrases].sort((a, b) => b.text.length - a.text.length);
+  const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  
+  // 패턴 생성 (유연한 공백 처리)
+  const pattern = sortedPhrases
+    .map(p => escapeRegExp(p.text.trim()).replace(/\s+/g, '[\\s\\n\\r]+'))
+    .filter(p => p.length > 0)
+    .join('|');
+    
+  if (!pattern) return <span className="whitespace-pre-wrap">{text}</span>;
+
+  const regex = new RegExp(`(${pattern})`, 'gi');
+  const parts = text.split(regex);
+
+  return (
+    <span className="whitespace-pre-wrap relative z-0">
+      {parts.map((part, i) => {
+        if (!part) return null;
+
+        const matchingPhrase = sortedPhrases.find(p => {
+          const pRegex = new RegExp(escapeRegExp(p.text.trim()).replace(/\s+/g, '[\\s\\n\\r]+'), 'gi');
+          return pRegex.test(part);
         });
-      } else {
-        newResult.push(node);
-      }
-    });
-    result = newResult;
-  });
 
-  return <span className="whitespace-pre-wrap">{result}</span>;
+        if (matchingPhrase) {
+          return (
+            <span
+              key={`${i}-${part.substring(0, 5)}`}
+              className={`inline transition-all duration-700 ${active ? 'font-semibold text-black' : ''}`}
+              style={{
+                backgroundImage: 'linear-gradient(to right, rgba(254, 240, 138, 0.5), rgba(254, 240, 138, 0.5))',
+                backgroundSize: active ? '100% 85%' : '0% 85%',
+                backgroundPosition: '0 90%',
+                backgroundRepeat: 'no-repeat',
+                transition: 'background-size 1.2s cubic-bezier(0.65, 0, 0.35, 1), color 0.5s',
+                padding: '0 1px'
+              }}
+            >
+              {part}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </span>
+  );
 };
 
 // ── Naver Mock ──
@@ -64,7 +83,7 @@ const MockNaver: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: 
         <div className="flex-1">
           <div className="text-gray-400 text-sm mb-2">무선 이어폰 / 블루투스 5.3</div>
           <h2 className="text-2xl font-bold mb-4">프리미엄 노이즈 캔슬링 이어폰 에어핏 프로</h2>
-          <div className="text-3xl font-black text-emerald-600 mb-6">189,000원</div>
+          <div className="text-3xl font-black text-[#059669] mb-6">189,000원</div>
           <div className="space-y-3">
             <div className="flex gap-4"><span className="w-16 text-gray-400 text-xs">구매혜택</span><span className="text-xs">적립금 1,890원</span></div>
             <div className="flex gap-4"><span className="w-16 text-gray-400 text-xs">배송안내</span><span className="text-xs font-bold">내일(수) 도착 보장</span></div>
@@ -90,41 +109,37 @@ const MockNaver: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: 
           </div>
 
           <div 
-            ref={reviewRef} 
-            className={`py-8 px-6 rounded-2xl border transition-all duration-700 relative overflow-hidden ${active ? 'bg-white border-primary shadow-lg scale-[1.02]' : 'bg-gray-50 border-transparent'}`}
+            ref={reviewRef}
+            className={`py-8 px-6 rounded-2xl transition-all duration-700 relative overflow-hidden ${active ? 'bg-emerald-50/50 ring-1 ring-emerald-100' : 'bg-transparent'}`}
           >
             {!active && (
               <div 
                 ref={targetRef}
                 className="absolute inset-0 z-10 cursor-pointer flex items-center justify-center group"
               >
-                <div className="bg-primary text-white px-4 py-2 rounded-full font-bold text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">이 리뷰 분석하기</div>
+                <div className="bg-[#03c75a] text-white px-5 py-2.5 rounded-full font-bold text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">리뷰 본문 분석하기</div>
               </div>
             )}
-            <div className="flex gap-5">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center font-bold text-emerald-600">구매</div>
-              <div className="flex-1">
-                <div className="font-bold text-[13px] text-gray-800 mb-1">구매자123</div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[#ffbb00] text-[14px]">★★★★★</span>
-                  <span className="text-gray-300 text-[12px]">|</span>
-                  <span className="text-gray-400 text-[12px]">2024.05.01</span>
-                </div>
-                <div className="text-[14px] text-gray-800 leading-[1.8] break-keep">
-                  <HighlightedText text={text} phrases={phrases} active={active} />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase">NP</div>
+                <div>
+                  <div className="font-bold text-[14px]">블로그마스터_현</div>
+                  <div className="text-[11px] text-gray-400 uppercase tracking-tighter font-mono">Verified Purchase · 2024.05.09</div>
                 </div>
               </div>
+              <div className="flex text-[#ffb800] text-sm tracking-tight">★★★★★</div>
+            </div>
+            <div className="text-[15px] leading-[1.8] text-[#333] break-keep">
+              <HighlightedText text={text} phrases={phrases} active={active} />
             </div>
           </div>
 
-          <div className="py-6 border-b border-gray-50 flex gap-5 opacity-40">
-            <div className="w-10 h-10 rounded-full bg-gray-100"></div>
-            <div className="flex-1">
-              <div className="font-bold text-[13px] mb-1">apple_fan</div>
-              <div className="text-[13px] text-gray-500">가성비 최고입니다. 디자인도 깔끔하고 통화 품질도 나쁘지 않아요.</div>
-            </div>
+          <div className="py-6 opacity-20">
+            <div className="font-bold text-[13px] mb-1">trend_setter</div>
+            <div className="text-[13px] text-gray-500 italic">"색상이 고민됐는데 화이트로 사길 잘했네요. 예뻐요!"</div>
           </div>
-          <div className="h-64"></div>
+          <div className="h-40"></div>
         </div>
       </div>
     </div>
@@ -134,51 +149,46 @@ const MockNaver: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: 
 // ── Coupang Mock ──
 const MockCoupang: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: boolean; reviewRef: any; targetRef: any }> = ({ text, phrases, active, reviewRef, targetRef }) => {
   return (
-    <div className="bg-[#f7f8fa] font-['Noto_Sans_KR']">
+    <div className="bg-white text-[#111] font-sans min-h-full">
       {/* Coupang Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-6 sticky top-0 z-20">
-        <div className="text-[#0076f5] font-black text-2xl tracking-tighter italic">COUPANG</div>
-        <div className="flex-grow bg-[#f0f0f0] rounded-sm px-4 py-2 text-xs text-gray-400">찾고 싶은 상품을 검색하세요</div>
-        <div className="flex gap-4 text-gray-400">
-          <span className="material-symbols-outlined text-[20px]">person</span>
-          <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
+      <div className="h-14 border-b border-gray-100 px-6 flex items-center justify-between sticky top-0 bg-white z-20">
+        <div className="text-xl font-black text-[#0076f5] italic tracking-tighter">COUPANG</div>
+        <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
+          <span className="material-symbols-outlined text-[18px] text-gray-400">search</span>
+          <div className="w-40 h-4 bg-gray-200 rounded"></div>
         </div>
       </div>
 
-      <div className="p-8 max-w-4xl mx-auto">
-        {/* Product Summary */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8 flex gap-8">
-          <div className="w-40 h-40 bg-gray-50 rounded"></div>
+      <div className="p-6">
+        <div className="flex gap-6 mb-8 border-b border-gray-100 pb-8">
+          <div className="w-32 h-32 bg-gray-100 rounded-lg shrink-0"></div>
           <div>
             <div className="text-[#0076f5] text-xs font-bold mb-1">로켓배송</div>
             <h2 className="text-lg font-bold mb-4">애플 정품 2024 에어팟 프로 2세대 USB-C (MagSafe 케이스 모델)</h2>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-[#ffb800] text-sm">★★★★★</span>
-              <span className="text-[#0076f5] text-xs font-bold">78,241개 상품평</span>
+              <span className="text-[#03c75a] text-xs font-bold">78,241개 상품평</span>
             </div>
             <div className="text-2xl font-black text-[#cb1400]">299,000원</div>
           </div>
         </div>
 
-        {/* Review Section */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 min-h-[800px]">
-          <h3 className="text-lg font-bold mb-6 pb-4 border-b">상품평</h3>
-          
-          <div className="py-6 border-b border-gray-50 opacity-40">
-            <div className="font-bold text-[13px] mb-2">쿠팡매니아</div>
-            <div className="text-[13px] text-gray-600 italic mb-2">"배송 진짜 빠르네요. 어제 밤에 시켰는데 오늘 새벽에 왔어요."</div>
+        <div className="space-y-8">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base">상품평 (78,241)</h3>
+            <span className="text-[#0076f5] text-sm font-bold">필터 ▾</span>
           </div>
 
           <div 
-            ref={reviewRef} 
-            className={`my-6 p-6 rounded-xl border-2 transition-all duration-700 relative overflow-hidden ${active ? 'bg-white border-[#0076f5] shadow-xl' : 'bg-gray-50 border-transparent'}`}
+            ref={reviewRef}
+            className={`p-6 rounded-2xl border transition-all duration-700 relative overflow-hidden ${active ? 'bg-blue-50/30 border-blue-100' : 'border-gray-50 bg-transparent'}`}
           >
             {!active && (
               <div 
                 ref={targetRef}
                 className="absolute inset-0 z-10 cursor-pointer flex items-center justify-center group"
               >
-                <div className="bg-[#0076f5] text-white px-6 py-3 rounded-full font-black text-sm opacity-0 group-hover:opacity-100 transition-opacity shadow-xl">클릭하여 분석 시작</div>
+                <div className="bg-[#0076f5] text-white px-4 py-2 rounded-full font-bold text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">상품평 분석하기</div>
               </div>
             )}
             <div className="flex items-center gap-2 mb-3">
@@ -208,7 +218,7 @@ const MockCoupang: React.FC<{ text: string; phrases: HighlightedPhrase[]; active
 // ── Insta Mock ──
 const MockInsta: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: boolean; reviewRef: any; targetRef: any }> = ({ text, phrases, active, reviewRef, targetRef }) => {
   return (
-    <div className="bg-black text-white font-[-apple-system] min-h-screen">
+    <div className="bg-black text-white font-[-apple-system] min-h-full">
       {/* Insta Header */}
       <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-black z-20">
         <div className="text-xl font-black italic tracking-tighter">Instagram</div>
@@ -218,18 +228,18 @@ const MockInsta: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: 
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto py-8">
-        <div className="flex items-center gap-3 mb-4 px-4">
+      <div className="max-w-[480px] mx-auto py-8 px-4">
+        <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 p-[2px]">
             <div className="w-full h-full bg-black rounded-full border border-black"></div>
           </div>
-          <span className="font-bold text-sm">jiyeon_daily</span>
+          <span className="font-black text-white text-sm">jiyeon_daily</span>
           <span className="text-gray-500 text-xs">• 2일 전</span>
         </div>
 
-        <div className="aspect-square bg-gray-900 w-full mb-6"></div>
+        <div className="aspect-square bg-gray-900 w-full mb-6 rounded-sm"></div>
 
-        <div className="px-4">
+        <div>
           <div className="flex gap-4 mb-4">
             <span className="material-symbols-outlined">favorite</span>
             <span className="material-symbols-outlined">chat_bubble</span>
@@ -239,7 +249,7 @@ const MockInsta: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: 
           <div className="font-bold text-sm mb-4">좋아요 1,241개</div>
 
           <div className="space-y-4">
-            <div className="text-sm opacity-40">
+            <div className="text-sm opacity-40 leading-relaxed">
               <span className="font-bold mr-2">minseo_2_</span> 진짜 너무 이쁘다 🥹 나도 빨리 가고 싶어
             </div>
 
@@ -255,16 +265,16 @@ const MockInsta: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: 
                   <div className="bg-white text-black px-4 py-2 rounded-full font-bold text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">포스트 분석하기</div>
                 </div>
               )}
-              <div className="text-sm">
-                <span className="font-bold mr-2 text-primary-container">jiyeon_daily</span>
+              <div className="text-sm leading-relaxed break-words">
+                <span className="font-black mr-2 text-white">jiyeon_daily</span>
                 <HighlightedText text={text} phrases={phrases} active={active} />
               </div>
             </div>
 
-            <div className="text-sm opacity-20">
+            <div className="text-sm opacity-20 leading-relaxed">
               <span className="font-bold mr-2">kim_sungyun</span> 저 이 사진 배경화면 해도 돼요?? 🙏🙏
             </div>
-            <div className="h-64"></div>
+            <div className="h-40"></div>
           </div>
         </div>
       </div>
@@ -272,14 +282,103 @@ const MockInsta: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: 
   );
 };
 
-const MockPlatformViewer: React.FC<Props> = ({ platform, originalText, highlightedPhrases, onComplete }) => {
+// ── General/Other Mock (Simple Blog Style) ──
+const MockGeneral: React.FC<{ text: string; phrases: HighlightedPhrase[]; active: boolean; reviewRef: any; targetRef: any }> = ({ text, phrases, active, reviewRef, targetRef }) => {
+  return (
+    <div className="bg-[#fcfcfc] text-[#333] font-sans min-h-full pb-20">
+      {/* Simple Header */}
+      <div className="h-16 bg-white border-b border-gray-100 px-8 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center text-white">
+            <span className="material-symbols-outlined text-[18px]">article</span>
+          </div>
+          <span className="font-bold text-gray-800 tracking-tight">Review Reader</span>
+        </div>
+        <div className="flex gap-4 text-gray-400">
+          <span className="material-symbols-outlined text-[20px]">share</span>
+          <span className="material-symbols-outlined text-[20px]">more_horiz</span>
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto mt-12 px-6">
+        {/* Article Header */}
+        <header className="mb-10 pb-8 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-primary font-bold text-xs mb-3 uppercase tracking-wider">
+            <span>Community</span>
+            <span className="text-gray-300">•</span>
+            <span>Real Review</span>
+          </div>
+          <h1 className="text-3xl font-black text-gray-900 leading-tight mb-6">
+            사용자가 직접 작성한 솔직한 리뷰 본문입니다
+          </h1>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+              <span className="material-symbols-outlined">person</span>
+            </div>
+            <div className="text-sm">
+              <p className="font-bold text-gray-800">익명 사용자</p>
+              <p className="text-gray-400 text-xs">2024.05.10 · 조회 1,240</p>
+            </div>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div 
+          ref={reviewRef}
+          className={`relative rounded-3xl transition-all duration-1000 ${
+            active 
+              ? 'bg-white p-8 shadow-[0_10px_40px_rgba(0,0,0,0.04)] ring-1 ring-gray-100 scale-[1.01]' 
+              : 'bg-transparent'
+          }`}
+        >
+          {!active && (
+            <div 
+              ref={targetRef}
+              className="absolute inset-0 z-10 cursor-pointer flex items-center justify-center group"
+            >
+              <div className="bg-gray-900 text-white px-6 py-3 rounded-full font-bold text-sm opacity-0 group-hover:opacity-100 transition-all shadow-xl transform translate-y-2 group-hover:translate-y-0">
+                문맥 분석하기
+              </div>
+            </div>
+          )}
+          
+          <div className={`text-[16px] leading-[1.8] text-gray-700 break-keep ${active ? 'opacity-100' : 'opacity-80'}`}>
+            <HighlightedText text={text} phrases={phrases} active={active} />
+          </div>
+          
+          {active && (
+            <div className="mt-12 pt-8 border-t border-dashed border-gray-100 flex items-center justify-between">
+              <div className="flex gap-4">
+                <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                  <span className="material-symbols-outlined text-[16px]">thumb_up</span> 도움돼요 24
+                </span>
+                <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                  <span className="material-symbols-outlined text-[16px]">chat</span> 댓글 8
+                </span>
+              </div>
+              <span className="text-[10px] text-gray-300 font-mono tracking-tighter uppercase">No-Click Analysis System Verified</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MockPlatformViewer: React.FC<Props> = ({ platform, originalText, highlightedPhrases, onComplete, trustScore }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const myReviewRef = useRef<HTMLDivElement>(null);
   const targetBtnRef = useRef<HTMLDivElement>(null);
   const [highlightActive, setHighlightActive] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
+  const [showCleanBadge, setShowCleanBadge] = useState(true);
 
   useEffect(() => {
+    // 초기화 (텍스트가 바뀌면 다시 시작)
+    setHighlightActive(false);
+    setIsClicking(false);
+    setShowCleanBadge(true);
+
     // 1단계: 자연스러운 서핑 (상품 정보부터 스크롤)
     const scrollTimer = setTimeout(() => {
       if (myReviewRef.current && containerRef.current) {
@@ -299,7 +398,7 @@ const MockPlatformViewer: React.FC<Props> = ({ platform, originalText, highlight
     }, 1000);
 
     return () => clearTimeout(scrollTimer);
-  }, [onComplete]);
+  }, [onComplete, originalText]); // 텍스트가 바뀌면(히스토리 클릭 시) 애니메이션 재실행
 
   return (
     <div className="w-full h-[700px] bg-white flex flex-col relative overflow-hidden group">
@@ -322,8 +421,35 @@ const MockPlatformViewer: React.FC<Props> = ({ platform, originalText, highlight
       <div ref={containerRef} className="flex-grow overflow-y-auto scroll-smooth custom-scrollbar">
         {platform === 'naver' && <MockNaver text={originalText} phrases={highlightedPhrases} active={highlightActive} reviewRef={myReviewRef} targetRef={targetBtnRef} />}
         {platform === 'insta' && <MockInsta text={originalText} phrases={highlightedPhrases} active={highlightActive} reviewRef={myReviewRef} targetRef={targetBtnRef} />}
-        {(platform === 'coupang' || platform === 'other') && <MockCoupang text={originalText} phrases={highlightedPhrases} active={highlightActive} reviewRef={myReviewRef} targetRef={targetBtnRef} />}
+        {platform === 'coupang' && <MockCoupang text={originalText} phrases={highlightedPhrases} active={highlightActive} reviewRef={myReviewRef} targetRef={targetBtnRef} />}
+        {platform === 'other' && <MockGeneral text={originalText} phrases={highlightedPhrases} active={highlightActive} reviewRef={myReviewRef} targetRef={targetBtnRef} />}
       </div>
+
+      {/* 청정리뷰 인증 마크 Overlay (상단 배치) */}
+      {highlightActive && highlightedPhrases.length === 0 && showCleanBadge && (
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-[80] pointer-events-auto w-full px-12 text-center group">
+          <div className="relative inline-flex bg-emerald-500/95 text-white px-8 py-5 rounded-[2rem] shadow-[0_25px_60px_rgba(16,185,129,0.4)] items-center gap-5 border-2 border-white/40 backdrop-blur-2xl animate-in fade-in slide-in-from-top-4 duration-1000 mx-auto">
+            
+            {/* Close Button */}
+            <button 
+              onClick={() => setShowCleanBadge(false)}
+              className="absolute -top-2 -right-2 w-8 h-8 bg-white text-emerald-600 rounded-full shadow-lg flex items-center justify-center hover:bg-emerald-50 transition-colors cursor-pointer border border-emerald-100 opacity-0 group-hover:opacity-100"
+            >
+              <span className="material-symbols-outlined text-[18px] font-bold">close</span>
+            </button>
+
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0 shadow-inner">
+              <span className="material-symbols-outlined text-3xl animate-pulse">verified</span>
+            </div>
+            <div className="flex flex-col items-start text-left">
+              <h3 className="text-xl font-black tracking-tight leading-tight">판독 완료!</h3>
+              <p className="text-sm font-bold opacity-90 whitespace-nowrap">
+                <span className="text-2xl mr-1">{trustScore}%</span>의 확률로 광고가 아닙니다
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

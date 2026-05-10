@@ -13,6 +13,11 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
 from app.api.analysis import router as analysis_router
+from app.database import engine, Base
+from app.models.analysis import Analysis # 테이블 생성을 위해 모델 임포트 필요
+
+# 데이터베이스 테이블 생성 (Alembic 없이도 로컬에서 작동하도록)
+Base.metadata.create_all(bind=engine)
 
 # Rate Limiter 초기화
 limiter = Limiter(key_func=get_remote_address, default_limits=[settings.RATE_LIMIT])
