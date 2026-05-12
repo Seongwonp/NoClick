@@ -39,7 +39,7 @@ const Header: React.FC = () => {
                 : 'text-gray-500'
             }`}
           >
-            Home
+            홈
           </Link>
           <Link
             to="/history"
@@ -49,7 +49,7 @@ const Header: React.FC = () => {
                 : 'text-gray-500'
             }`}
           >
-            My History
+            분석 내역
           </Link>
           <Link
             to="/how-it-works"
@@ -59,7 +59,7 @@ const Header: React.FC = () => {
                 : 'text-gray-500'
             }`}
           >
-            How it Works
+            사용법
           </Link>
           <button
             onClick={() => setIsSettingsOpen(true)}
@@ -67,7 +67,7 @@ const Header: React.FC = () => {
               isSettingsOpen ? 'text-emerald-600 border-b-2 border-emerald-500' : 'text-gray-500'
             }`}
           >
-            API Settings
+            API 설정
           </button>
         </nav>
 
@@ -93,7 +93,7 @@ const Header: React.FC = () => {
                 location.pathname === '/' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500'
               }`}
             >
-              Home
+              홈
             </Link>
             <Link
               to="/history"
@@ -102,7 +102,7 @@ const Header: React.FC = () => {
                 location.pathname === '/history' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500'
               }`}
             >
-              My History
+              분석 내역
             </Link>
             <Link
               to="/how-it-works"
@@ -111,7 +111,7 @@ const Header: React.FC = () => {
                 location.pathname === '/how-it-works' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500'
               }`}
             >
-              How it Works
+              사용법
             </Link>
             <button
               onClick={() => {
@@ -122,7 +122,7 @@ const Header: React.FC = () => {
                 isSettingsOpen ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
-              API Settings
+              API 설정
             </button>
           </nav>
         </div>
