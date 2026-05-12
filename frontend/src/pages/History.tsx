@@ -57,7 +57,7 @@ const History: React.FC = () => {
             {history.map((item) => (
               <div 
                 key={item.id}
-                onClick={() => navigate(`/result`, { state: { text: item.original_content, id: item.id } })}
+                onClick={() => navigate(`/result?id=${item.id}`)}
                 className="bg-white p-6 rounded-2xl border border-gray-100 custom-shadow hover:translate-y-[-2px] transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-4">
