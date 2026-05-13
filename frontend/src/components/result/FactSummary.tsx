@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaRobot } from 'react-icons/fa';
 import type { AnalysisResponse } from '../../types/analysis';
 
 interface FactSummaryProps {
@@ -28,8 +29,8 @@ const FactSummary: React.FC<FactSummaryProps> = ({ analysisResult }) => {
 
       {/* AI 총평 (Avatar Chat Layout) */}
       <div className="bg-white rounded-[32px] p-6 lg:p-8 border border-[#009368]/10 shadow-[0_8px_30px_rgba(0,147,104,0.08)] flex gap-5 items-start">
-        <div className="w-14 h-14 bg-[#009368]/5 rounded-[24px] flex-shrink-0 flex items-center justify-center text-[28px] shadow-[inset_0_2px_10px_rgba(0,147,104,0.05)] border border-[#009368]/10">
-          🤖
+        <div className="w-14 h-14 bg-[#009368]/5 rounded-[24px] flex-shrink-0 flex items-center justify-center shadow-[inset_0_2px_10px_rgba(0,147,104,0.05)] border border-[#009368]/10">
+          <FaRobot className="text-[24px] text-[#009368]" />
         </div>
         <div className="flex-1 pt-1">
           <h3 className="text-[15px] font-extrabold text-gray-800 tracking-tight mb-2">AI가 분석한 솔직한 총평</h3>
