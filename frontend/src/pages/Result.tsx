@@ -152,7 +152,7 @@ const Result: React.FC = () => {
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5">
           <p className="text-[13px] text-slate-600 leading-relaxed break-keep">
-            이번 분석으로 <span className="font-bold text-slate-900">{savedTimeText}</span> 정도 아꼈어요! :)
+            이번 분석으로 <span className="font-bold text-slate-900">{savedTimeText}</span> 정도 아꼈어요.
             {hasMeaningfulCost && <> 불필요한 지출도 <span className="font-bold text-emerald-600">{savedCostText}</span>쯤 줄일 수 있어요.</>}
           </p>
         </div>
@@ -196,21 +196,21 @@ const Result: React.FC = () => {
             onClick={() => setShowDetails((prev) => !prev)}
             className="w-full bg-white rounded-2xl border border-slate-200 px-5 py-4 flex items-center justify-between text-left shadow-sm"
           >
-            <span className="text-[14px] font-bold text-slate-800">상세 분석 보기</span>
+            <div>
+              <span className="text-[14px] font-bold text-slate-800">상세 분석 보기</span>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                숨겨진 단점 {analysisResult.hidden_negatives?.length || 0}건 · 광고 표현 {analysisResult.highlighted_phrases?.length || 0}개
+              </p>
+            </div>
             <span className="material-symbols-outlined text-slate-400">{showDetails ? 'expand_less' : 'expand_more'}</span>
           </button>
-          <p className="text-[12px] text-slate-400 px-1">
-            숨겨진 단점 {analysisResult.hidden_negatives?.length || 0}건 · 광고 표현 {analysisResult.highlighted_phrases?.length || 0}개
-          </p>
 
           {showDetails && (
             <div className="space-y-5 animate-fade-in-up">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 <HiddenNegatives negatives={analysisResult.hidden_negatives} />
                 {!hasHighlightedPhrases ? (
-                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-center text-slate-400 text-[13px]">
-                    핵심 성향 그래프는 상단에서 바로 확인할 수 있어요 :)
-                  </div>
+                  <RadarPanel result={analysisResult} radarData={radarData} />
                 ) : (
                   <RadarPanel result={analysisResult} radarData={radarData} />
                 )}
