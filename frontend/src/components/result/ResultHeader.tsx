@@ -61,14 +61,6 @@ const ResultHeader: React.FC<Props> = ({ result, trustRank }) => {
           </div>
         </div>
 
-        {/* 숨겨진 의도 */}
-        {result.hidden_intent && (
-          <div className="flex items-start gap-2 mt-4 bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3">
-            <span className="material-symbols-outlined text-amber-500 text-[16px] flex-shrink-0 mt-0.5"
-              style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
-            <p className="text-[12px] text-amber-800 font-medium leading-snug break-keep">{result.hidden_intent}</p>
-          </div>
-        )}
       </div>
     </div>
   );

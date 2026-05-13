@@ -213,6 +213,17 @@ const Result: React.FC = () => {
           {/* 1. 신뢰 등급 */}
           <ResultHeader result={analysisResult} trustRank={trustRank} />
 
+          {/* 1-b. 숨겨진 의도 */}
+          {analysisResult.hidden_intent && (
+            <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-[2rem] px-5 py-4 animate-fade-in-up" style={{ animationDelay: '60ms' }}>
+              <span className="material-symbols-outlined text-amber-500 text-[18px] flex-shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
+              <div>
+                <p className="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider mb-1">숨겨진 의도</p>
+                <p className="text-[13px] text-amber-900 font-semibold leading-snug break-keep">{analysisResult.hidden_intent}</p>
+              </div>
+            </div>
+          )}
+
           {/* 2. 핵심 요약 */}
           {analysisResult.real_summary && (
             <div className="bg-white rounded-[2rem] border border-emerald-50 custom-shadow px-6 py-5 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
@@ -221,34 +232,24 @@ const Result: React.FC = () => {
                 "{analysisResult.real_summary}"
               </blockquote>
               {analysisResult.overall_verdict && (
-                <p className="text-[12px] text-on-surface-variant mt-3 leading-relaxed break-keep line-clamp-3">
+                <p className="text-[12px] text-on-surface-variant mt-3 leading-relaxed break-keep">
                   {analysisResult.overall_verdict}
                 </p>
               )}
-            </div>
-          )}
-
-          {/* 2-b. 절약 통계 */}
-          {(analysisResult.saved_cost || analysisResult.saved_time) && (
-            <div className="flex gap-3 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-              {analysisResult.saved_time && (
-                <div className="flex-1 bg-white rounded-2xl border border-emerald-50 custom-shadow px-4 py-3.5 flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-emerald-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>schedule</span>
-                  <div>
-                    <p className="text-[10px] text-on-surface-variant font-semibold">시간 절약</p>
-                    <p className="text-[15px] font-black text-on-surface leading-tight">{analysisResult.saved_time}</p>
-                  </div>
-                </div>
-              )}
-              {analysisResult.saved_cost && (
-                <div className="flex-1 bg-white rounded-2xl border border-emerald-50 custom-shadow px-4 py-3.5 flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-emerald-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>savings</span>
-                  <div>
-                    <p className="text-[10px] text-on-surface-variant font-semibold">비용 절약</p>
-                    <p className="text-[15px] font-black text-on-surface leading-tight">{analysisResult.saved_cost}</p>
-                  </div>
-                </div>
-              )}
+              {/* 절약 멘트 */}
+              {(() => {
+                const hasCost = analysisResult.saved_cost && analysisResult.saved_cost !== '0원';
+                const hasTime = !!analysisResult.saved_time;
+                if (!hasCost && !hasTime) return null;
+                const parts = [];
+                if (hasTime) parts.push(`약 ${analysisResult.saved_time}`);
+                if (hasCost) parts.push(`${analysisResult.saved_cost}`);
+                return (
+                  <p className="text-[11px] text-emerald-600 font-semibold mt-3 pt-3 border-t border-emerald-50">
+                    이 분석으로 {parts.join('과 ')}을 아꼈어요
+                  </p>
+                );
+              })()}
             </div>
           )}
 
