@@ -13,15 +13,15 @@ const STEPS = [
   { icon: 'summarize',      label: '결과 정리 중' },
 ];
 
-const LoadingScreen: React.FC<Props> = ({ progress }) => {
+const LoadingScreen: React.FC<Props> = ({ progress, step }) => {
   const activeStep = Math.min(Math.floor(progress / 20), STEPS.length - 1);
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-slate-50 px-4 py-12">
-      <div className="w-full max-w-sm">
+    <div className="flex-1 flex items-center justify-center bg-slate-50 pt-24 md:pt-28 px-4 py-12">
+      <div className="w-full mx-auto" style={{ width: 'clamp(320px, 92vw, 460px)' }}>
 
         {/* 카드 */}
-        <div className="bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100">
+        <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200">
 
           {/* 상단 그라데이션 바 */}
           <div className="h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
@@ -44,7 +44,7 @@ const LoadingScreen: React.FC<Props> = ({ progress }) => {
             {/* 타이틀 */}
             <div className="text-center mb-7">
               <h2 className="text-[20px] font-extrabold text-slate-900 tracking-tight mb-1">리뷰 분석 중이에요</h2>
-              <p className="text-[12px] text-slate-400 font-medium">보통 10~20초 걸려요</p>
+              <p className="text-[12px] text-slate-400 font-medium break-keep whitespace-normal min-h-[18px]">{step}</p>
             </div>
 
             {/* 스텝 목록 */}
@@ -52,7 +52,6 @@ const LoadingScreen: React.FC<Props> = ({ progress }) => {
               {STEPS.map((s, i) => {
                 const isDone   = i < activeStep;
                 const isActive = i === activeStep;
-                const isPending = i > activeStep;
                 return (
                   <div
                     key={i}

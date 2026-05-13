@@ -31,10 +31,10 @@ const RadarPanel: React.FC<Props> = ({ result, radarData }) => {
   const ds = result.dimension_scores;
 
   const bars = [
-    { label: '진정성', value: ds?.authenticity ?? 50, color: '#10b981', desc: '개인 경험 기반 여부' },
-    { label: '정보성', value: ds?.information ?? 50, color: '#3b82f6', desc: '가격·수치 등 실질 정보' },
-    { label: '상세함', value: ds?.specificity ?? 50, color: '#8b5cf6', desc: '구체적 묘사 수준' },
-    { label: '과장성', value: ds?.exaggeration ?? 50, color: '#ef4444', desc: '수치가 높을수록 광고 신호', bad: true },
+    { label: '진정성', value: ds?.authenticity ?? 50, color: '#10b981', desc: '개인 경험 기반 여부', textColor: 'text-emerald-600' },
+    { label: '정보성', value: ds?.information ?? 50, color: '#3b82f6', desc: '가격·수치 등 실질 정보', textColor: 'text-blue-600' },
+    { label: '상세함', value: ds?.specificity ?? 50, color: '#8b5cf6', desc: '구체적 묘사 수준', textColor: 'text-violet-600' },
+    { label: '과장성', value: ds?.exaggeration ?? 50, color: '#ef4444', desc: '수치가 높을수록 광고 신호', textColor: 'text-red-500', bad: true },
   ];
 
   return (
@@ -65,7 +65,7 @@ const RadarPanel: React.FC<Props> = ({ result, radarData }) => {
               <span className="text-[12px] font-bold text-gray-700">{b.label}</span>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-gray-400">{b.desc}</span>
-                <span className={`text-[12px] font-extrabold ${b.bad ? 'text-red-500' : 'text-emerald-600'}`}>{b.value}</span>
+                <span className={`text-[12px] font-extrabold ${b.textColor}`}>{b.value}</span>
               </div>
             </div>
             <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">

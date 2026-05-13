@@ -3,7 +3,7 @@ import type { HighlightedPhrase } from '../../types/analysis';
 
 const PHRASE_META: Record<string, { label: string; color: string; bg: string; border: string; icon: string; desc: string }> = {
   exaggeration:       { label: '과장 표현',  color: '#d97706', bg: '#fffbeb', border: '#fde68a', icon: 'priority_high', desc: '사실보다 부풀려진 묘사' },
-  sponsor_denial:     { label: '광고 부인',  color: '#dc2626', bg: '#fff1f2', border: '#fecdd3', icon: 'block',          desc: '광고임을 숨기거나 부정' },
+  sponsor_denial:     { label: '광고 부인',  color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: 'block',          desc: '광고임을 숨기거나 부정' },
   negative_avoidance: { label: '단점 회피',  color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe', icon: 'visibility_off', desc: '부정적 면을 의도적으로 생략' },
   ad_pattern:         { label: '광고 패턴',  color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe', icon: 'campaign',       desc: '전형적인 협찬 글 패턴' },
 };
@@ -27,9 +27,9 @@ const AdBreakdown: React.FC<Props> = ({ phrases, adProbability }) => {
     .sort((a, b) => b.count - a.count);
 
   const verdict = adProbability >= 70
-    ? { text: '광고성 리뷰로 판단됩니다. 내용을 그대로 신뢰하기 어려워요.', color: '#ef4444', bg: '#fff1f2', border: '#fecdd3', icon: 'warning' }
+    ? { text: '광고성 리뷰로 판단됩니다. 내용을 그대로 신뢰하기 어려워요.', color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: 'warning' }
     : adProbability >= 40
-    ? { text: '일부 광고 표현이 포함되어 있어요. 주요 내용은 참고할 수 있지만 과장된 부분에 주의하세요.', color: '#f59e0b', bg: '#fffbeb', border: '#fde68a', icon: 'info' }
+    ? { text: '일부 광고 표현이 포함되어 있어요. 주요 내용은 참고할 수 있지만 과장된 부분에 주의하세요.', color: '#d97706', bg: '#fffbeb', border: '#fde68a', icon: 'info' }
     : { text: '광고 표현이 거의 없는 솔직한 리뷰예요. 참고 가치가 높아요.', color: '#10b981', bg: '#f0fdf4', border: '#a7f3d0', icon: 'check_circle' };
 
   if (total === 0) {
@@ -147,7 +147,7 @@ const DonutChart: React.FC<{ entries: DonutEntry[]; total: number; adProbability
       <div>
         <p className="text-[11px] text-slate-400 font-semibold mb-1">총 광고 표현</p>
         <p className="text-[22px] font-black text-slate-900 leading-none">{total}<span className="text-[12px] font-bold text-slate-400 ml-1">개</span></p>
-        <p className="text-[11px] font-semibold mt-1" style={{ color: adProbability >= 70 ? '#ef4444' : adProbability >= 40 ? '#f59e0b' : '#10b981' }}>
+        <p className="text-[11px] font-semibold mt-1" style={{ color: adProbability >= 70 ? '#dc2626' : adProbability >= 40 ? '#d97706' : '#10b981' }}>
           광고 확률 {adProbability}%
         </p>
       </div>

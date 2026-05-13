@@ -62,7 +62,7 @@ const ResultHeader: React.FC<Props> = ({ result, trustRank }) => {
     }
   };
 
-  const adRisk = result.ad_probability >= 70 ? { label: '광고 가능성 높음', color: '#ef4444', bg: '#fff1f2' }
+  const adRisk = result.ad_probability >= 70 ? { label: '광고 가능성 높음', color: '#ef4444', bg: '#fef2f2' }
     : result.ad_probability >= 40 ? { label: '광고 가능성 중간', color: '#f59e0b', bg: '#fffbeb' }
     : { label: '광고 가능성 낮음', color: '#10b981', bg: '#f0fdf4' };
 
@@ -122,8 +122,8 @@ const ResultHeader: React.FC<Props> = ({ result, trustRank }) => {
             {/* 숨겨진 의도 */}
             {result.hidden_intent && (
               <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-3">
-                <span className="material-symbols-outlined text-amber-500 text-[16px] flex-shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
-                <p className="text-[12px] md:text-[13px] text-amber-800 font-medium leading-snug break-keep">{result.hidden_intent}</p>
+                <span className="material-symbols-outlined text-amber-600 text-[16px] flex-shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
+                <p className="text-[12px] md:text-[13px] text-amber-900 font-medium leading-snug break-keep">{result.hidden_intent}</p>
               </div>
             )}
 
@@ -133,7 +133,7 @@ const ResultHeader: React.FC<Props> = ({ result, trustRank }) => {
                 { label: '광고 표현', val: result.highlighted_phrases?.length || 0, unit: '개', color: '#ef4444' },
                 { label: '숨겨진 단점', val: result.hidden_negatives?.length || 0, unit: '건', color: '#6366f1' },
                 { label: '절약 예상', val: formatSavedCost(result.saved_cost), unit: '원', color: '#10b981' },
-                { label: '절약 시간', val: result.saved_time?.replace('분', '') || '0', unit: '분', color: '#3b82f6' },
+                { label: '절약 시간', val: result.saved_time?.replace('분', '') || '0', unit: '분', color: '#059669' },
               ].map((s, i) => (
                 <div key={i} className="bg-slate-50 rounded-xl p-2.5 md:p-3 border border-slate-200 flex flex-col">
                   <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1 leading-tight">{s.label}</p>

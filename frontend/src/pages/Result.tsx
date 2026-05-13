@@ -16,9 +16,9 @@ let lastRequestTime = 0;
 
 const getRank = (score: number) => {
   if (score >= 93) return { grade: 'S', color: '#10b981', bg: '#ecfdf5', borderColor: '#a7f3d0', label: '매우 신뢰', sub: '믿을 수 있는 솔직한 후기예요.' };
-  if (score >= 85) return { grade: 'A', color: '#3b82f6', bg: '#eff6ff', borderColor: '#bfdbfe', label: '신뢰 가능', sub: '대체로 믿을 수 있는 내용이에요.' };
+  if (score >= 85) return { grade: 'A', color: '#22c55e', bg: '#f0fdf4', borderColor: '#bbf7d0', label: '신뢰 가능', sub: '대체로 믿을 수 있는 내용이에요.' };
   if (score >= 70) return { grade: 'B', color: '#f59e0b', bg: '#fffbeb', borderColor: '#fde68a', label: '주의 필요', sub: '홍보성 내용이 일부 섞여 있을 수 있어요.' };
-  return { grade: 'C', color: '#ef4444', bg: '#fff1f2', borderColor: '#fecdd3', label: '광고 의심', sub: '광고 표현이 많이 발견된 리뷰예요.' };
+  return { grade: 'C', color: '#ef4444', bg: '#fef2f2', borderColor: '#fecaca', label: '광고 의심', sub: '광고 표현이 많이 발견된 리뷰예요.' };
 };
 
 const Result: React.FC = () => {
