@@ -12,7 +12,7 @@ const HiddenNegatives: React.FC<Props> = ({ negatives }) => {
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-7">
       <div className="flex items-center gap-2.5 mb-5">
         <span
-          className="material-symbols-outlined text-indigo-500 text-[20px]"
+          className="material-symbols-outlined text-emerald-600 text-[20px]"
           style={{ fontVariationSettings: "'FILL' 1" }}
         >
           visibility_off
@@ -25,9 +25,9 @@ const HiddenNegatives: React.FC<Props> = ({ negatives }) => {
 
       <div className="space-y-3">
         {negatives.map((n, i) => (
-          <div key={i} className="flex items-start gap-3 py-3 border-b border-slate-50 last:border-0">
-            <div className="w-5 h-5 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-[10px] font-black text-indigo-400">{i + 1}</span>
+          <div key={i} className="flex items-start gap-3 py-3 border-b border-slate-100 last:border-0">
+            <div className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-[10px] font-black text-emerald-600">{i + 1}</span>
             </div>
             <div className="min-w-0">
               <p className="text-[13px] font-bold text-slate-800 leading-snug mb-1">{n.inferred}</p>

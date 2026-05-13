@@ -32,68 +32,82 @@ const HighlightedText: React.FC<{
   activePhraseIndices: Set<number>;
   activeFilters: string[];
 }> = ({ text, phrases, activePhraseIndices, activeFilters }) => {
-  let result: React.ReactNode[] = [text];
+  type Match = { start: number; end: number; phrase: HighlightedPhrase; idx: number };
+  const matches: Match[] = [];
+  const nextSearchByText: Record<string, number> = {};
 
   phrases.forEach((phrase, idx) => {
-    // 필터링 처리: 활성화된 필터에 없으면 하이라이트 생략
     if (activeFilters.length > 0 && !activeFilters.includes(phrase.type)) return;
+    if (!phrase.text) return;
 
-    const newResult: React.ReactNode[] = [];
-    const style = PHRASE_STYLE[phrase.type] ?? PHRASE_STYLE.neutral;
-    const isActive = activePhraseIndices.has(idx);
+    const from = nextSearchByText[phrase.text] ?? 0;
+    const start = text.indexOf(phrase.text, from);
+    if (start === -1) return;
 
-    result.forEach((node) => {
-      if (typeof node === 'string') {
-        const parts = node.split(phrase.text);
-        parts.forEach((part, i) => {
-          newResult.push(part);
-          if (i < parts.length - 1) {
-            newResult.push(
-              <span key={`${idx}-${i}`} className="relative group/phrase inline">
-                <mark
-                  style={{
-                    background: `linear-gradient(${style.lightColor}, ${style.lightColor}) no-repeat`,
-                    backgroundSize: isActive ? '100% 30%' : '0% 30%',
-                    backgroundPosition: '0 95%',
-                    transition: 'background-size 0.8s cubic-bezier(0.65, 0, 0.35, 1)',
-                    color: 'inherit',
-                    padding: '0 1px',
-                    borderRadius: '2px',
-                    cursor: 'help'
-                  }}
-                  className="relative transition-all duration-300 group-hover/phrase:bg-opacity-100"
-                >
-                  {phrase.text}
-                  <span
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[10px] font-black text-white whitespace-nowrap opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none shadow-xl z-50"
-                    style={{ backgroundColor: style.color }}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[12px]">info</span>
-                      {style.label}
-                    </span>
-                  </span>
-                </mark>
-                {phrase.reason && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-4 bg-gray-900 text-white text-[12px] rounded-2xl opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none z-50 shadow-2xl transform group-hover/phrase:translate-y-2">
-                    <p className="font-black mb-2 flex items-center gap-2" style={{ color: style.color }}>
-                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: style.color }} />
-                       {style.label}
-                    </p>
-                    <p className="leading-relaxed font-medium text-white/90 break-keep">{phrase.reason}</p>
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-1 border-[6px] border-transparent border-b-gray-900" />
-                  </div>
-                )}
-              </span>
-            );
-          }
-        });
-      } else {
-        newResult.push(node);
-      }
-    });
-    result = newResult;
+    matches.push({ start, end: start + phrase.text.length, phrase, idx });
+    nextSearchByText[phrase.text] = start + phrase.text.length;
   });
+
+  matches.sort((a, b) => a.start - b.start);
+
+  const result: React.ReactNode[] = [];
+  let cursor = 0;
+
+  matches.forEach((m, order) => {
+    if (m.start < cursor) return; // overlap 방지
+    if (cursor < m.start) {
+      result.push(text.slice(cursor, m.start));
+    }
+
+    const style = PHRASE_STYLE[m.phrase.type] ?? PHRASE_STYLE.neutral;
+    const isActive = activePhraseIndices.has(m.idx);
+    const phraseText = text.slice(m.start, m.end);
+
+    result.push(
+      <span key={`${m.idx}-${order}`} className="relative group/phrase inline">
+        <mark
+          style={{
+            background: `linear-gradient(${style.lightColor}, ${style.lightColor}) no-repeat`,
+            backgroundSize: isActive ? '100% 30%' : '0% 30%',
+            backgroundPosition: '0 95%',
+            transition: 'background-size 0.8s cubic-bezier(0.65, 0, 0.35, 1)',
+            color: 'inherit',
+            padding: '0 1px',
+            borderRadius: '2px',
+            cursor: 'help'
+          }}
+          className="relative transition-all duration-300 group-hover/phrase:bg-opacity-100"
+        >
+          {phraseText}
+          <span
+            className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[10px] font-black text-white whitespace-nowrap opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none shadow-xl z-50"
+            style={{ backgroundColor: style.color }}
+          >
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[12px]">info</span>
+              {style.label}
+            </span>
+          </span>
+        </mark>
+        {m.phrase.reason && (
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-4 bg-gray-900 text-white text-[12px] rounded-2xl opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none z-50 shadow-2xl transform group-hover/phrase:translate-y-2">
+            <p className="font-black mb-2 flex items-center gap-2" style={{ color: style.color }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: style.color }} />
+              {style.label}
+            </p>
+            <p className="leading-relaxed font-medium text-white/90 break-keep">{m.phrase.reason}</p>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-1 border-[6px] border-transparent border-b-gray-900" />
+          </div>
+        )}
+      </span>
+    );
+
+    cursor = m.end;
+  });
+
+  if (cursor < text.length) {
+    result.push(text.slice(cursor));
+  }
 
   return <span className="whitespace-pre-wrap leading-[2.4] tracking-tight">{result}</span>;
 };

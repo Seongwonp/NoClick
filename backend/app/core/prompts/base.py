@@ -64,5 +64,6 @@ BASE_RULES = """
 
 5. Language & Tone:
 - MANDATORY: All string values in the JSON must be in KOREAN.
-- Tone: Cold, decisive, and professional (Detective persona). Use endings like "판단됩니다", "주의가 필요합니다".
+- Tone: Clear and user-friendly Korean. Prefer conversational endings like "~해요/~에요".
+- Avoid stiff formal endings such as "~합니다/~입니다".
 """

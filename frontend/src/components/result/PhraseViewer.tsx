@@ -3,10 +3,10 @@ import MockPlatformViewer from '../MockPlatformViewer';
 import type { AnalysisResponse } from '../../types/analysis';
 
 export const PHRASE_META: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  exaggeration:       { label: '과장 표현', color: '#d97706', bg: '#fffbeb', icon: 'priority_high' },
+  exaggeration:       { label: '과장 표현', color: '#0f172a', bg: '#f8fafc', icon: 'priority_high' },
   sponsor_denial:     { label: '광고 부인', color: '#dc2626', bg: '#fef2f2', icon: 'block' },
-  negative_avoidance: { label: '단점 회피', color: '#3b82f6', bg: '#eff6ff', icon: 'visibility_off' },
-  ad_pattern:         { label: '광고 패턴', color: '#8b5cf6', bg: '#f5f3ff', icon: 'campaign' },
+  negative_avoidance: { label: '단점 회피', color: '#0f172a', bg: '#f8fafc', icon: 'visibility_off' },
+  ad_pattern:         { label: '광고 패턴', color: '#0f172a', bg: '#f8fafc', icon: 'campaign' },
   neutral:            { label: '중립',      color: '#64748b', bg: '#f8fafc', icon: 'remove' },
 };
 

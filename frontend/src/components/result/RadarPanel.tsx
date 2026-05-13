@@ -32,8 +32,8 @@ const RadarPanel: React.FC<Props> = ({ result, radarData }) => {
 
   const bars = [
     { label: '진정성', value: ds?.authenticity ?? 50, color: '#10b981', desc: '개인 경험 기반 여부', textColor: 'text-emerald-600' },
-    { label: '정보성', value: ds?.information ?? 50, color: '#3b82f6', desc: '가격·수치 등 실질 정보', textColor: 'text-blue-600' },
-    { label: '상세함', value: ds?.specificity ?? 50, color: '#8b5cf6', desc: '구체적 묘사 수준', textColor: 'text-violet-600' },
+    { label: '정보성', value: ds?.information ?? 50, color: '#10b981', desc: '가격·수치 등 실질 정보', textColor: 'text-emerald-600' },
+    { label: '상세함', value: ds?.specificity ?? 50, color: '#10b981', desc: '구체적 묘사 수준', textColor: 'text-emerald-600' },
     { label: '과장성', value: ds?.exaggeration ?? 50, color: '#ef4444', desc: '수치가 높을수록 광고 신호', textColor: 'text-red-500', bad: true },
   ];
 

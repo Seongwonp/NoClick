@@ -50,6 +50,7 @@ Your core mission is not to summarize, but to infer what the author deliberately
   2) Critical missing information/risk,
   3) Practical user recommendation.
 - Prefer explicit causal wording ("because", "therefore", "which implies").
+- Write the final sentences in natural Korean with "~해요/~에요" endings.
 {BASE_RULES}
 [Few-shot Examples]
 
