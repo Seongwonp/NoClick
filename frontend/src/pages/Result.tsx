@@ -5,8 +5,9 @@ import { apiService } from '../services/api';
 import type { AnalysisResponse } from '../types/analysis';
 import LoadingScreen from '../components/result/LoadingScreen';
 import ResultHeader from '../components/result/ResultHeader';
-import PhraseViewer from '../components/result/PhraseViewer';
 import RadarPanel from '../components/result/RadarPanel';
+import MockPlatformViewer from '../components/MockPlatformViewer';
+import { PHRASE_META } from '../components/result/PhraseViewer';
 
 let lastRequestTag = '';
 let lastRequestTime = 0;
@@ -16,13 +17,6 @@ const getRank = (score: number) => {
   if (score >= 85) return { grade: 'A', color: '#22c55e', bg: '#f0fdf4', borderColor: '#bbf7d0', label: '신뢰 가능', sub: '대체로 믿을 수 있는 내용이에요.' };
   if (score >= 70) return { grade: 'B', color: '#f59e0b', bg: '#fffbeb', borderColor: '#fde68a', label: '주의 필요', sub: '홍보성 내용이 일부 섞여 있을 수 있어요.' };
   return { grade: 'C', color: '#ef4444', bg: '#fef2f2', borderColor: '#fecaca', label: '광고 의심', sub: '광고 표현이 많이 발견된 리뷰예요.' };
-};
-
-const PHRASE_META: Record<string, { label: string; color: string; bg: string }> = {
-  exaggeration:       { label: '과장 표현', color: '#d97706', bg: '#fffbeb' },
-  sponsor_denial:     { label: '광고 부인', color: '#dc2626', bg: '#fef2f2' },
-  negative_avoidance: { label: '단점 회피', color: '#3b82f6', bg: '#eff6ff' },
-  ad_pattern:         { label: '광고 패턴', color: '#8b5cf6', bg: '#f5f3ff' },
 };
 
 const Result: React.FC = () => {
@@ -36,7 +30,7 @@ const Result: React.FC = () => {
   const [step, setStep] = useState('리뷰 내용 확인 중...');
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [showOriginal, setShowOriginal] = useState(false);
+  const [showRadar, setShowRadar] = useState(false);
 
   const analysisStarted = useRef(false);
 
@@ -80,13 +74,12 @@ const Result: React.FC = () => {
       setProgress(10);
       const steps = ['리뷰 내용 확인 중...', '광고 표현 찾는 중...', '숨겨진 단점 파악 중...', '작성 의도 분석 중...', '결과 정리 중...'];
       const interval = setInterval(() => {
-        setProgress((prev) => {
+        setProgress(prev => {
           if (prev >= 90) { clearInterval(interval); return 90; }
           setStep(steps[Math.min(Math.floor(prev / 20), steps.length - 1)]);
           return prev + 2;
         });
       }, 120);
-
       const result = await apiService.analyze(text, platform);
       clearInterval(interval);
       setProgress(100);
@@ -136,7 +129,6 @@ const Result: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
   const phraseTotal = Object.values(typeCounts).reduce((s, v) => s + v, 0);
-
   const negatives = analysisResult.hidden_negatives || [];
 
   const timeLabel = analysisResult.created_at
@@ -144,99 +136,165 @@ const Result: React.FC = () => {
     : '방금 분석';
 
   return (
-    <div className="w-full bg-white pt-24 md:pt-28 px-5 md:px-6 pb-0">
-      <div className="max-w-[600px] mx-auto flex flex-col pb-16">
+    <div className="w-full bg-[#f8f9fa] pt-16 relative">
+      {/* 홈이랑 동일한 배경 블롭 */}
+      <div className="fixed top-[-10%] right-[-5%] w-[420px] h-[420px] bg-emerald-100/10 rounded-full blur-[120px] -z-10" />
+      <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-100/10 rounded-full blur-[120px] -z-10" />
 
-        {/* ── 1. 히어로 카드 (등급 + 요약 + 의도) ── */}
-        <ResultHeader result={analysisResult} trustRank={trustRank} />
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-start px-4 md:px-6 gap-5 lg:gap-8">
 
-        {/* ── 2. 발견된 표현들 ── */}
-        {phraseTotal > 0 && (
-          <section className="mt-8 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">발견된 표현들</p>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(typeCounts)
-                .sort((a, b) => b[1] - a[1])
-                .map(([type, count]) => {
-                  const meta = PHRASE_META[type];
-                  if (!meta) return null;
-                  return (
-                    <span
-                      key={type}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold"
-                      style={{ backgroundColor: meta.bg, color: meta.color }}
-                    >
-                      {meta.label}
-                      <span className="font-black opacity-70">{count}</span>
-                    </span>
-                  );
-                })}
+        {/* ── 왼쪽: 원문 고정 패널 ── */}
+        <div className="w-full lg:w-[46%] order-2 lg:order-1 pb-8 lg:sticky lg:top-20 lg:pt-8">
+          <p className="text-[11px] font-extrabold text-on-surface-variant uppercase tracking-wider mb-3 px-1">
+            원문 분석
+          </p>
+
+          {/* 필터 버튼 */}
+          {phraseTotal > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {Object.entries(PHRASE_META).filter(([k]) => k !== 'neutral').map(([type, meta]) => {
+                const count = typeCounts[type] || 0;
+                if (count === 0) return null;
+                const isActive = activeFilters.includes(type);
+                return (
+                  <button
+                    key={type}
+                    onClick={() => setActiveFilters(prev =>
+                      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+                    )}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[12px] font-bold transition-all ${isActive ? 'ring-2 ring-offset-1' : 'opacity-60 hover:opacity-100'}`}
+                    style={{
+                      backgroundColor: meta.bg,
+                      color: meta.color,
+                      borderColor: isActive ? meta.color : 'transparent',
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-[13px]">{meta.icon}</span>
+                    {meta.label}
+                    <span className="opacity-60">{count}</span>
+                  </button>
+                );
+              })}
+              {activeFilters.length > 0 && (
+                <button
+                  onClick={() => setActiveFilters([])}
+                  className="text-[11px] text-on-surface-variant hover:text-on-surface px-2 transition-colors"
+                >
+                  초기화
+                </button>
+              )}
             </div>
-          </section>
-        )}
+          )}
 
-        {/* ── 3. 숨겨진 단점 ── */}
-        {negatives.length > 0 && (
-          <section className="mt-8 animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">이 리뷰가 숨긴 것들</p>
-            <div>
+          {/* 원문 뷰어 */}
+          <div
+            className="bg-white rounded-[2rem] overflow-hidden custom-shadow border border-emerald-50"
+            style={{ height: 'clamp(400px, calc(100vh - 14rem), 680px)' }}
+          >
+            <MockPlatformViewer
+              platform={analysisResult.platform || 'naver'}
+              originalText={analysisResult.original_content || ''}
+              highlightedPhrases={analysisResult.highlighted_phrases || []}
+              activeFilters={activeFilters}
+              onComplete={() => {}}
+            />
+          </div>
+        </div>
+
+        {/* ── 오른쪽: 분석 결과 스크롤 ── */}
+        <div className="w-full lg:w-[54%] order-1 lg:order-2 pt-5 lg:pt-8 pb-16 space-y-4">
+
+          {/* 1. 신뢰 등급 */}
+          <ResultHeader result={analysisResult} trustRank={trustRank} />
+
+          {/* 2. 핵심 요약 */}
+          {analysisResult.real_summary && (
+            <div className="bg-white rounded-[2rem] border border-emerald-50 custom-shadow px-6 py-5 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+              <p className="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider mb-3">광고 빼고 핵심</p>
+              <blockquote className="text-[15px] font-bold text-on-surface leading-relaxed break-keep">
+                "{analysisResult.real_summary}"
+              </blockquote>
+              {analysisResult.overall_verdict && (
+                <p className="text-[12px] text-on-surface-variant mt-3 leading-relaxed break-keep line-clamp-3">
+                  {analysisResult.overall_verdict}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* 3. 발견된 표현 타입 */}
+          {phraseTotal > 0 && (
+            <div className="flex flex-wrap gap-2 px-1 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+              {Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).map(([type, count]) => {
+                const meta = PHRASE_META[type];
+                if (!meta) return null;
+                return (
+                  <span
+                    key={type}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold"
+                    style={{ backgroundColor: meta.bg, color: meta.color }}
+                  >
+                    {meta.label}
+                    <span className="font-black opacity-60">{count}</span>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {/* 4. 숨겨진 단점 */}
+          {negatives.length > 0 && (
+            <div className="bg-white rounded-[2rem] border border-emerald-50 custom-shadow px-6 py-5 animate-fade-in-up" style={{ animationDelay: '160ms' }}>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-indigo-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>visibility_off</span>
+                <p className="text-[14px] font-extrabold text-on-surface tracking-tight">이 리뷰가 숨긴 것들</p>
+              </div>
               {negatives.map((n, i) => (
-                <div key={i} className="flex items-start gap-3.5 py-4 border-b border-slate-50 last:border-0">
-                  <span className="text-[11px] font-black text-slate-300 w-4 flex-shrink-0 mt-0.5">{i + 1}</span>
+                <div key={i} className="flex items-start gap-3 py-3.5 border-b border-gray-50 last:border-0">
+                  <span className="text-[11px] font-black text-gray-300 w-4 flex-shrink-0 mt-0.5">{i + 1}</span>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-bold text-slate-800 leading-snug mb-1">{n.inferred}</p>
-                    <p className="text-[11px] text-slate-400 leading-relaxed break-keep">{n.reasoning}</p>
+                    <p className="text-[13px] font-bold text-on-surface leading-snug mb-1">{n.inferred}</p>
+                    <p className="text-[11px] text-on-surface-variant leading-relaxed break-keep">{n.reasoning}</p>
                   </div>
                 </div>
               ))}
             </div>
-          </section>
-        )}
-
-        {/* ── 4. 원문 / 상세 아코디언 ── */}
-        <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
-          <button
-            type="button"
-            onClick={() => setShowOriginal(prev => !prev)}
-            className="w-full flex items-center justify-between py-4 border-t border-slate-100 text-left"
-          >
-            <span className="text-[13px] font-bold text-slate-500">
-              원문 & 상세 분석 보기
-            </span>
-            <span className="material-symbols-outlined text-slate-300 text-[20px]">
-              {showOriginal ? 'expand_less' : 'expand_more'}
-            </span>
-          </button>
-
-          {showOriginal && (
-            <div className="space-y-6 pt-2 animate-fade-in-up">
-              <PhraseViewer
-                result={analysisResult}
-                activeFilters={activeFilters}
-                onToggleFilter={(type) => setActiveFilters(prev =>
-                  prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-                )}
-                onClearFilters={() => setActiveFilters([])}
-              />
-              <RadarPanel result={analysisResult} radarData={radarData} />
-            </div>
           )}
-        </div>
 
-        {/* ── 푸터 ── */}
-        <div className="flex items-center justify-between flex-wrap gap-4 pt-6 pb-8 border-t border-slate-100 mt-6">
-          <div className="flex items-center gap-2 text-slate-300 text-[12px] font-medium">
-            <FaHistory size={11} />
-            {timeLabel}
+          {/* 5. 성향 분석 (아코디언) */}
+          <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <button
+              type="button"
+              onClick={() => setShowRadar(prev => !prev)}
+              className="w-full flex items-center justify-between py-3.5 border-t border-emerald-50 text-left"
+            >
+              <span className="text-[13px] font-bold text-on-surface-variant">리뷰 성향 상세 분석</span>
+              <span className="material-symbols-outlined text-gray-300 text-[20px]">
+                {showRadar ? 'expand_less' : 'expand_more'}
+              </span>
+            </button>
+            {showRadar && (
+              <div className="pt-2 animate-fade-in-up">
+                <RadarPanel result={analysisResult} radarData={radarData} />
+              </div>
+            )}
           </div>
-          <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-slate-900 text-white font-bold text-[14px] rounded-xl hover:bg-slate-700 transition-all active:scale-95"
-          >
-            다른 리뷰 분석하기
-          </button>
-        </div>
 
+          {/* 푸터 */}
+          <div className="flex items-center justify-between pt-5 border-t border-emerald-50">
+            <div className="flex items-center gap-2 text-on-surface-variant text-[12px] font-medium">
+              <FaHistory size={11} />
+              {timeLabel}
+            </div>
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-emerald-600 text-white font-bold text-[14px] rounded-2xl hover:bg-emerald-700 transition-all active:scale-95 custom-shadow"
+            >
+              다른 리뷰 분석하기
+            </button>
+          </div>
+
+        </div>
       </div>
     </div>
   );
@@ -248,23 +306,23 @@ interface ErrorScreenProps { message: string; onBack: () => void; onRetry: () =>
 const ErrorScreen: React.FC<ErrorScreenProps> = ({ message, onBack, onRetry }) => {
   const isUserError = ['너무 짧아요', 'URL이 아닌', '오타인 것', '반복된 내용', '한국어', '리뷰 본문만'].some(h => message.includes(h));
   return (
-    <div className="flex-1 flex items-center justify-center bg-white px-6 pt-20 pb-16">
-      <div className="w-full max-w-sm flex flex-col items-center text-center gap-5">
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isUserError ? 'bg-amber-50' : 'bg-red-50'}`}>
+    <div className="flex-1 flex items-center justify-center bg-[#f8f9fa] px-6 pt-20 pb-16">
+      <div className="w-full max-w-sm bg-white rounded-[2rem] border border-emerald-50 custom-shadow p-8 flex flex-col items-center text-center gap-5">
+        <div className={`w-14 h-14 rounded-[1.5rem] flex items-center justify-center ${isUserError ? 'bg-amber-50' : 'bg-red-50'}`}>
           <span className={`material-symbols-outlined text-[26px] ${isUserError ? 'text-amber-500' : 'text-red-400'}`} style={{ fontVariationSettings: "'FILL' 1" }}>
             {isUserError ? 'info' : 'error'}
           </span>
         </div>
         <div>
-          <h2 className="text-[20px] font-extrabold text-slate-900 mb-2 tracking-tight">
+          <h2 className="text-[20px] font-extrabold text-on-surface mb-2 tracking-tight">
             {isUserError ? '입력 내용을 확인해 주세요' : '분석에 실패했어요'}
           </h2>
-          <p className="text-[14px] text-slate-400 leading-relaxed break-keep">{message}</p>
+          <p className="text-[14px] text-on-surface-variant leading-relaxed break-keep">{message}</p>
         </div>
         <div className="flex gap-3 w-full">
-          <button onClick={onBack} className="flex-1 py-3.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-[14px] hover:bg-slate-50 transition-colors">돌아가기</button>
+          <button onClick={onBack} className="flex-1 py-3.5 rounded-2xl border border-gray-200 text-on-surface-variant font-bold text-[14px] hover:bg-gray-50 transition-colors">돌아가기</button>
           {!isUserError && (
-            <button onClick={onRetry} className="flex-1 py-3.5 rounded-xl bg-slate-900 text-white font-bold text-[14px] hover:bg-slate-700 transition-colors">다시 시도</button>
+            <button onClick={onRetry} className="flex-1 py-3.5 rounded-2xl bg-emerald-600 text-white font-bold text-[14px] hover:bg-emerald-700 transition-colors">다시 시도</button>
           )}
         </div>
       </div>
