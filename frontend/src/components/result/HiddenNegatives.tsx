@@ -6,34 +6,35 @@ interface Props {
 }
 
 const HiddenNegatives: React.FC<Props> = ({ negatives }) => {
+  if (!negatives || negatives.length === 0) return null;
+
   return (
-    <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col">
-      <div className="flex items-center gap-3 mb-5 md:mb-6">
-        <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-emerald-100 flex-shrink-0">
-          <span className="material-symbols-outlined text-[18px]">visibility</span>
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-7">
+      <div className="flex items-center gap-2.5 mb-5">
+        <span
+          className="material-symbols-outlined text-indigo-500 text-[20px]"
+          style={{ fontVariationSettings: "'FILL' 1" }}
+        >
+          visibility_off
+        </span>
+        <div>
+          <h3 className="text-[15px] font-extrabold text-slate-900 tracking-tight">이 리뷰가 말하지 않은 것들</h3>
+          <p className="text-[11px] text-slate-400 mt-0.5">AI가 추론한 숨겨진 단점이에요</p>
         </div>
-        <h3 className="text-[14px] md:text-[15px] font-extrabold text-on-surface tracking-tight">이 리뷰가 말하지 않은 것들</h3>
       </div>
 
-      <div className="space-y-3 flex-grow">
-        {negatives?.map((n, i) => (
-          <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-emerald-200 transition-colors">
-            <p className="text-[13px] md:text-[14px] font-bold text-gray-800 leading-snug mb-2">{n.inferred}</p>
-            <p className="text-[11px] md:text-[12px] text-gray-400 leading-relaxed mb-3 break-keep">{n.reasoning}</p>
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 flex-grow bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${n.confidence}%` }} />
-              </div>
-              <span className="text-[11px] font-bold text-emerald-600 flex-shrink-0">{n.confidence}% 가능성</span>
+      <div className="space-y-3">
+        {negatives.map((n, i) => (
+          <div key={i} className="flex items-start gap-3 py-3 border-b border-slate-50 last:border-0">
+            <div className="w-5 h-5 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-[10px] font-black text-indigo-400">{i + 1}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-bold text-slate-800 leading-snug mb-1">{n.inferred}</p>
+              <p className="text-[11px] text-slate-400 leading-relaxed break-keep">{n.reasoning}</p>
             </div>
           </div>
         ))}
-        {(!negatives || negatives.length === 0) && (
-          <div className="flex flex-col items-center justify-center py-10 gap-2">
-            <span className="material-symbols-outlined text-gray-200 text-[36px]">check_circle</span>
-            <p className="text-gray-400 text-[13px]">특별히 숨겨진 단점이 없어요.</p>
-          </div>
-        )}
       </div>
     </div>
   );
