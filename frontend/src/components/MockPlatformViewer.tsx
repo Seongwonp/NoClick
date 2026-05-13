@@ -64,8 +64,8 @@ const HighlightedText: React.FC<{
                   className="relative transition-all duration-300 group-hover/phrase:bg-opacity-100"
                 >
                   {phrase.text}
-                  <span 
-                    className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-1 rounded-lg text-[10px] font-black text-white whitespace-nowrap opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none shadow-xl z-50 transform group-hover/phrase:-translate-y-1"
+                  <span
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[10px] font-black text-white whitespace-nowrap opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none shadow-xl z-50"
                     style={{ backgroundColor: style.color }}
                   >
                     <span className="flex items-center gap-1.5">
