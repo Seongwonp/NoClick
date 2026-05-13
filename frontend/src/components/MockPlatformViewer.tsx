@@ -15,7 +15,7 @@ interface MockProps {
   activePhraseIndices: Set<number>;
   activeFilters: string[];
   active: boolean;
-  reviewRef: React.RefObject<HTMLDivElement>;
+  reviewRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const PHRASE_STYLE: Record<string, { label: string; color: string; lightColor: string; icon: string }> = {

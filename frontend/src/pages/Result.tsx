@@ -100,7 +100,7 @@ const Result: React.FC = () => {
   // ─── 로딩 화면 ───────────────────────────────────────────────────────────────
   if (loading && !analysisComplete) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#f8f9fa] flex items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center bg-[#f8f9fa] px-6 py-16">
         <div className="w-full max-w-md bg-white rounded-[2rem] p-10 custom-shadow border border-emerald-50 flex flex-col items-center text-center relative overflow-hidden">
           <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-50 rounded-full blur-3xl opacity-50 pointer-events-none" />
           <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-40 pointer-events-none" />
@@ -298,7 +298,6 @@ const Result: React.FC = () => {
                       backgroundColor: meta.bg,
                       color: meta.color,
                       borderColor: isActive ? meta.color : meta.bg,
-                      ringColor: meta.color,
                     }}
                   >
                     <span className="material-symbols-outlined text-[13px]">{meta.icon}</span>
