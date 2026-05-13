@@ -12,14 +12,26 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
+const getSelectedModel = (): 'gemini' | 'huggingface' => {
+  const saved = localStorage.getItem('noclick_model');
+  return saved === 'huggingface' ? 'huggingface' : 'gemini';
+};
+
+const getUserApiKey = (): string | undefined => {
+  const key = localStorage.getItem('noclick_apiKey')?.trim();
+  return key ? key : undefined;
+};
+
 export const apiService = {
   // 블로그 분석 요청
-  analyze: async (content: string, platform: string = 'general', model: string = 'gemini'): Promise<AnalysisResponse> => {
+  analyze: async (content: string, platform: string = 'general', model?: string): Promise<AnalysisResponse> => {
+    const selectedModel = (model as 'gemini' | 'huggingface' | undefined) || getSelectedModel();
     const requestBody: AnalysisRequest = {
       content,
       platform,
-      model,
+      model: selectedModel,
       session_id: getSessionId(),
+      api_key: selectedModel === 'gemini' ? getUserApiKey() : undefined,
     };
 
     const response = await fetch(`${API_BASE_URL}/analyze`, {
