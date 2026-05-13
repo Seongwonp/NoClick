@@ -9,6 +9,7 @@ import PhraseViewer from '../components/result/PhraseViewer';
 import SummaryCards from '../components/result/SummaryCards';
 import HiddenNegatives from '../components/result/HiddenNegatives';
 import RadarPanel from '../components/result/RadarPanel';
+import AdBreakdown from '../components/result/AdBreakdown';
 
 let lastRequestTag = '';
 let lastRequestTime = 0;
@@ -97,7 +98,21 @@ const Result: React.FC = () => {
   }
 
   if (error) {
-    return <ErrorScreen message={error} onBack={() => navigate(-1)} onRetry={() => { analysisStarted.current = false; setError(null); setLoading(true); const state = location.state as any; const text = state?.text || searchParams.get('text'); const platform = state?.platform || searchParams.get('platform') || 'naver'; if (text) performAnalysis(text, platform); }} />;
+    return (
+      <ErrorScreen
+        message={error}
+        onBack={() => navigate(-1)}
+        onRetry={() => {
+          analysisStarted.current = false;
+          setError(null);
+          setLoading(true);
+          const state = location.state as { text?: string; platform?: string } | null;
+          const text = state?.text || searchParams.get('text');
+          const platform = state?.platform || searchParams.get('platform') || 'naver';
+          if (text) performAnalysis(text, platform);
+        }}
+      />
+    );
   }
 
   if (!analysisResult) return null;
@@ -120,8 +135,10 @@ const Result: React.FC = () => {
     <div className="w-full bg-slate-50 pt-24 md:pt-28 px-4 md:px-6 pb-0">
       <div className="max-w-[1100px] mx-auto flex flex-col gap-5 md:gap-6 pb-8">
 
+        {/* 1. 헤더 + 신뢰도 게이지 */}
         <ResultHeader result={analysisResult} trustRank={trustRank} />
 
+        {/* 2. 원문 하이라이트 */}
         <PhraseViewer
           result={analysisResult}
           activeFilters={activeFilters}
@@ -131,15 +148,21 @@ const Result: React.FC = () => {
           onClearFilters={() => setActiveFilters([])}
         />
 
+        {/* 3. 광고 패턴 분석 */}
+        <AdBreakdown phrases={analysisResult.highlighted_phrases} adProbability={analysisResult.ad_probability} />
+
+        {/* 4. 한 줄 요약 + 종합 의견 */}
         <SummaryCards result={analysisResult} />
 
-        <TwoColumnGrid>
+        {/* 5. 숨겨진 단점 + 레이더 차트 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
           <HiddenNegatives negatives={analysisResult.hidden_negatives} />
           <RadarPanel result={analysisResult} radarData={radarData} />
-        </TwoColumnGrid>
+        </div>
 
+        {/* 6. 푸터 */}
         <div className="border-t border-slate-200 pt-6 pb-16 flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-3 text-gray-400 font-medium text-[13px]">
+          <div className="flex items-center gap-3 text-slate-400 font-medium text-[13px]">
             <FaHistory size={12} />
             {timeLabel}
           </div>
@@ -156,12 +179,6 @@ const Result: React.FC = () => {
   );
 };
 
-const TwoColumnGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-    {children}
-  </div>
-);
-
 interface ErrorScreenProps {
   message: string;
   onBack: () => void;
@@ -169,44 +186,32 @@ interface ErrorScreenProps {
 }
 
 const ErrorScreen: React.FC<ErrorScreenProps> = ({ message, onBack, onRetry }) => {
-  const isUserError = [
-    '너무 짧아요', 'URL이 아닌', '오타인 것', '반복된 내용', '한국어', '리뷰 본문만',
-  ].some(hint => message.includes(hint));
+  const isUserError = ['너무 짧아요', 'URL이 아닌', '오타인 것', '반복된 내용', '한국어', '리뷰 본문만'].some(h => message.includes(h));
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-slate-50 pt-24 md:pt-28 px-6 py-16">
-      <div className="w-full max-w-md min-w-[280px] sm:min-w-[340px] bg-white rounded-2xl p-7 custom-shadow border border-gray-100 flex flex-col items-center text-center gap-5">
-
-        <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center border ${isUserError ? 'bg-amber-50 border-amber-100' : 'bg-red-50 border-red-100'}`}>
-          <span className={`material-symbols-outlined text-[28px] ${isUserError ? 'text-amber-500' : 'text-red-500'}`}>
+    <div className="flex-1 flex items-center justify-center bg-slate-50 px-6 py-16">
+      <div className="w-full max-w-sm bg-white rounded-2xl p-8 shadow-sm border border-slate-200 flex flex-col items-center text-center gap-5">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border ${isUserError ? 'bg-amber-50 border-amber-100' : 'bg-red-50 border-red-100'}`}>
+          <span className={`material-symbols-outlined text-[26px] ${isUserError ? 'text-amber-500' : 'text-red-500'}`} style={{ fontVariationSettings: "'FILL' 1" }}>
             {isUserError ? 'info' : 'error'}
           </span>
         </div>
-
         <div>
-          <h2 className="text-[18px] font-extrabold text-gray-900 mb-2">
+          <h2 className="text-[17px] font-extrabold text-slate-900 mb-2">
             {isUserError ? '입력 내용을 확인해 주세요' : '분석에 실패했어요'}
           </h2>
-          <p className="text-[14px] text-gray-500 leading-relaxed break-keep whitespace-normal">{message}</p>
+          <p className="text-[13px] text-slate-500 leading-relaxed break-keep">{message}</p>
         </div>
-
         <div className="flex gap-3 w-full">
-          <button
-            onClick={onBack}
-            className="flex-1 py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold text-[14px] hover:bg-gray-50 transition-colors"
-          >
+          <button onClick={onBack} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-[14px] hover:bg-slate-50 transition-colors">
             돌아가기
           </button>
           {!isUserError && (
-            <button
-              onClick={onRetry}
-              className="flex-1 py-3 rounded-2xl bg-emerald-600 text-white font-bold text-[14px] hover:bg-emerald-700 transition-colors"
-            >
+            <button onClick={onRetry} className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold text-[14px] hover:bg-emerald-700 transition-colors">
               다시 시도
             </button>
           )}
         </div>
-
       </div>
     </div>
   );
