@@ -69,7 +69,9 @@ def _is_url_only(text: str) -> bool:
 
 
 def _is_repetitive(text: str) -> bool:
-    return bool(_REPEAT_RE.search(text.strip()))
+    # ㅋㅋㅋ / ㅎㅎㅎ / ㅠㅠ 등 감정 표현용 연속 자모는 반복 판정 제외
+    cleaned = re.sub(r"[ㄱ-ㅣ]{2,}", "", text.strip())
+    return bool(_REPEAT_RE.search(cleaned))
 
 
 def _has_no_korean(text: str) -> bool:
