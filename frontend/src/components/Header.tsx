@@ -131,16 +131,12 @@ const Header: React.FC = () => {
       
       {/* Settings Modal (API) */}
       {isSettingsOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-md p-4 sm:p-6">
-          <div className="relative w-full max-w-[420px]">
-            {/* Glow effect behind modal */}
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-[2.5rem] blur opacity-25 animate-pulse"></div>
-            
-            {/* Modal Content */}
-            <div className="bg-white rounded-[2rem] p-7 sm:p-9 w-full shadow-2xl border border-white/50 transform transition-all relative flex flex-col max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/25 backdrop-blur-sm p-4 sm:p-6">
+          <div className="relative w-full max-w-[460px]">
+            <div className="bg-white rounded-2xl p-7 sm:p-8 w-full custom-shadow border border-emerald-50 relative flex flex-col max-h-[90vh] overflow-y-auto">
               <button 
                 onClick={() => setIsSettingsOpen(false)}
-                className="absolute top-6 right-6 text-gray-400 hover:text-emerald-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-emerald-50"
+                className="absolute top-5 right-5 text-gray-400 hover:text-emerald-600 transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-emerald-50"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -161,10 +157,10 @@ const Header: React.FC = () => {
                 <label className="block text-[15px] font-extrabold text-on-surface mb-3">AI 모델 선택</label>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    className={`flex-1 py-5 px-4 rounded-[1.25rem] border-2 flex sm:flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`flex-1 py-4 px-4 rounded-xl border flex sm:flex-col items-center justify-center gap-2 transition-colors ${
                       selectedModel === 'gemini' 
-                        ? 'border-emerald-500 bg-emerald-50/70 text-emerald-700 shadow-md transform scale-[1.02]' 
-                        : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700' 
+                        : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                     onClick={() => setSelectedModel('gemini')}
                   >
@@ -172,10 +168,10 @@ const Header: React.FC = () => {
                     <span className="font-bold text-[14px]">Gemini</span>
                   </button>
                   <button
-                    className={`flex-1 py-5 px-4 rounded-[1.25rem] border-2 flex sm:flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                    className={`flex-1 py-4 px-4 rounded-xl border flex sm:flex-col items-center justify-center gap-2 transition-colors ${
                       selectedModel === 'huggingface' 
-                        ? 'border-blue-500 bg-blue-50/70 text-blue-700 shadow-md transform scale-[1.02]' 
-                        : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700' 
+                        : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                     onClick={() => setSelectedModel('huggingface')}
                   >
@@ -192,15 +188,14 @@ const Header: React.FC = () => {
                   <label className="block text-[15px] font-extrabold text-on-surface mb-2">
                     개인 API 키 <span className="text-gray-400 font-medium ml-1 text-[13px]">(선택사항)</span>
                   </label>
-                  <div className="relative group">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-[1rem] blur opacity-0 group-focus-within:opacity-20 transition duration-300"></div>
+                  <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 text-[20px] z-10">key</span>
                     <input 
                       type="password"
                       placeholder="Gemini API 키 입력"
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
-                      className="relative w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1rem] focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all text-[14px] font-mono shadow-inner z-10"
+                      className="relative w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all text-[14px] font-mono z-10"
                     />
                   </div>
                   <p className="mt-3 text-[13px] leading-relaxed text-gray-500 break-keep">
@@ -210,10 +205,10 @@ const Header: React.FC = () => {
 
                 {/* HuggingFace Info */}
                 <div className={`col-start-1 row-start-1 transition-all duration-300 ease-in-out flex flex-col justify-center ${selectedModel === 'huggingface' ? 'opacity-100 translate-y-0 z-10' : 'opacity-0 translate-y-2 pointer-events-none -z-10'}`}>
-                  <div className="bg-blue-50/50 rounded-[1rem] p-5 text-center border border-blue-100/50 h-full flex flex-col justify-center items-center">
-                    <span className="material-symbols-outlined text-blue-400 text-[28px] mb-2">cloud_done</span>
-                    <p className="text-[14px] font-bold text-blue-800 mb-1">API 키가 필요하지 않습니다</p>
-                    <p className="text-[13px] text-blue-600/80 break-keep">
+                  <div className="bg-emerald-50/50 rounded-xl p-5 text-center border border-emerald-100 h-full flex flex-col justify-center items-center">
+                    <span className="material-symbols-outlined text-emerald-500 text-[28px] mb-2">cloud_done</span>
+                    <p className="text-[14px] font-bold text-emerald-700 mb-1">API 키가 필요하지 않습니다</p>
+                    <p className="text-[13px] text-emerald-700/80 break-keep leading-relaxed">
                       HuggingFace 오픈소스 모델은 서버 자체 리소스를 활용하여 별도의 개인 API 키 없이 바로 사용할 수 있습니다.
                     </p>
                   </div>
@@ -224,7 +219,7 @@ const Header: React.FC = () => {
             <div className="mt-10">
               <button 
                 onClick={() => setIsSettingsOpen(false)}
-                className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-[16px] hover:bg-emerald-700 transition-all shadow-md hover:shadow-emerald-200/50 flex items-center justify-center gap-2 active:scale-95"
+                className="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-[15px] hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
               >
                 <span>설정 완료</span>
                 <span className="material-symbols-outlined text-[20px]">check</span>
