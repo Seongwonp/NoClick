@@ -133,96 +133,71 @@ const Home: React.FC = () => {
           </div>
         </section>
 
-        {/* Persona Story Section */}
-        <section className="mb-24 pt-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-          <h2 className="text-[32px] md:text-[36px] font-extrabold text-on-surface mb-12 tracking-tight">
-            이런 경험, <span className="text-emerald-600">누구나 한 번쯤 있으시죠?</span>
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            
-            {/* Persona 1 */}
-            <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-[2rem] border border-gray-100 shadow-sm text-left relative overflow-hidden group hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-              <div className="flex items-start gap-4 relative z-10">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[24px] shadow-sm flex-shrink-0">
-                  💸
-                </div>
-                <div>
-                  <h3 className="text-[17px] font-bold text-on-surface">김호갱 <span className="text-[13px] font-medium text-gray-400 ml-1">24세, 대학생</span></h3>
-                  <p className="text-[13px] text-emerald-600 font-bold mb-3">#리뷰_500개_읽고도_실패</p>
-                  <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm inline-block">
-                    <p className="text-[14px] text-on-surface-variant leading-relaxed break-keep">
-                      "별점 5점짜리 <strong>협찬 리뷰에 속아서</strong> 또 돈 날렸어요."
-                    </p>
+        {/* Integrated Feature Stack (Borderless & Unified) */}
+        <section className="mb-32 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          <div className="max-w-5xl mx-auto px-4">
+            {/* Divider with Brand Point */}
+            <div className="flex flex-col items-center mb-16">
+               <div className="w-px h-16 bg-gradient-to-b from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 mb-6"></div>
+               <h2 className="text-[24px] md:text-[28px] font-black text-on-surface tracking-tight">
+                  <span className="text-emerald-600">No-Click</span>이 해결하는 세 가지 혁신
+               </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              {[
+                { 
+                  icon: 'shield', 
+                  color: 'from-emerald-500 to-teal-400',
+                  title: '광고 패턴 정밀 감지', 
+                  quote: '“내돈내산인 줄 알았는데 광고였어요”',
+                  desc: 'AI가 수만 건의 데이터를 학습하여 교묘하게 숨겨진 협찬 문구와 홍보 패턴을 즉시 식별합니다.'
+                },
+                { 
+                  icon: 'visibility', 
+                  color: 'from-blue-500 to-indigo-400',
+                  title: '숨겨진 단점 추론', 
+                  quote: '“별점 5점 리뷰에 속아 또 돈 날렸어요”',
+                  desc: '칭찬 일색인 문장 사이에 미묘하게 묻힌 실제 사용상의 불편함과 리스크를 논리적으로 추출합니다.'
+                },
+                { 
+                  icon: 'edit_note', 
+                  color: 'from-purple-500 to-pink-400',
+                  title: '팩트 중심 실질 요약', 
+                  quote: '“진짜 후기 찾는 게 너무 피로해요”',
+                  desc: '화려한 미사여구를 제거하고 구매 결정에 꼭 필요한 핵심 팩트만 담아 10초 요약을 제공합니다.'
+                }
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col items-center text-center group">
+                  {/* Icon with Glow */}
+                  <div className={`w-16 h-16 rounded-[2rem] bg-gradient-to-br ${item.color} flex items-center justify-center text-white mb-8 shadow-lg shadow-emerald-200/20 group-hover:scale-110 transition-transform duration-500`}>
+                     <span className="material-symbols-outlined text-[32px]" style={{fontVariationSettings: "'FILL' 1"}}>{item.icon}</span>
                   </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Persona 2 */}
-            <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-[2rem] border border-gray-100 shadow-sm text-left relative overflow-hidden group hover:shadow-md hover:-translate-y-1 transition-all duration-300" style={{ animationDelay: '300ms' }}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-100/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-              <div className="flex items-start gap-4 relative z-10">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[24px] shadow-sm flex-shrink-0">
-                  😡
-                </div>
-                <div>
-                  <h3 className="text-[17px] font-bold text-on-surface">이지윤 <span className="text-[13px] font-medium text-gray-400 ml-1">29세, 직장인</span></h3>
-                  <p className="text-[13px] text-rose-500 font-bold mb-3">#내돈내산_이라며</p>
-                  <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm inline-block">
-                    <p className="text-[14px] text-on-surface-variant leading-relaxed break-keep">
-                      "1시간 웨이팅해서 먹었는데, 알고보니 <strong>교묘하게 숨긴 광고</strong>였어요."
-                    </p>
+                  {/* Persona Quote as sub-header */}
+                  <div className="mb-4">
+                     <span className="text-[12px] font-bold text-on-surface-variant/40 italic leading-relaxed px-4 py-1.5 bg-gray-50 rounded-full border border-gray-100">
+                        {item.quote}
+                     </span>
                   </div>
+
+                  {/* Title & Desc */}
+                  <h3 className="text-[18px] font-bold text-on-surface mb-3 tracking-tight">{item.title}</h3>
+                  <p className="text-[14px] text-on-surface-variant leading-relaxed font-medium opacity-80 break-keep max-w-[260px]">
+                    {item.desc}
+                  </p>
                 </div>
-              </div>
+              ))}
             </div>
-
-          </div>
-        </section>
-
-        {/* Feature Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left mt-16">
-          <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-              <span className="material-symbols-outlined text-[28px]" style={{fontVariationSettings: "'FILL' 1"}}>shield</span>
-            </div>
-            <h3 className="text-[20px] font-bold mb-3">광고 패턴 감지</h3>
-            <p className="text-[15px] leading-[1.6] text-on-surface-variant">
-              인공지능이 수천 개의 데이터를 기반으로 협찬 문구와 숨겨진 광고 패턴을 완벽하게 분석합니다.
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="w-14 h-14 bg-blue-50 text-secondary rounded-2xl flex items-center justify-center mb-6">
-              <span className="material-symbols-outlined text-[28px]" style={{fontVariationSettings: "'FILL' 1"}}>visibility</span>
-            </div>
-            <h3 className="text-[20px] font-bold mb-3">숨겨진 단점 복원</h3>
-            <p className="text-[15px] leading-[1.6] text-on-surface-variant">
-              좋은 말로만 가득 찬 리뷰 사이에서 실제 사용자가 느낀 미묘한 불편함과 단점을 찾아냅니다.
-            </p>
-          </div>
-
-          <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="w-14 h-14 bg-purple-50 text-tertiary rounded-2xl flex items-center justify-center mb-6">
-              <span className="material-symbols-outlined text-[28px]" style={{fontVariationSettings: "'FILL' 1"}}>edit_note</span>
-            </div>
-            <h3 className="text-[20px] font-bold mb-3">탈광고 재작성</h3>
-            <p className="text-[15px] leading-[1.6] text-on-surface-variant">
-              불필요한 수식어는 빼고 팩트만 남겨서 한눈에 읽기 쉽게 핵심만 요약해드립니다.
-            </p>
           </div>
         </section>
       </div>
 
-
-
       {/* Background Decorative Elements */}
-      <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-100/20 rounded-full blur-[120px] -z-10 animate-pulse"></div>
-      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-100/20 rounded-full blur-[120px] -z-10 pulse-slow"></div>
+      <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-100/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-100/10 rounded-full blur-[120px] -z-10 pulse-slow"></div>
     </div>
   );
-
 };
 
 export default Home;
