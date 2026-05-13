@@ -15,6 +15,11 @@ export const getRank = (score: number) => {
 
 const ResultHeader: React.FC<ResultHeaderProps> = ({ analysisResult }) => {
   const trustRank = getRank(analysisResult.trust_score);
+  const savedCostDisplay = (() => {
+    const raw = (analysisResult.saved_cost || '').trim();
+    if (!raw || raw === '0원') return '-';
+    return raw.replace(/\s+/g, '');
+  })();
 
   return (
     <div className="bg-white/70 backdrop-blur-xl rounded-2xl lg:rounded-[32px] p-4 md:p-6 lg:p-8 border border-white/40 shadow-[0_8px_32px_rgba(0,147,104,0.05)] animate-fade-in-up flex flex-col gap-5 lg:gap-8">
@@ -52,13 +57,13 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ analysisResult }) => {
         {[
           { label: '광고 패턴', val: analysisResult.highlighted_phrases?.length || 0, unit: '개', color: '#ef4444' },
           { label: '숨은 단점', val: analysisResult.hidden_negatives?.length || 0, unit: '건', color: '#eab308' },
-          { label: '비용 절감', val: analysisResult.saved_cost?.replace('원','') || '0', unit: '원', color: '#10b981' }
+          { label: '비용 절감', val: savedCostDisplay, unit: '', color: '#10b981' }
         ].map((s, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center justify-center gap-1.5">
+          <div key={i} className="flex-1 flex flex-col items-center justify-center gap-1.5 min-w-0">
             <p className="text-[11px] font-bold text-[#009368]/70 uppercase tracking-widest">{s.label}</p>
-            <p className="font-black text-[18px] text-gray-800 flex items-baseline gap-0.5">
-              <span style={{ color: s.color }}>{s.val}</span>
-              <span className="text-[11px] text-gray-400 font-bold">{s.unit}</span>
+            <p className="font-black text-[18px] text-gray-800 flex items-baseline gap-0.5 whitespace-nowrap tabular-nums">
+              <span style={{ color: s.color }} className="truncate max-w-full">{s.val}</span>
+              {s.unit && <span className="text-[11px] text-gray-400 font-bold">{s.unit}</span>}
             </p>
           </div>
         ))}
