@@ -203,82 +203,73 @@ const Result: React.FC = () => {
         {/* ── 오른쪽: 분석 결과 스크롤 ── */}
         <div className="w-full lg:w-[50%] order-1 lg:order-2 pt-5 lg:pt-8 pb-16 space-y-4">
 
-          {/* 0. 블로그 제목 */}
+          {/* 블로그 제목 */}
           {analysisResult.blog_title && (
             <p className="text-[12px] font-semibold text-on-surface-variant truncate px-1 animate-fade-in-up">
               {analysisResult.blog_title}
             </p>
           )}
 
-          {/* 1. 신뢰 등급 */}
+          {/* 카드 1 — 신뢰 등급 */}
           <ResultHeader result={analysisResult} trustRank={trustRank} />
 
-          {/* 1-b. 숨겨진 의도 */}
-          {analysisResult.hidden_intent && (
-            <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-[2rem] px-5 py-4 animate-fade-in-up" style={{ animationDelay: '60ms' }}>
-              <span className="material-symbols-outlined text-amber-500 text-[18px] flex-shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
-              <div>
-                <p className="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider mb-1">숨겨진 의도</p>
-                <p className="text-[13px] text-amber-900 font-semibold leading-snug break-keep">{analysisResult.hidden_intent}</p>
+          {/* 카드 2 — 통합 분석 (숨겨진 의도 + 요약 + 표현 타입 + 절약) */}
+          <div className="bg-white rounded-[2rem] border border-emerald-50 custom-shadow overflow-hidden animate-fade-in-up" style={{ animationDelay: '60ms' }}>
+            {analysisResult.hidden_intent && (
+              <div className="flex items-start gap-3 bg-amber-50 border-b border-amber-100 px-6 py-4">
+                <span className="material-symbols-outlined text-amber-500 text-[16px] flex-shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
+                <p className="text-[12px] text-amber-900 font-semibold leading-snug break-keep">
+                  <span className="font-extrabold text-amber-700">숨겨진 의도 · </span>
+                  {analysisResult.hidden_intent}
+                </p>
               </div>
-            </div>
-          )}
-
-          {/* 2. 핵심 요약 */}
-          {analysisResult.real_summary && (
-            <div className="bg-white rounded-[2rem] border border-emerald-50 custom-shadow px-6 py-5 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-              <p className="text-[11px] font-extrabold text-emerald-600 uppercase tracking-wider mb-3">광고 빼고 핵심</p>
-              <blockquote className="text-[15px] font-bold text-on-surface leading-relaxed break-keep">
+            )}
+            <div className="px-6 py-5">
+              <p className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-wider mb-2">광고 빼고 핵심</p>
+              <p className="text-[15px] font-bold text-on-surface leading-relaxed break-keep mb-3">
                 "{analysisResult.real_summary}"
-              </blockquote>
+              </p>
               {analysisResult.overall_verdict && (
-                <p className="text-[12px] text-on-surface-variant mt-3 leading-relaxed break-keep">
+                <p className="text-[12px] text-on-surface-variant leading-relaxed break-keep">
                   {analysisResult.overall_verdict}
                 </p>
               )}
-              {/* 절약 멘트 */}
+              {phraseTotal > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-gray-50">
+                  {Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).map(([type, count]) => {
+                    const meta = PHRASE_META[type];
+                    if (!meta) return null;
+                    return (
+                      <span key={type} className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold"
+                        style={{ backgroundColor: meta.bg, color: meta.color }}>
+                        {meta.label} <span className="opacity-50">{count}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               {(() => {
                 const hasCost = analysisResult.saved_cost && analysisResult.saved_cost !== '0원';
                 const hasTime = !!analysisResult.saved_time;
                 if (!hasCost && !hasTime) return null;
-                const parts = [];
+                const parts: string[] = [];
                 if (hasTime) parts.push(`약 ${analysisResult.saved_time}`);
                 if (hasCost) parts.push(`${analysisResult.saved_cost}`);
                 return (
-                  <p className="text-[11px] text-emerald-600 font-semibold mt-3 pt-3 border-t border-emerald-50">
+                  <p className="text-[11px] text-emerald-600 font-semibold mt-3">
                     이 분석으로 {parts.join('과 ')}을 아꼈어요
                   </p>
                 );
               })()}
             </div>
-          )}
+          </div>
 
-          {/* 3. 발견된 표현 타입 */}
-          {phraseTotal > 0 && (
-            <div className="flex flex-wrap gap-2 px-1 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-              {Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).map(([type, count]) => {
-                const meta = PHRASE_META[type];
-                if (!meta) return null;
-                return (
-                  <span
-                    key={type}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold"
-                    style={{ backgroundColor: meta.bg, color: meta.color }}
-                  >
-                    {meta.label}
-                    <span className="font-black opacity-60">{count}</span>
-                  </span>
-                );
-              })}
-            </div>
-          )}
-
-          {/* 4. 숨겨진 단점 */}
+          {/* 카드 3 — 숨긴 것들 */}
           {negatives.length > 0 && (
-            <div className="bg-white rounded-[2rem] border border-emerald-50 custom-shadow px-6 py-5 animate-fade-in-up" style={{ animationDelay: '160ms' }}>
+            <div className="bg-white rounded-[2rem] border border-emerald-50 custom-shadow px-6 py-5 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
               <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-indigo-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>visibility_off</span>
-                <p className="text-[14px] font-extrabold text-on-surface tracking-tight">이 리뷰가 숨긴 것들</p>
+                <span className="material-symbols-outlined text-indigo-400 text-[17px]" style={{ fontVariationSettings: "'FILL' 1" }}>visibility_off</span>
+                <p className="text-[13px] font-extrabold text-on-surface tracking-tight">이 리뷰가 숨긴 것들</p>
               </div>
               {negatives.map((n, i) => (
                 <div key={i} className="flex items-start gap-3 py-3.5 border-b border-gray-50 last:border-0">
@@ -292,8 +283,8 @@ const Result: React.FC = () => {
             </div>
           )}
 
-          {/* 5. 성향 분석 */}
-          <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          {/* 성향 분석 (카드 없이 가볍게) */}
+          <div className="animate-fade-in-up" style={{ animationDelay: '180ms' }}>
             <RadarPanel result={analysisResult} radarData={radarData} />
           </div>
 
