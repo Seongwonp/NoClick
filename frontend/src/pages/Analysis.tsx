@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FaSearch, FaRegLightbulb } from 'react-icons/fa';
 import { apiService } from '../services/api';
 
 const Analysis: React.FC = () => {
@@ -82,11 +83,17 @@ const Analysis: React.FC = () => {
               </div>
               <div className="flex items-center gap-3 text-on-surface">
                 <span className="material-symbols-outlined text-secondary text-lg pulse-slow" style={{fontVariationSettings: "'FILL' 1"}}>search</span>
-                <p className="font-body-md text-[14px]">광고성 수식어를 찾았어요 🔍</p>
+                <p className="font-body-md text-[14px] flex items-center gap-1.5">
+                  <span>광고성 수식어를 찾았어요</span>
+                  <FaSearch className="text-[12px] text-secondary" />
+                </p>
               </div>
               <div className="flex items-center gap-3 text-on-surface-variant opacity-70">
                 <span className="material-symbols-outlined text-tertiary-container text-lg">auto_awesome</span>
-                <p className="font-body-md text-[14px]">숨겨진 맥락을 파악 중입니다 ✨</p>
+                <p className="font-body-md text-[14px] flex items-center gap-1.5">
+                  <span>숨겨진 맥락을 파악 중입니다</span>
+                  <FaRegLightbulb className="text-[12px] text-tertiary-container" />
+                </p>
               </div>
               <div className="flex items-center gap-3 text-on-surface-variant opacity-40">
                 <span className="material-symbols-outlined text-gray-400 text-lg">verified</span>

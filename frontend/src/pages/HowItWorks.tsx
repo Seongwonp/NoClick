@@ -71,7 +71,7 @@ const HowItWorks: React.FC = () => {
         </section>
         </section>
 
-        <section className="mb-14 pt-8 md:pt-12">
+        <section className="mb-24 pt-8 md:pt-12">
           <div className="flex flex-col items-center mb-10">
             <div className="w-px h-14 bg-gradient-to-b from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 mb-5" />
             <h2 className="text-[24px] md:text-[28px] font-black text-on-surface tracking-tight text-center">
@@ -79,7 +79,7 @@ const HowItWorks: React.FC = () => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-15">
             {[
               {
                 icon: 'rule',
@@ -119,7 +119,7 @@ const HowItWorks: React.FC = () => {
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl border border-emerald-50 custom-shadow p-4 md:p-5">
+        <section className="mt-20 md:mt-24 bg-white rounded-2xl border border-emerald-50 custom-shadow p-4 md:p-6">
           <h2 className="text-[20px] font-extrabold text-on-surface tracking-tight mb-4">자주 묻는 질문</h2>
           <div className="space-y-3">
             {faqs.map((f, idx) => {

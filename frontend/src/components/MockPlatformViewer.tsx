@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { FaStar } from 'react-icons/fa';
 import type { HighlightedPhrase } from '../types/analysis';
 
 interface Props {
@@ -26,90 +27,106 @@ export const PHRASE_STYLE: Record<string, { label: string; color: string; lightC
   neutral:            { label: '중립',      color: '#8395a7', lightColor: 'rgba(131, 149, 167, 0.2)', icon: 'info' },
 };
 
+const HighlightedSpan: React.FC<{
+  phrase: HighlightedPhrase;
+  part: string;
+  isActive: boolean;
+}> = ({ phrase, part, isActive }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const style = PHRASE_STYLE[phrase.type] ?? PHRASE_STYLE.neutral;
+  const reason = phrase.reason || (phrase as any).reasoning;
+
+  return (
+    <span 
+      className="relative group/phrase inline"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <span
+        style={{
+          background: `linear-gradient(${style.lightColor}, ${style.lightColor}) no-repeat`,
+          backgroundSize: isActive ? '100% 30%' : '0% 30%',
+          backgroundPosition: '0 95%',
+          transition: 'background-size 0.8s cubic-bezier(0.65, 0, 0.35, 1)',
+          color: 'inherit',
+          padding: '0 1px',
+          borderRadius: '2px'
+        }}
+        className="relative"
+      >
+        {part}
+      </span>
+      {isHovered && (
+        <div className="absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
+          <div 
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.12)] border border-white bg-white/95 backdrop-blur-sm animate-fade-in-up whitespace-nowrap"
+            style={{ 
+              color: style.color,
+              borderColor: style.color + '30',
+              animationDuration: '0.3s'
+            }}
+          >
+            <span className="material-symbols-outlined text-[15px]">{style.icon}</span>
+            <span className="text-[12px] font-black">{style.label}</span>
+            {reason && (
+              <>
+                <div className="w-[1px] h-3 bg-current opacity-20 mx-0.5" />
+                <span className="text-[12px] font-bold text-gray-700 max-w-[240px] truncate">{reason}</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </span>
+  );
+};
+
 const HighlightedText: React.FC<{
   text: string;
   phrases: HighlightedPhrase[];
   activePhraseIndices: Set<number>;
   activeFilters: string[];
 }> = ({ text, phrases, activePhraseIndices, activeFilters }) => {
-  type Match = { start: number; end: number; phrase: HighlightedPhrase; idx: number };
-  const matches: Match[] = [];
-  const nextSearchByText: Record<string, number> = {};
+  let result: React.ReactNode[] = [text];
 
   phrases.forEach((phrase, idx) => {
+    // 필터링 처리: 활성화된 필터에 없으면 하이라이트 생략
     if (activeFilters.length > 0 && !activeFilters.includes(phrase.type)) return;
     if (!phrase.text) return;
 
-    const from = nextSearchByText[phrase.text] ?? 0;
-    const start = text.indexOf(phrase.text, from);
-    if (start === -1) return;
+    const newResult: React.ReactNode[] = [];
+    const isActive = activePhraseIndices.has(idx);
 
-    matches.push({ start, end: start + phrase.text.length, phrase, idx });
-    nextSearchByText[phrase.text] = start + phrase.text.length;
+    // 공백, 띄어쓰기 차이 무시를 위한 정규식 생성
+    const escaped = phrase.text.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regexStr = escaped.replace(/\s+/g, '\\s+');
+    const regex = new RegExp(`(${regexStr})`, 'gi');
+
+    result.forEach((node) => {
+      if (typeof node === 'string') {
+        const parts = node.split(regex);
+        parts.forEach((part, i) => {
+          if (i % 2 === 1) { // 정규식 캡처 그룹 매칭 부분
+            newResult.push(
+              <HighlightedSpan 
+                key={`${idx}-${i}`}
+                phrase={phrase}
+                part={part}
+                isActive={isActive}
+              />
+            );
+          } else {
+            if (part) newResult.push(part);
+          }
+        });
+      } else {
+        newResult.push(node);
+      }
+    });
+    result = newResult;
   });
 
-  matches.sort((a, b) => a.start - b.start);
-
-  const result: React.ReactNode[] = [];
-  let cursor = 0;
-
-  matches.forEach((m, order) => {
-    if (m.start < cursor) return; // overlap 방지
-    if (cursor < m.start) {
-      result.push(text.slice(cursor, m.start));
-    }
-
-    const style = PHRASE_STYLE[m.phrase.type] ?? PHRASE_STYLE.neutral;
-    const isActive = activePhraseIndices.has(m.idx);
-    const phraseText = text.slice(m.start, m.end);
-
-    result.push(
-      <span key={`${m.idx}-${order}`} className="relative group/phrase inline">
-        <mark
-          style={{
-            background: `linear-gradient(${style.lightColor}, ${style.lightColor}) no-repeat`,
-            backgroundSize: isActive ? '100% 30%' : '0% 30%',
-            backgroundPosition: '0 95%',
-            transition: 'background-size 0.8s cubic-bezier(0.65, 0, 0.35, 1)',
-            color: 'inherit',
-            padding: '0 1px',
-            borderRadius: '2px',
-            cursor: 'help'
-          }}
-          className="relative transition-all duration-300 group-hover/phrase:bg-opacity-100"
-        >
-          {phraseText}
-          <span
-            className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[10px] font-black text-white whitespace-nowrap opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none shadow-xl z-50"
-            style={{ backgroundColor: style.color }}
-          >
-            <span className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[12px]">info</span>
-              {style.label}
-            </span>
-          </span>
-        </mark>
-        {m.phrase.reason && (
-          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-4 bg-gray-900 text-white text-[12px] rounded-2xl opacity-0 group-hover/phrase:opacity-100 transition-all duration-300 pointer-events-none z-50 shadow-2xl transform group-hover/phrase:translate-y-2">
-            <p className="font-black mb-2 flex items-center gap-2" style={{ color: style.color }}>
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: style.color }} />
-              {style.label}
-            </p>
-            <p className="leading-relaxed font-medium text-white/90 break-keep">{m.phrase.reason}</p>
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-1 border-[6px] border-transparent border-b-gray-900" />
-          </div>
-        )}
-      </span>
-    );
-
-    cursor = m.end;
-  });
-
-  if (cursor < text.length) {
-    result.push(text.slice(cursor));
-  }
-
-  return <span className="whitespace-pre-wrap leading-[2.4] tracking-tight">{result}</span>;
+  return <span className="whitespace-pre-wrap leading-[1.8] tracking-tight">{result}</span>;
 };
 
 // ── Naver Mock ──
@@ -122,24 +139,28 @@ const MockNaver: React.FC<MockProps> = ({ text, phrases, activePhraseIndices, ac
       </div>
       <div className="text-[12px] text-gray-400 font-medium">ID: naver_user***</div>
     </div>
-    <div className="p-8 flex-grow overflow-hidden flex flex-col">
+    <div className="p-4 md:p-6 lg:p-8 flex-grow overflow-hidden flex flex-col">
       <div className="flex gap-6 border-b border-gray-100 mb-8 pb-3 flex-shrink-0">
         <span className="text-[#03c75a] text-sm font-bold border-b-2 border-[#03c75a] pb-3 -mb-[13px]">전체 리뷰 1,284</span>
       </div>
       <div
         ref={reviewRef}
-        className={`rounded-3xl border transition-all duration-700 relative flex-grow overflow-hidden flex flex-col ${active ? 'bg-white border-[#10b981] shadow-2xl shadow-emerald-500/10' : 'bg-[#fafafa] border-transparent'}`}
+        className={`rounded-3xl border transition-all duration-700 relative shrink min-h-0 flex flex-col ${active ? 'bg-white border-[#10b981] shadow-2xl shadow-emerald-500/10' : 'bg-[#fafafa] border-transparent'}`}
       >
-        <div className="p-8 flex gap-6 h-full">
+        <div className="p-4 md:p-6 lg:p-8 flex gap-4 md:gap-6 shrink min-h-0">
           <div className="w-12 h-12 rounded-full bg-[#f0f1fd] flex items-center justify-center font-bold text-[#10b981] text-[13px] flex-shrink-0 border border-emerald-100">Best</div>
           <div className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center gap-2 mb-4 flex-shrink-0">
               <div className="font-bold text-[15px] text-gray-900">구매자99</div>
-              <div className="flex text-amber-400 text-[10px]">★★★★★</div>
+              <div className="flex text-amber-400 text-[10px] gap-0.5">
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <FaStar key={idx} />
+                ))}
+              </div>
             </div>
             {/* Scrollable Area */}
-            <div className="flex-grow overflow-y-auto pr-4 custom-scrollbar-slim relative">
-              <div className="text-[16px] text-gray-800 leading-[2.4] break-keep font-medium">
+            <div className="overflow-y-auto pr-4 custom-scrollbar-slim relative shrink min-h-0">
+              <div className="text-[14px] text-gray-800 leading-[1.8] font-medium">
                 <HighlightedText text={text} phrases={phrases} activePhraseIndices={activePhraseIndices} activeFilters={activeFilters} />
               </div>
               {/* Fade at bottom */}
@@ -159,21 +180,21 @@ const MockCoupang: React.FC<MockProps> = ({ text, phrases, activePhraseIndices, 
       <div className="text-[#0076f5] font-black text-2xl italic tracking-tighter">COUPANG</div>
       <div className="w-8 h-8 bg-gray-100 rounded-full"></div>
     </div>
-    <div className="p-8 flex-grow overflow-hidden flex flex-col">
-      <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex-grow overflow-hidden flex flex-col">
+    <div className="p-4 md:p-6 lg:p-8 flex-grow overflow-hidden flex flex-col">
+      <div className="bg-white p-4 md:p-6 lg:p-8 rounded-2xl lg:rounded-3xl border border-gray-100 shadow-sm flex-grow overflow-hidden flex flex-col">
         <h3 className="text-xs font-bold mb-6 pb-3 border-b text-gray-300 uppercase tracking-[0.2em] flex-shrink-0">Customer Reviews</h3>
         <div
           ref={reviewRef}
-          className={`rounded-3xl border-2 transition-all duration-700 flex-grow overflow-hidden flex flex-col ${active ? 'bg-white border-[#0076f5] shadow-2xl shadow-blue-500/10' : 'bg-[#fcfcfc] border-transparent'}`}
+          className={`rounded-3xl border-2 transition-all duration-700 shrink min-h-0 flex flex-col ${active ? 'bg-white border-[#0076f5] shadow-2xl shadow-blue-500/10' : 'bg-[#fcfcfc] border-transparent'}`}
         >
-          <div className="p-8 flex flex-col h-full min-h-0">
+          <div className="p-4 md:p-6 lg:p-8 flex flex-col shrink min-h-0">
             <div className="flex items-center gap-3 mb-6 flex-shrink-0">
               <span className="bg-[#0076f5] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">BEST</span>
               <span className="text-[14px] font-bold text-[#111]">로켓배송매니아</span>
               <span className="text-[12px] text-gray-400">2024.05.01</span>
             </div>
-            <div className="flex-grow overflow-y-auto pr-4 custom-scrollbar-slim relative">
-              <div className="text-[16px] text-[#333] leading-[2.4] break-keep font-medium">
+            <div className="overflow-y-auto pr-4 custom-scrollbar-slim relative shrink min-h-0">
+              <div className="text-[14px] text-[#333] leading-[1.8] font-medium">
                 <HighlightedText text={text} phrases={phrases} activePhraseIndices={activePhraseIndices} activeFilters={activeFilters} />
               </div>
               <div className="sticky bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none opacity-60"></div>
@@ -195,7 +216,7 @@ const MockInsta: React.FC<MockProps> = ({ text, phrases, activePhraseIndices, ac
         <span className="material-symbols-outlined">send</span>
       </div>
     </div>
-    <div className="p-8 flex-grow overflow-hidden flex flex-col">
+    <div className="p-4 md:p-6 lg:p-8 flex-grow overflow-hidden flex flex-col">
       <div className="flex items-center gap-4 mb-6 flex-shrink-0">
         <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 p-[2px]">
           <div className="w-full h-full rounded-full bg-white p-[2px]">
@@ -206,12 +227,12 @@ const MockInsta: React.FC<MockProps> = ({ text, phrases, activePhraseIndices, ac
       </div>
       <div
         ref={reviewRef}
-        className={`rounded-[2.5rem] transition-all duration-700 flex-grow overflow-hidden flex flex-col ${active ? 'bg-white shadow-2xl ring-1 ring-gray-100' : 'bg-gray-50'}`}
+        className={`rounded-[2.5rem] transition-all duration-700 shrink min-h-0 flex flex-col ${active ? 'bg-white shadow-2xl ring-1 ring-gray-100' : 'bg-gray-50'}`}
       >
-        <div className="p-8 flex flex-col h-full min-h-0">
-          <div className="flex-grow overflow-y-auto pr-4 custom-scrollbar-slim relative">
-            <div className="text-[15px] leading-[2.4] break-keep">
-              <span className="font-bold mr-2 text-[15px]">daily_review_life</span>
+        <div className="p-4 md:p-6 lg:p-8 flex flex-col shrink min-h-0">
+          <div className="overflow-y-auto pr-4 custom-scrollbar-slim relative shrink min-h-0">
+            <div className="text-[14px] leading-[1.8]">
+              <span className="font-bold mr-2 text-[14px]">daily_review_life</span>
               <span className="font-medium text-gray-800 tracking-tight">
                 <HighlightedText text={text} phrases={phrases} activePhraseIndices={activePhraseIndices} activeFilters={activeFilters} />
               </span>
@@ -230,13 +251,13 @@ const MockInsta: React.FC<MockProps> = ({ text, phrases, activePhraseIndices, ac
 
 // ── Other Mock ──
 const MockOther: React.FC<MockProps> = ({ text, phrases, activePhraseIndices, activeFilters, active, reviewRef }) => (
-  <div className="bg-[#f8f9fa] h-full p-8 font-sans flex flex-col items-center justify-center">
+  <div className="bg-[#f8f9fa] h-full p-4 md:p-6 lg:p-8 font-sans flex flex-col items-center justify-center">
     <div className="w-full max-w-[700px] flex-grow flex flex-col overflow-hidden">
       <div
         ref={reviewRef}
-        className={`bg-white rounded-[3rem] border transition-all duration-700 flex-grow overflow-hidden flex flex-col ${active ? 'border-emerald-500/30 shadow-2xl shadow-emerald-500/10' : 'border-gray-100'}`}
+        className={`bg-white rounded-[3rem] border transition-all duration-700 shrink min-h-0 flex flex-col ${active ? 'border-emerald-500/30 shadow-2xl shadow-emerald-500/10' : 'border-gray-100'}`}
       >
-        <div className="p-10 flex flex-col h-full min-h-0">
+        <div className="p-5 md:p-7 lg:p-10 flex flex-col shrink min-h-0">
           <div className="flex items-center gap-5 mb-8 flex-shrink-0">
              <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center">
                 <span className="material-symbols-outlined text-gray-300 text-3xl">person</span>
@@ -246,8 +267,8 @@ const MockOther: React.FC<MockProps> = ({ text, phrases, activePhraseIndices, ac
                 <div className="text-[12px] text-gray-400 font-medium tracking-wide">SOURCE: WEB COMMUNITY</div>
              </div>
           </div>
-          <div className="flex-grow overflow-y-auto pr-4 custom-scrollbar-slim relative">
-            <div className="text-[17px] font-medium leading-[2.4] text-gray-800 break-keep tracking-tight">
+          <div className="overflow-y-auto pr-4 custom-scrollbar-slim relative shrink min-h-0">
+            <div className="text-[15px] font-medium leading-[1.8] text-gray-800 tracking-tight">
               <HighlightedText text={text} phrases={phrases} activePhraseIndices={activePhraseIndices} activeFilters={activeFilters} />
             </div>
             <div className="sticky bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none opacity-60"></div>
