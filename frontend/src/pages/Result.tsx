@@ -119,12 +119,13 @@ const Result: React.FC = () => {
     danger:  { label: '광고 의심', color: 'text-red-600',     bg: 'bg-red-50',     border: 'border-red-100',     icon: <FaTimesCircle /> },
   }[trustLevel];
 
+  const ds = result.dimension_scores;
   const radarData = [
-    { subject: '진정성', value: score, fullMark: 100 },
-    { subject: '정보성', value: Math.min(100, score + 10), fullMark: 100 },
-    { subject: '상세함', value: Math.min(100, Math.max(0, score - 5)), fullMark: 100 },
-    { subject: '광고패턴', value: result.ad_probability ?? (100 - score), fullMark: 100 },
-    { subject: '과장성', value: Math.min(100, 100 - score + 15), fullMark: 100 },
+    { subject: '진정성', value: ds?.authenticity  ?? score,                        fullMark: 100 },
+    { subject: '정보성', value: ds?.information   ?? Math.min(100, score + 10),    fullMark: 100 },
+    { subject: '상세함', value: ds?.specificity   ?? Math.min(100, score - 5),     fullMark: 100 },
+    { subject: '광고패턴', value: result.ad_probability,                            fullMark: 100 },
+    { subject: '과장성', value: ds?.exaggeration  ?? Math.min(100, 100 - score + 15), fullMark: 100 },
   ];
 
   return (
@@ -228,13 +229,16 @@ const Result: React.FC = () => {
              </h3>
              <div className="bg-white p-8 rounded-[2rem] border border-emerald-50 shadow-sm flex flex-col gap-8 h-full">
                 <div className="text-center">
-                  <p className="text-[13px] text-on-surface-variant mb-2">절약한 예상 비용</p>
-                  <p className="text-[32px] font-black text-emerald-600">{result.saved_cost}</p>
+                  <p className="text-[13px] text-on-surface-variant mb-1">당신의 소중한 시간</p>
+                  <p className="text-[36px] font-black text-emerald-600 leading-tight">{result.saved_time}</p>
+                  <p className="text-[11px] text-emerald-500 font-semibold mt-1">을 지켜드렸습니다</p>
                 </div>
                 <div className="h-px bg-gray-50"></div>
                 <div className="text-center">
-                  <p className="text-[13px] text-on-surface-variant mb-2">절약한 예상 시간</p>
-                  <p className="text-[32px] font-black text-emerald-600">{result.saved_time}</p>
+                  <p className="text-[13px] text-on-surface-variant mb-1">광고에 속을 뻔한 비용</p>
+                  <p className="text-[28px] font-black text-emerald-600 leading-tight">{result.saved_cost}</p>
+                  <p className="text-[11px] text-gray-400 font-medium mt-1">광고성 리뷰 위험 회피 추정액</p>
+                  <p className="text-[10px] text-gray-300 mt-1">* AI가 예상한 금액으로 실제와 다를 수 있습니다</p>
                 </div>
                 <div className="mt-auto pt-6 text-center">
                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-lg text-[11px] font-bold text-emerald-700">

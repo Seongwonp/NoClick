@@ -9,6 +9,73 @@
 
 ---
 
+## 2026-05-13 | 성원 (AI & Backend)
+
+### 🤖 AI 엔진
+- **다차원 성분 분석 `dimension_scores` 추가** (`base.py`)
+  - 기존: 레이더 차트가 `trust_score` ± 상수로 가짜 다차원을 연출
+  - 수정: AI가 4개 축을 독립적으로 채점 후 JSON에 포함
+  - `authenticity` (진정성): 실제 경험 밀도
+  - `information` (정보성): 가격·수치·날짜 등 팩트 밀도
+  - `specificity` (상세함): 구체 묘사 vs 뭉뚱그린 칭찬
+  - `exaggeration` (과장성): 최상급 표현 빈도 (높을수록 광고 신호)
+- **`saved_time` 규칙 정교화** — "항상 5분" → 글자수 기반 동적 계산
+  - 200자 기준 5분, 100자마다 1분 추가, 최대 30분, "약 X분" 형식
+- **`saved_cost` 가격 추정 추가** — 텍스트에 가격 없어도 AI가 카테고리 시장가 추정
+  - 예: 홍대 파스타 → 약 15,000원, 스킨케어 세럼 → 약 45,000원
+  - ad_probability > 70% → 추정가의 10%를 "X,XXX원 (AI 추정)" 으로 반환
+
+### 🗄️ DB
+- **`dimension_scores` 컬럼 추가** (`models/analysis.py`, `002_add_dimension_scores.py`)
+  - JSON 타입, nullable — 기존 레코드 영향 없음
+  - `alembic upgrade head` 로 반영 완료
+
+### 🔧 백엔드
+- **스키마/CRUD/API 라우트에 `dimension_scores` 반영** (`schemas`, `crud`, `api/analysis.py`)
+  - `/analyze`, `/history`, `/{id}` 3개 엔드포인트 모두 반영
+
+### 🎨 UI
+- **레이더 차트 실데이터 연결** (`Result.tsx`)
+  - `dimension_scores` 있으면 실값 사용, 없으면 기존 fallback 유지 (하위 호환)
+- **절약 리포트 카드 문구 개선** (`Result.tsx`)
+  - "절약한 예상 시간" → **"당신의 소중한 시간 약 X분을 지켜드렸습니다"**
+  - "절약한 예상 비용" → **"광고에 속을 뻔한 비용"** + AI 추정 disclaimer 추가
+  - `* AI가 예상한 금액으로 실제와 다를 수 있습니다` 소문자 주석 표시
+
+### 📄 문서
+- **PPT 개선판 반영** (`No-Click_PPT.pptx`, 17 슬라이드)
+  - 슬라이드 4 신규: 페르소나 (28세 직장인 김지연 스토리)
+  - 슬라이드 9: 실제 분석 결과 예시 (광고 확률 89%, 숨겨진 단점 3개)
+  - 슬라이드 13 신규: 내부 테스트 기반 성능 지표
+  - 슬라이드 15 팀: 차아미·서예솔 작업 상태 "완료"로 업데이트
+  - 슬라이드 16 비전: "Gemini 3.0 Flash 도입" → "B2B API 서비스 론칭"으로 교체
+
+---
+
+## 2026-05-12 | 성원 (AI & Backend) + 차아미 (Frontend)
+
+### 🔀 병합
+- **`front-back_ver2` + `back_ver1` 최종 병합** (`merge/front-backend` 브랜치)
+  - 차아미 UI (새 디자인 시스템, MockPlatformViewer 애니메이션) 채택
+  - 성원 실백엔드 API 연동 유지
+  - 타입 충돌 해결: `rewritten_text` → `overall_verdict`, `original_text` → `original_content`
+
+### 🎨 UI
+- **MockPlatformViewer 하이라이트 애니메이션 개선** (`MockPlatformViewer.tsx`)
+  - `activePhraseIndices: Set<number>` 기반 순차 애니메이션 (back_ver1 버전 채택)
+  - 플랫폼별 Mock UI: Naver / Coupang / Instagram / Other
+
+### 🐛 버그 수정
+- **히스토리 클릭 시 재분석 버그 수정** (`History.tsx`)
+  - 원인: `navigate('/result', { state: { id } })` → `Result.tsx`는 URL query만 읽음
+  - 수정: `navigate('/result?id=${item.id}')` 로 변경
+
+### 🔒 보안
+- **`.gitignore` 보완** — `.env`, `*.db-shm`, `*.db-wal` 추가
+  - `back_ver1` 브랜치에 `.env` 실키 커밋된 이력 확인 → `merge/front-backend`에는 미포함 확인
+
+---
+
 ## 2026-05-09 | 성원 (AI & Backend)
 
 ### 🤖 AI 엔진
@@ -149,8 +216,14 @@
     "hidden_intent": "업체로부터 식사 제공 또는 원고료를 받고 작성한 바이럴 마케팅 글",
     "overall_verdict": "광고성 개입 가능성이 높다고 판단되며 방문 전 메뉴 가격과 주차 조건을 별도 확인해야 합니다.",
     "real_summary": "핵심 정보가 누락된 과장형 광고 의심 후기입니다.",
-    "saved_cost": "정밀 분석 필요",
-    "saved_time": "5분",
+    "dimension_scores": {
+      "authenticity": 12,
+      "information": 8,
+      "specificity": 15,
+      "exaggeration": 91
+    },
+    "saved_cost": "1,500원 (AI 추정)",
+    "saved_time": "약 10분",
     "original_content": "드디어 방문한 망원 핫플! 사장님이 너무 친절하시고..."
   },
   "error": null
@@ -175,8 +248,13 @@
 | `data.hidden_intent` | string | 글의 숨겨진 의도 |
 | `data.overall_verdict` | string | 수사관 종합 판정 |
 | `data.real_summary` | string | 탈광고 한 줄 요약 |
-| `data.saved_cost` | string | 예상 절약 비용 (예: "15,000원") |
-| `data.saved_time` | string | 예상 절약 시간 (예: "5분") |
+| `data.dimension_scores` | object | 다차원 성분 분석 (각 0~100) |
+| `data.dimension_scores.authenticity` | number | 진정성 — 실제 경험 밀도 |
+| `data.dimension_scores.information` | number | 정보성 — 가격·수치 등 팩트 밀도 |
+| `data.dimension_scores.specificity` | number | 상세함 — 구체 묘사 비율 |
+| `data.dimension_scores.exaggeration` | number | 과장성 — 높을수록 광고 신호 |
+| `data.saved_cost` | string | 예상 절약 비용 (예: "1,500원 (AI 추정)") |
+| `data.saved_time` | string | 예상 절약 시간 (예: "약 10분") |
 | `data.original_content` | string | 입력한 원본 텍스트 |
 
 ---

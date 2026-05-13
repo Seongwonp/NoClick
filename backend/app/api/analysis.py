@@ -32,11 +32,14 @@ async def analyze_blog(request: Request, body: AnalysisRequest, db: Session = De
 
         blog_title = analysis_data.pop("blog_title", "제목 추론 불가")
 
+        dimension_scores = analysis_data.pop("dimension_scores", None)
+
         response_data = AnalysisResponse(
             **analysis_data,
             blog_title=blog_title,
             original_content=body.content,
             platform=body.platform,
+            dimension_scores=dimension_scores,
         )
 
         db_record = save_analysis(
@@ -79,6 +82,7 @@ def get_analysis_history(
                 real_summary=r.real_summary or "",
                 saved_cost=r.saved_cost or "",
                 saved_time=r.saved_time or "",
+                dimension_scores=r.dimension_scores,
                 original_content=r.original_content or "",
                 platform=r.platform or "general",
                 created_at=r.created_at.isoformat() if r.created_at else None,
@@ -115,6 +119,7 @@ def get_analysis_by_id(
             real_summary=record.real_summary or "",
             saved_cost=record.saved_cost or "",
             saved_time=record.saved_time or "",
+            dimension_scores=record.dimension_scores,
             original_content=record.original_content or "",
             platform=record.platform or "general",
             created_at=record.created_at.isoformat() if record.created_at else None,

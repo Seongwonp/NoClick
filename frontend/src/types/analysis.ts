@@ -20,12 +20,20 @@ export interface HiddenNegative {
   reasoning: string;
 }
 
+export interface DimensionScores {
+  authenticity: number;   // 진정성 (high = genuine)
+  information: number;    // 정보성 (high = factual density)
+  specificity: number;    // 상세함 (high = concrete details)
+  exaggeration: number;   // 과장성 (high = bad signal)
+}
+
 export interface AnalysisResponse {
   id?: number;
   platform?: string;
   original_content: string;
   ad_probability: number;
   trust_score: number;
+  dimension_scores?: DimensionScores;
   highlighted_phrases: HighlightedPhrase[];
   hidden_negatives: HiddenNegative[];
   hidden_intent: string;

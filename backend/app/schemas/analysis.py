@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict
 
 class HighlightedPhrase(BaseModel):
     text: str
@@ -30,6 +30,7 @@ class AnalysisResponse(BaseModel):
     real_summary: str
     saved_cost: str
     saved_time: str
+    dimension_scores: Optional[Dict[str, int]] = None
     blog_title: str
     created_at: Optional[str] = None
 

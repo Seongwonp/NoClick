@@ -25,5 +25,6 @@ class Analysis(Base):
 
     saved_cost = Column(String)
     saved_time = Column(String)
+    dimension_scores = Column(JSON, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -26,6 +26,7 @@ def save_analysis(
         real_summary=response.real_summary,
         saved_cost=response.saved_cost,
         saved_time=response.saved_time,
+        dimension_scores=response.dimension_scores,
     )
     db.add(db_obj)
     db.commit()
