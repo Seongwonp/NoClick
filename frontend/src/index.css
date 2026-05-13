@@ -145,6 +145,16 @@
     100% { transform: translateY(0px); }
   }
 
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translate(-50%, 0px); }
+    50% { transform: translate(-50%, -3px); }
+  }
+
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+
   @keyframes shiver {
     0% { transform: translate(0,0); }
     25% { transform: translate(1px, -1px); }
@@ -215,6 +225,12 @@
   .animate-shiver {
     animation: shiver 0.2s linear infinite;
   }
+  .animate-bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 2s ease-in-out infinite;
+  }
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
@@ -228,5 +244,19 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.2);
   }
+  .custom-scrollbar-slim::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar-slim::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 10px;
+  }
+  .custom-scrollbar-slim:hover::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.3);
+  }
 }
+
 

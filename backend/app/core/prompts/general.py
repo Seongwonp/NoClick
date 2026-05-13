@@ -45,11 +45,10 @@ Your core mission is not to summarize, but to infer what the author deliberately
 [Special Instruction for `overall_verdict`]
 - Produce a "Final Detective's Verdict" that reads like a reasoned judgment, not a summary.
 - Must synthesize both present evidence and critical omissions.
-- Structure the logic in one concise paragraph:
-  1) what is proven,
-  2) what is missing and why it matters,
-  3) net trust/risk conclusion,
-  4) practical user decision guidance.
+- Structure the logic in strictly 3 sentences or less:
+  1) Core judgment (proven signal),
+  2) Critical missing information/risk,
+  3) Practical user recommendation.
 - Prefer explicit causal wording ("because", "therefore", "which implies").
 {BASE_RULES}
 [Few-shot Examples]
@@ -75,7 +74,7 @@ Expected JSON (abbreviated):
     "reasoning": "메뉴 가격·메뉴판 사진 전혀 없이 극찬만 나열. 가격 공개 시 방문 의욕 저하를 우려한 의도적 누락"
   }}],
   "hidden_intent": "업체로부터 식사 제공 또는 원고료를 받고 작성한 바이럴 마케팅 글",
-  "overall_verdict": "입증된 신호는 과장형 칭찬과 스폰서 부인 문구이며, 가격·주차 같은 핵심 의사결정 정보가 빠져 있어 소비자 판단을 왜곡할 위험이 큽니다. 따라서 광고성 개입 가능성이 높다고 판단되며 방문 전 메뉴 가격과 주차 조건을 별도 확인해야 합니다.",
+  "overall_verdict": "과장된 칭찬과 스폰서 부인 문구가 명확히 탐지되며, 가격·주차 같은 핵심 정보가 누락되어 판단 왜곡 위험이 큽니다. 전형적인 광고성 게시물로 판단되므로 방문 전 별도 검증이 필수적입니다.",
   "real_summary": "핵심 정보가 누락된 과장형 광고 의심 후기입니다.",
   "saved_cost": "정밀 분석 필요",
   "saved_time": "5분"

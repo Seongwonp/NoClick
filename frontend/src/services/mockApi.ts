@@ -1,4 +1,4 @@
-import type { AnalysisResult, AnalysisRequest, HighlightedPhrase } from '../types/analysis';
+import type { AnalysisResponse, AnalysisRequest, HighlightedPhrase } from '../types/analysis';
 
 const STORAGE_KEY = 'noclick_history';
 
@@ -33,45 +33,46 @@ function extractPhrases(text: string): HighlightedPhrase[] {
 }
 
 export const mockAnalysisService = {
-  analyze: async (request: AnalysisRequest): Promise<AnalysisResult> => {
+  analyze: async (request: AnalysisRequest): Promise<AnalysisResponse> => {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    const userText = request.text?.trim() ?? '';
+    const userText = (request.content || request.text || '').trim();
     const phrases  = userText ? extractPhrases(userText) : SAMPLE_PHRASES;
     // 유저 텍스트에서 패턴을 못 찾으면 샘플 텍스트로 대체하여 하이라이트가 보이게 함
     const originalText = (userText && phrases.length > 0) ? userText : SAMPLE_TEXT;
     const displayPhrases = phrases.length > 0 ? phrases : SAMPLE_PHRASES;
 
-    const newResult: AnalysisResult = {
+    const newResponse: AnalysisResponse = {
       id: Math.random().toString(36).substring(2, 9),
-      url: request.url,
       platform: request.platform || 'other',
-      original_text: originalText,
+      original_content: originalText,
       ad_probability: Math.floor(Math.random() * 100),
       trust_score: Math.floor(Math.random() * 100),
       highlighted_phrases: displayPhrases,
       hidden_negatives: [
         { inferred: '가성비 아쉬움', confidence: 70, reasoning: '가격 언급이 회피됨' },
       ],
-      real_summary: '전반적으로 만족스러우나 가격대가 높고 광고성 수식어가 포함된 리뷰입니다.',
-      rewritten_text: '해당 제품은 기능적인 면에서는 만족스럽습니다. 다만 광고성 미사여구를 제외하면 가격이 타사 대비 비싸고, 마감이 아쉽다는 의견이 지배적입니다. 가성비를 중요하게 생각하신다면 신중한 선택이 필요합니다.',
+      hidden_intent: '상품 홍보 및 브랜드 이미지 제고',
+      overall_verdict: '전반적으로 만족스러우나 가격대가 높고 광고성 수식어가 포함된 리뷰입니다. 광고성 미사여구를 제외하면 가격이 타사 대비 비싸고, 마감이 아쉽다는 의견이 지배적입니다.',
+      real_summary: '가격이 비싸고 마감이 아쉽지만 기능은 만족스러운 리뷰',
+      blog_title: '인생 최고 제품 솔직 후기',
       saved_cost: '15,000원',
       saved_time: '30분',
       created_at: new Date().toISOString().split('T')[0],
     };
 
     const history = mockAnalysisService.getHistory();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([newResult, ...history]));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([newResponse, ...history]));
 
-    return newResult;
+    return newResponse;
   },
 
-  getHistory: (): AnalysisResult[] => {
+  getHistory: (): AnalysisResponse[] => {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
   },
 
-  getResult: (id: string): AnalysisResult | undefined => {
+  getResult: (id: string): AnalysisResponse | undefined => {
     return mockAnalysisService.getHistory().find(item => item.id === id);
   },
 };

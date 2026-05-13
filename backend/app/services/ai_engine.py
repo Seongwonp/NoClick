@@ -229,7 +229,24 @@ class AIEngine:
             if not response.text:
                 return {"error": "AI 응답이 비어있습니다.", "_retryable": True}
 
-            return json.loads(response.text.strip())
+            data = json.loads(response.text.strip())
+            
+            # Post-processing for dynamic savings report based on character count
+            # This ensures the values change according to text length as requested.
+            char_count = len(prompt.split("[분석할 본문]")[-1].strip())
+            
+            # saved_time: (char_count / 100) * 5 minutes, min 5
+            saved_time_val = max(5, round((char_count / 100) * 5))
+            data["saved_time"] = f"{saved_time_val}분"
+            
+            # saved_cost: if ad_probability > 60, (char_count * 100) won, min 10000
+            if data.get("ad_probability", 0) > 60:
+                saved_cost_val = max(10000, round(char_count * 100, -3)) # Round to nearest 1000
+                data["saved_cost"] = f"{saved_cost_val:,}원"
+            else:
+                data["saved_cost"] = "0원"
+
+            return data
 
         except asyncio.TimeoutError:
             logger.error("Gemini 호출 타임아웃")

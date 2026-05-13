@@ -1,5 +1,7 @@
 export interface AnalysisRequest {
   content: string;
+  text?: string; // For backward compatibility or mock usage
+  url?: string;
   platform: string;
   model: string;
   session_id?: string;
@@ -21,7 +23,7 @@ export interface HiddenNegative {
 }
 
 export interface AnalysisResponse {
-  id?: number;
+  id: string | number;
   platform?: string;
   original_content: string;
   ad_probability: number;
