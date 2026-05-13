@@ -117,8 +117,8 @@ const Result: React.FC = () => {
     : '방금 분석';
 
   return (
-    <div style={{ width: '100%', backgroundColor: '#f8f9fa', padding: '2rem 1rem 0' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '2rem' }}>
+    <div className="w-full bg-slate-50 pt-24 md:pt-28 px-4 md:px-6 pb-0">
+      <div className="max-w-[1100px] mx-auto flex flex-col gap-5 md:gap-6 pb-8">
 
         <ResultHeader result={analysisResult} trustRank={trustRank} />
 
@@ -138,14 +138,14 @@ const Result: React.FC = () => {
           <RadarPanel result={analysisResult} radarData={radarData} />
         </TwoColumnGrid>
 
-        <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: '1.5rem', paddingBottom: '4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+        <div className="border-t border-slate-200 pt-6 pb-16 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3 text-gray-400 font-medium text-[13px]">
             <FaHistory size={12} />
             {timeLabel}
           </div>
           <button
             onClick={() => navigate('/')}
-            className="px-8 py-4 bg-emerald-600 text-white font-extrabold text-[15px] rounded-2xl hover:bg-emerald-700 transition-all active:scale-95 custom-shadow"
+            className="px-7 py-3.5 bg-emerald-600 text-white font-extrabold text-[15px] rounded-xl hover:bg-emerald-700 transition-all active:scale-95 shadow-sm"
           >
             다른 리뷰 분석하기
           </button>
@@ -156,25 +156,11 @@ const Result: React.FC = () => {
   );
 };
 
-const TwoColumnGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
-
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-      gap: '1.5rem',
-    }}>
-      {children}
-    </div>
-  );
-};
+const TwoColumnGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+    {children}
+  </div>
+);
 
 interface ErrorScreenProps {
   message: string;
@@ -188,8 +174,8 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ message, onBack, onRetry }) =
   ].some(hint => message.includes(hint));
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-[#f8f9fa] px-6 py-16">
-      <div className="w-full max-w-sm bg-white rounded-[2rem] p-8 custom-shadow border border-gray-100 flex flex-col items-center text-center gap-5">
+    <div className="flex-1 flex items-center justify-center bg-slate-50 pt-24 md:pt-28 px-6 py-16">
+      <div className="w-full max-w-md min-w-[280px] sm:min-w-[340px] bg-white rounded-2xl p-7 custom-shadow border border-gray-100 flex flex-col items-center text-center gap-5">
 
         <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center border ${isUserError ? 'bg-amber-50 border-amber-100' : 'bg-red-50 border-red-100'}`}>
           <span className={`material-symbols-outlined text-[28px] ${isUserError ? 'text-amber-500' : 'text-red-500'}`}>
@@ -201,7 +187,7 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ message, onBack, onRetry }) =
           <h2 className="text-[18px] font-extrabold text-gray-900 mb-2">
             {isUserError ? '입력 내용을 확인해 주세요' : '분석에 실패했어요'}
           </h2>
-          <p className="text-[14px] text-gray-500 leading-relaxed break-keep">{message}</p>
+          <p className="text-[14px] text-gray-500 leading-relaxed break-keep whitespace-normal">{message}</p>
         </div>
 
         <div className="flex gap-3 w-full">

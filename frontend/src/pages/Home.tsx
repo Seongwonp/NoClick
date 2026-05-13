@@ -52,13 +52,13 @@ const Home: React.FC = () => {
 
           {/* Input Area Integrated into Hero */}
           <div id="analysis-input" className="relative max-w-3xl mx-auto group scroll-mt-32">
-            <div className={`absolute -inset-1.5 bg-gradient-to-r ${
+            <div className={`absolute -inset-1 bg-gradient-to-r ${
               platform.id === 'naver' ? 'from-emerald-400 to-green-400' :
               platform.id === 'insta' ? 'from-fuchsia-400 to-pink-400' :
               platform.id === 'coupang' ? 'from-rose-400 to-orange-400' :
               'from-emerald-400 to-blue-400'
-            } rounded-[2rem] blur opacity-15 group-focus-within:opacity-30 transition-all duration-700`}></div>
-            <div className={`relative z-10 bg-white rounded-[2rem] border custom-shadow overflow-visible transition-colors ${inputError ? 'border-red-300' : 'border-emerald-50'}`}>
+            } rounded-2xl blur opacity-10 group-focus-within:opacity-20 transition-all duration-500`}></div>
+            <div className={`relative z-10 bg-white rounded-2xl border custom-shadow overflow-visible transition-colors ${inputError ? 'border-red-300' : 'border-emerald-50'}`}>
               <textarea
                 className="w-full h-56 p-8 border-none focus:ring-0 text-on-surface text-[18px] placeholder-outline bg-transparent resize-none font-body-md outline-none"
                 placeholder="네이버 블로그, 인스타그램, 쿠팡 등의 리뷰 텍스트를 그대로 복사해서 붙여넣어주세요..."
@@ -71,7 +71,7 @@ const Home: React.FC = () => {
                   분석할 리뷰 내용을 입력해주세요.
                 </p>
               )}
-              <div className="flex items-center justify-between px-8 py-5 bg-emerald-50/30 border-t border-emerald-50 rounded-b-[2rem]">
+              <div className="flex items-center justify-between px-8 py-5 bg-emerald-50/30 border-t border-emerald-50 rounded-b-2xl">
                 <div className="flex items-center gap-4">
                   <div className="relative group/platform" ref={dropdownRef}>
                     <div
@@ -123,7 +123,7 @@ const Home: React.FC = () => {
                 <button 
                   type="button"
                   onClick={handleStartAnalysis}
-                  className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-2 active:scale-95 transition-all shadow-md hover:bg-emerald-700 hover:shadow-emerald-200/50 cursor-pointer"
+                  className="bg-emerald-600 text-white px-7 py-3 rounded-xl font-bold flex items-center gap-2 active:scale-95 transition-all shadow-md hover:bg-emerald-700 hover:shadow-emerald-200/50 cursor-pointer"
                 >
                   분석 시작하기
                   <span className="material-symbols-outlined text-[20px]">analytics</span>
@@ -194,8 +194,8 @@ const Home: React.FC = () => {
       </div>
 
       {/* Background Decorative Elements */}
-      <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-100/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
-      <div className="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-100/10 rounded-full blur-[120px] -z-10 pulse-slow"></div>
+      <div className="fixed top-[-10%] right-[-5%] w-[420px] h-[420px] bg-emerald-100/10 rounded-full blur-[120px] -z-10"></div>
+      <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-100/10 rounded-full blur-[120px] -z-10"></div>
     </div>
   );
 };

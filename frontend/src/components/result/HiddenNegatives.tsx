@@ -7,7 +7,7 @@ interface Props {
 
 const HiddenNegatives: React.FC<Props> = ({ negatives }) => {
   return (
-    <div className="bg-white rounded-[2rem] p-6 md:p-8 border border-emerald-50 custom-shadow flex flex-col">
+    <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col">
       <div className="flex items-center gap-3 mb-5 md:mb-6">
         <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 border border-indigo-100 flex-shrink-0">
           <span className="material-symbols-outlined text-[18px]">visibility</span>
@@ -17,7 +17,7 @@ const HiddenNegatives: React.FC<Props> = ({ negatives }) => {
 
       <div className="space-y-3 flex-grow">
         {negatives?.map((n, i) => (
-          <div key={i} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-200 transition-colors">
+          <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-indigo-200 transition-colors">
             <p className="text-[13px] md:text-[14px] font-bold text-gray-800 leading-snug mb-2">{n.inferred}</p>
             <p className="text-[11px] md:text-[12px] text-gray-400 leading-relaxed mb-3 break-keep">{n.reasoning}</p>
             <div className="flex items-center gap-2">

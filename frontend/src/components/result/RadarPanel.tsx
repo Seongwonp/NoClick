@@ -38,7 +38,7 @@ const RadarPanel: React.FC<Props> = ({ result, radarData }) => {
   ];
 
   return (
-    <div className="bg-white rounded-[2rem] p-6 md:p-8 border border-emerald-50 custom-shadow flex flex-col gap-6">
+    <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col gap-6">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-emerald-100 flex-shrink-0">
           <span className="material-symbols-outlined text-[18px]">analytics</span>

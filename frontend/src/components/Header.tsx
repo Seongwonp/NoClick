@@ -23,9 +23,9 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm font-plus-jakarta-sans antialiased">
+      <header className="fixed top-0 w-full z-50 border-b border-gray-100 bg-white/90 backdrop-blur-md shadow-sm antialiased">
       <div className="flex justify-between items-center h-16 px-6 max-w-7xl mx-auto">
-        <Link to="/" className="text-xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400">
+        <Link to="/" className="text-xl font-extrabold tracking-tight text-emerald-600">
           No-Click
         </Link>
         
@@ -84,7 +84,7 @@ const Header: React.FC = () => {
 
       {/* Mobile Navigation Drawer */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 animate-in fade-in slide-in-from-top-4 duration-200">
+        <div className="md:hidden bg-white border-b border-gray-100 animate-in fade-in slide-in-from-top-4 duration-200">
           <nav className="flex flex-col p-4 space-y-4">
             <Link
               to="/"

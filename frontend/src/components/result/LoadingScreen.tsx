@@ -8,7 +8,7 @@ interface Props {
 const LoadingScreen: React.FC<Props> = ({ progress, step }) => {
   return (
     <div className="flex-1 flex items-center justify-center bg-[#f8f9fa] px-6 py-16">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-md min-w-[280px] sm:min-w-[320px]">
 
         {/* 아이콘 */}
         <div className="flex justify-center mb-8">
@@ -25,8 +25,10 @@ const LoadingScreen: React.FC<Props> = ({ progress, step }) => {
 
         {/* 텍스트 */}
         <div className="text-center mb-8">
-          <h2 className="text-[22px] font-extrabold text-gray-900 mb-2">리뷰 분석 중이에요</h2>
-          <p className="text-[14px] text-emerald-600 font-semibold animate-pulse min-h-[20px]">{step}</p>
+          <h2 className="text-[22px] font-extrabold text-gray-900 mb-2 break-keep">리뷰 분석 중이에요</h2>
+          <p className="text-[14px] text-emerald-600 font-semibold animate-pulse min-h-[20px] break-keep whitespace-normal">
+            {step}
+          </p>
         </div>
 
         {/* 프로그레스 바 */}
@@ -41,7 +43,7 @@ const LoadingScreen: React.FC<Props> = ({ progress, step }) => {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-[11px] text-gray-400 text-center mt-4">
+          <p className="text-[11px] text-gray-400 text-center mt-4 break-keep">
             광고 여부를 꼼꼼히 살펴보고 있어요 · 보통 10~20초 걸려요
           </p>
         </div>

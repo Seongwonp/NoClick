@@ -71,7 +71,7 @@ const PhraseViewer: React.FC<Props> = ({ result, activeFilters, onToggleFilter, 
         </div>
       </div>
 
-      <div className="bg-white rounded-[2rem] overflow-hidden custom-shadow border border-emerald-50 h-[360px] md:h-[480px]">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 h-[360px] md:h-[500px]">
         <MockPlatformViewer
           platform={result.platform || 'naver'}
           originalText={result.original_content || ''}
