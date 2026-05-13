@@ -51,4 +51,5 @@ export interface AnalysisResult {
   status: string;
   data?: AnalysisResponse | AnalysisResponse[];
   error?: string;
+  total?: number;
 }

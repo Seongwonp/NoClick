@@ -38,11 +38,20 @@ def get_analysis(db: Session, analysis_id: int) -> Optional[Analysis]:
     return db.query(Analysis).filter(Analysis.id == analysis_id).first()
 
 
-def get_history(db: Session, session_id: str, limit: int = 20) -> List[Analysis]:
+def get_history(db: Session, session_id: str, limit: int = 10, skip: int = 0) -> List[Analysis]:
     return (
         db.query(Analysis)
         .filter(Analysis.session_id == session_id)
         .order_by(Analysis.created_at.desc())
+        .offset(skip)
         .limit(limit)
         .all()
+    )
+
+
+def count_history(db: Session, session_id: str) -> int:
+    return (
+        db.query(Analysis)
+        .filter(Analysis.session_id == session_id)
+        .count()
     )

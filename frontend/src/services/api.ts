@@ -44,22 +44,23 @@ export const apiService = {
     return result.data as AnalysisResponse;
   },
 
-  // 히스토리 조회
-  async getHistory(limit: number = 20): Promise<AnalysisResponse[]> {
+  // 히스토리 조회 (페이지네이션)
+  async getHistory(page: number = 1, limit: number = 10): Promise<{ items: AnalysisResponse[]; total: number }> {
     const sessionId = getSessionId();
-    const response = await fetch(`${API_BASE_URL}/history?session_id=${sessionId}&limit=${limit}`);
+    const skip = (page - 1) * limit;
+    const response = await fetch(`${API_BASE_URL}/history?session_id=${sessionId}&limit=${limit}&skip=${skip}`);
 
     if (!response.ok) {
       throw new Error('히스토리 조회 중 오류가 발생했습니다.');
     }
 
     const result: AnalysisResult = await response.json();
-    
+
     if (result.status === 'success' && Array.isArray(result.data)) {
-      return result.data;
+      return { items: result.data, total: result.total ?? result.data.length };
     }
-    
-    return [];
+
+    return { items: [], total: 0 };
   },
 
   // 특정 분석 결과 조회

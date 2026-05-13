@@ -38,3 +38,4 @@ class AnalysisResult(BaseModel):
     status: str
     data: Optional[Union[AnalysisResponse, List[AnalysisResponse]]] = None
     error: Optional[str] = None
+    total: Optional[int] = None

@@ -4,7 +4,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.schemas.analysis import AnalysisRequest, AnalysisResult, AnalysisResponse
 from app.services.ai_engine import ai_engine
-from app.crud import save_analysis, get_analysis, get_history
+from app.crud import save_analysis, get_analysis, get_history, count_history
 from app.database import get_db
 from app.core.config import settings
 from typing import Any, List
@@ -61,14 +61,16 @@ async def analyze_blog(request: Request, body: AnalysisRequest, db: Session = De
 @router.get("/history", response_model=AnalysisResult)
 def get_analysis_history(
     session_id: str = Query(..., description="히스토리 조회할 세션 ID"),
-    limit: int = Query(20, ge=1, le=100, description="조회 개수 (기본 20, 최대 100)"),
+    limit: int = Query(10, ge=1, le=50, description="페이지당 개수 (기본 10)"),
+    skip: int = Query(0, ge=0, description="건너뛸 개수"),
     db: Session = Depends(get_db),
 ) -> Any:
     """
-    session_id 기준으로 최근 분석 히스토리를 반환합니다.
+    session_id 기준으로 분석 히스토리를 페이지 단위로 반환합니다.
     """
     try:
-        records = get_history(db=db, session_id=session_id, limit=limit)
+        total = count_history(db=db, session_id=session_id)
+        records = get_history(db=db, session_id=session_id, limit=limit, skip=skip)
         history = [
             AnalysisResponse(
                 id=r.id,
@@ -89,7 +91,7 @@ def get_analysis_history(
             )
             for r in records
         ]
-        return AnalysisResult(status="success", data=history if history else [])
+        return AnalysisResult(status="success", data=history if history else [], total=total)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
