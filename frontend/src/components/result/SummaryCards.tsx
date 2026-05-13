@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { AnalysisResponse } from '../../types/analysis';
 
 interface Props {
@@ -6,8 +6,15 @@ interface Props {
 }
 
 const SummaryCards: React.FC<Props> = ({ result }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '140ms' }}>
+    <div className="animate-fade-in-up" style={{ animationDelay: '140ms', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1.5rem' }}>
 
       {/* 한 줄 요약 */}
       <div className="bg-white rounded-[2rem] p-6 md:p-8 border border-emerald-50 custom-shadow flex flex-col gap-4 md:gap-5">

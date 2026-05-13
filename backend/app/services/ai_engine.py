@@ -182,8 +182,7 @@ class AIEngine:
             if not key:
                 # 모든 Gemini 키 소진 → HuggingFace 자동 전환
                 logger.warning("Gemini 키 전부 소진 → HuggingFace(EXAONE)로 자동 전환")
-                from app.services.hf_engine import hf_engine
-                return await hf_engine.analyze_blog_content(content, platform)
+                return await self._fallback_to_hf(content, platform)
 
             result = await self._call_gemini_with_retry(full_prompt, key)
 
@@ -191,9 +190,19 @@ class AIEngine:
                 self._exhaust_key(key)
                 continue
 
-            if "error" not in result:
-                self._cache_set(cache_key, result)
+            # Gemini가 오류를 반환했고 HF 키가 있으면 자동 전환
+            if "error" in result:
+                logger.warning("Gemini 오류 발생 → HuggingFace 자동 전환: %s", result.get("error"))
+                return await self._fallback_to_hf(content, platform)
+
+            self._cache_set(cache_key, result)
             return result
+
+    async def _fallback_to_hf(self, content: str, platform: str) -> Dict[str, Any]:
+        from app.services.hf_engine import hf_engine
+        if not settings.HUGGINGFACE_API_KEY:
+            return {"error": "AI 서버가 일시적으로 사용 불가능합니다. 잠시 후 다시 시도해 주세요."}
+        return await hf_engine.analyze_blog_content(content, platform)
 
     async def _call_gemini_with_retry(self, prompt: str, api_key: str) -> Dict[str, Any]:
         retries = max(0, settings.AI_MAX_RETRIES)
