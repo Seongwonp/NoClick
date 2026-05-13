@@ -30,7 +30,6 @@ const Result: React.FC = () => {
   const [step, setStep] = useState('리뷰 내용 확인 중...');
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [showRadar, setShowRadar] = useState(false);
 
   const analysisStarted = useRef(false);
 
@@ -144,7 +143,7 @@ const Result: React.FC = () => {
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-start px-4 md:px-6 gap-5 lg:gap-8">
 
         {/* ── 왼쪽: 원문 고정 패널 ── */}
-        <div className="w-full lg:w-[46%] order-2 lg:order-1 pb-8 lg:sticky lg:top-20 lg:pt-8">
+        <div className="w-full lg:w-[50%] order-2 lg:order-1 pb-8 lg:sticky lg:top-20 lg:pt-8">
           <p className="text-[11px] font-extrabold text-on-surface-variant uppercase tracking-wider mb-3 px-1">
             원문 분석
           </p>
@@ -189,7 +188,7 @@ const Result: React.FC = () => {
           {/* 원문 뷰어 */}
           <div
             className="bg-white rounded-[2rem] overflow-hidden custom-shadow border border-emerald-50"
-            style={{ height: 'clamp(400px, calc(100vh - 14rem), 680px)' }}
+            style={{ height: 'clamp(440px, calc(100vh - 12rem), 740px)' }}
           >
             <MockPlatformViewer
               platform={analysisResult.platform || 'naver'}
@@ -202,7 +201,14 @@ const Result: React.FC = () => {
         </div>
 
         {/* ── 오른쪽: 분석 결과 스크롤 ── */}
-        <div className="w-full lg:w-[54%] order-1 lg:order-2 pt-5 lg:pt-8 pb-16 space-y-4">
+        <div className="w-full lg:w-[50%] order-1 lg:order-2 pt-5 lg:pt-8 pb-16 space-y-4">
+
+          {/* 0. 블로그 제목 */}
+          {analysisResult.blog_title && (
+            <p className="text-[12px] font-semibold text-on-surface-variant truncate px-1 animate-fade-in-up">
+              {analysisResult.blog_title}
+            </p>
+          )}
 
           {/* 1. 신뢰 등급 */}
           <ResultHeader result={analysisResult} trustRank={trustRank} />
@@ -218,6 +224,30 @@ const Result: React.FC = () => {
                 <p className="text-[12px] text-on-surface-variant mt-3 leading-relaxed break-keep line-clamp-3">
                   {analysisResult.overall_verdict}
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* 2-b. 절약 통계 */}
+          {(analysisResult.saved_cost || analysisResult.saved_time) && (
+            <div className="flex gap-3 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+              {analysisResult.saved_time && (
+                <div className="flex-1 bg-white rounded-2xl border border-emerald-50 custom-shadow px-4 py-3.5 flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-emerald-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>schedule</span>
+                  <div>
+                    <p className="text-[10px] text-on-surface-variant font-semibold">시간 절약</p>
+                    <p className="text-[15px] font-black text-on-surface leading-tight">{analysisResult.saved_time}</p>
+                  </div>
+                </div>
+              )}
+              {analysisResult.saved_cost && (
+                <div className="flex-1 bg-white rounded-2xl border border-emerald-50 custom-shadow px-4 py-3.5 flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-emerald-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>savings</span>
+                  <div>
+                    <p className="text-[10px] text-on-surface-variant font-semibold">비용 절약</p>
+                    <p className="text-[15px] font-black text-on-surface leading-tight">{analysisResult.saved_cost}</p>
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -261,23 +291,9 @@ const Result: React.FC = () => {
             </div>
           )}
 
-          {/* 5. 성향 분석 (아코디언) */}
+          {/* 5. 성향 분석 */}
           <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            <button
-              type="button"
-              onClick={() => setShowRadar(prev => !prev)}
-              className="w-full flex items-center justify-between py-3.5 border-t border-emerald-50 text-left"
-            >
-              <span className="text-[13px] font-bold text-on-surface-variant">리뷰 성향 상세 분석</span>
-              <span className="material-symbols-outlined text-gray-300 text-[20px]">
-                {showRadar ? 'expand_less' : 'expand_more'}
-              </span>
-            </button>
-            {showRadar && (
-              <div className="pt-2 animate-fade-in-up">
-                <RadarPanel result={analysisResult} radarData={radarData} />
-              </div>
-            )}
+            <RadarPanel result={analysisResult} radarData={radarData} />
           </div>
 
           {/* 푸터 */}
