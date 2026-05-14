@@ -1,24 +1,33 @@
 # No-Click
 
+광고성 리뷰를 걸러내고, 글에 **안 적힌 단점**까지 복원하는 AI 리뷰 분석 서비스입니다.
 
-리뷰 본문 텍스트를 분석해 광고성 패턴, 숨겨진 단점, 요약 결론을 제공하는 FastAPI + React 프로젝트입니다.
+[발표자료(PDF) 보기](https://github.com/user-attachments/files/27737001/No-Click_Ceaser_.pdf)
 
-## 핵심 기능
+## What It Does
 
-- 광고 표현/과장 문구 하이라이트
+- 광고 패턴 하이라이트 (`highlighted_phrases`)
 - 숨겨진 단점 추론 (`hidden_negatives`)
-- 신뢰도 점수/광고 확률 점수 제공
-- 분석 히스토리 저장/조회
+- 광고 확률/신뢰도 점수 산출 (`ad_probability`, `trust_score`)
+- 다차원 성분 분석 (`dimension_scores`)
+  - `authenticity`, `information`, `specificity`, `exaggeration`
+- 분석 결과 저장 + 세션 기반 히스토리 조회
 
-## 기술 스택
+## Why It’s Different
+
+- 플랫폼 무관 분석: `naver`, `insta`, `coupang`, `other`
+- 단순 광고 판별이 아니라 “결핍 정보 기반” 추론
+- 탈광고 요약과 절약 시간/비용 리포트까지 제공
+
+## Tech Stack
 
 - Frontend: React 19, TypeScript, Vite, Tailwind CSS v4
 - Backend: FastAPI, SQLAlchemy, Alembic, SQLite
-- AI: Gemini / HuggingFace(EXAONE fallback)
+- AI: Gemini (primary), HuggingFace EXAONE (fallback), Claude (optional tuning)
 
-## 빠른 시작
+## Quick Start
 
-### 1) Backend 실행
+### 1) Backend
 
 ```bash
 cd backend
@@ -28,9 +37,9 @@ poetry run alembic upgrade head
 poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-- API 문서: `http://localhost:8000/docs`
+- Swagger: `http://localhost:8000/docs`
 
-### 2) Frontend 실행
+### 2) Frontend
 
 ```bash
 cd frontend
@@ -38,42 +47,43 @@ npm install
 npm run dev
 ```
 
-- 기본 주소: `http://localhost:5173`
-- 기본 API 주소: `http://localhost:8000/api/analysis`
+- App: `http://localhost:5173`
+- API Base(default): `http://localhost:8000/api/analysis`
 
-## 환경 변수
+## API
 
-Backend(`backend/.env`) 주요 항목:
+Base prefix: `/api/analysis`
 
-- `GEMINI_API_KEYS` (쉼표 구분 다중 키 지원)
-- `HUGGINGFACE_API_KEY` (선택)
-- `CLAUDE_API_KEY` (선택)
-- `DATABASE_URL` (기본 `sqlite:///./noclick.db`)
-- `RATE_LIMIT` (기본 `10/minute`)
-- `ALLOWED_ORIGINS` (콤마 구분)
+1. `POST /analyze`
+   - body: `content`, `platform`, `model`, `session_id`, `api_key(optional)`
+2. `GET /history?session_id=...&limit=10&skip=0`
+3. `GET /{analysis_id}`
 
-Frontend 배포 변수 예시는 `frontend/.env.production` 참고:
+## Security & Reliability
+
+- 입력 검증: URL-only / 초단문 / 반복 / 비한국어 / 인젝션 패턴 차단
+- Rate Limit: 기본 `10/minute` (IP 기준)
+- CORS: `ALLOWED_ORIGINS` 기반 제한
+- Gemini 다중 키 로테이션 + 재시도(backoff) + 캐시 적용
+
+## Environment Variables
+
+Backend (`backend/.env`):
+
+- `GEMINI_API_KEYS`
+- `HUGGINGFACE_API_KEY` (optional)
+- `CLAUDE_API_KEY` (optional)
+- `DATABASE_URL` (default: `sqlite:///./noclick.db`)
+- `RATE_LIMIT` (default: `10/minute`)
+- `ALLOWED_ORIGINS`
+
+Frontend 배포 예시(`frontend/.env.production`):
 
 - `VITE_API_URL`
 - `VITE_APP_TITLE`
 - `VITE_APP_VERSION`
 
-## API 요약
-
-기본 prefix: `/api/analysis`
-
-1. `POST /analyze`
-   - 요청: `content`, `platform`, `model`, `session_id`, `api_key(optional)`
-   - `platform`: `naver | insta | coupang | other` (미지정 시 백엔드 기본값 `general`)
-   - `model`: `gemini | huggingface`
-
-2. `GET /history?session_id=...&limit=10&skip=0`
-   - 세션별 분석 이력 조회 (페이지네이션)
-
-3. `GET /{analysis_id}`
-   - 단건 분석 결과 조회
-
-## 프로젝트 구조
+## Project Structure
 
 ```text
 NoClick/
@@ -95,8 +105,3 @@ NoClick/
 ├── CHANGELOG.md
 └── AI_MASTER_CONTEXT.md
 ```
-
-____
-
-[No-Click_Ceaser_발표.pdf](https://github.com/user-attachments/files/27737001/No-Click_Ceaser_.pdf)
-
