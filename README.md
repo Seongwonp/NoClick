@@ -1,5 +1,6 @@
 # No-Click
 
+
 리뷰 본문 텍스트를 분석해 광고성 패턴, 숨겨진 단점, 요약 결론을 제공하는 FastAPI + React 프로젝트입니다.
 
 ## 핵심 기능
@@ -94,3 +95,8 @@ NoClick/
 ├── CHANGELOG.md
 └── AI_MASTER_CONTEXT.md
 ```
+
+____
+
+[No-Click_Ceaser_발표.pdf](https://github.com/user-attachments/files/27737001/No-Click_Ceaser_.pdf)
+
