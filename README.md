@@ -1,4 +1,7 @@
 # No-Click
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/54f459cb-125d-4569-ad04-61e859a9bf11" width="900" alt="No-Click 메인 화면" />
+</p>
 
 광고성 리뷰를 탐지하고, 글에 숨겨진 단점을 추론해 신뢰도 기반 분석 결과를 제공하는 AI 웹 서비스입니다.
 
