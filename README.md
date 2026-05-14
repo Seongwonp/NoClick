@@ -1,33 +1,49 @@
 # No-Click
 
-광고성 리뷰를 걸러내고, 글에 **안 적힌 단점**까지 복원하는 AI 리뷰 분석 서비스입니다.
+광고성 리뷰를 탐지하고, 글에 숨겨진 단점을 추론해 신뢰도 기반 분석 결과를 제공하는 AI 웹 서비스입니다.
 
-[발표자료(PDF) 보기](https://github.com/user-attachments/files/27737001/No-Click_Ceaser_.pdf)
+- 서비스: https://noclick.pages.dev/
+- 발표자료(PDF): https://github.com/user-attachments/files/27737001/No-Click_Ceaser_.pdf
 
-## What It Does
+## 주요 기능
 
-- 광고 패턴 하이라이트 (`highlighted_phrases`)
-- 숨겨진 단점 추론 (`hidden_negatives`)
-- 광고 확률/신뢰도 점수 산출 (`ad_probability`, `trust_score`)
-- 다차원 성분 분석 (`dimension_scores`)
-  - `authenticity`, `information`, `specificity`, `exaggeration`
-- 분석 결과 저장 + 세션 기반 히스토리 조회
+- 광고성 표현/과장 문구 하이라이트
+- 숨겨진 단점(`hidden_negatives`) 추론
+- 광고 확률(`ad_probability`) 및 신뢰도(`trust_score`) 산출
+- 세션 기반 분석 히스토리 조회
+- 탈광고 요약 및 절약 시간/비용 리포트
 
-## Why It’s Different
+## 개발 기간
 
-- 플랫폼 무관 분석: `naver`, `insta`, `coupang`, `other`
-- 단순 광고 판별이 아니라 “결핍 정보 기반” 추론
-- 탈광고 요약과 절약 시간/비용 리포트까지 제공
+- 2026.05.05 ~ 2026.05.14 (MVP 구현 및 배포 완료)
 
-## Tech Stack
+## 팀 소개
 
-- Frontend: React 19, TypeScript, Vite, Tailwind CSS v4
+### 박성원 (AI & Backend)
+- Gemini 3.0 Flash 기반 AI 분석 엔진 설계/최적화
+- FastAPI 백엔드 아키텍처 및 보안 레이어 구축
+- DB 스키마 설계 및 API 명세 수립
+
+### 차아미 (Frontend Development)
+- 사용자 중심 디자인 시스템 및 인터랙션 설계
+- 브랜드 아이덴티티/시각 가이드라인 수립
+- 프론트엔드 레이아웃 및 스타일링 최적화
+- React 기반 웹 인터페이스 구현
+
+### 서예솔 (UI/UX & Frontend)
+- 실시간 AI 분석 결과 시각화 컴포넌트 개발
+- 백엔드 API 연동 및 상태 관리 시스템 구축
+- API JSON 매핑 및 TypeScript 타입 정의
+
+## 기술 스택
+
+- Frontend: React, TypeScript, Vite, Tailwind CSS
 - Backend: FastAPI, SQLAlchemy, Alembic, SQLite
-- AI: Gemini (primary), HuggingFace EXAONE (fallback), Claude (optional tuning)
+- AI: Gemini, HuggingFace(EXAONE fallback), Claude(선택)
 
-## Quick Start
+## 로컬 실행
 
-### 1) Backend
+### 1) 백엔드
 
 ```bash
 cd backend
@@ -39,7 +55,7 @@ poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 - Swagger: `http://localhost:8000/docs`
 
-### 2) Frontend
+### 2) 프론트엔드
 
 ```bash
 cd frontend
@@ -47,61 +63,15 @@ npm install
 npm run dev
 ```
 
-- App: `http://localhost:5173`
-- API Base(default): `http://localhost:8000/api/analysis`
+- 로컬 주소: `http://localhost:5173`
 
-## API
+## 배포
 
-Base prefix: `/api/analysis`
+- 프론트엔드: Cloudflare Pages
+- 백엔드: Render Web Service
 
-1. `POST /analyze`
-   - body: `content`, `platform`, `model`, `session_id`, `api_key(optional)`
-2. `GET /history?session_id=...&limit=10&skip=0`
-3. `GET /{analysis_id}`
+## API 요약
 
-## Security & Reliability
-
-- 입력 검증: URL-only / 초단문 / 반복 / 비한국어 / 인젝션 패턴 차단
-- Rate Limit: 기본 `10/minute` (IP 기준)
-- CORS: `ALLOWED_ORIGINS` 기반 제한
-- Gemini 다중 키 로테이션 + 재시도(backoff) + 캐시 적용
-
-## Environment Variables
-
-Backend (`backend/.env`):
-
-- `GEMINI_API_KEYS`
-- `HUGGINGFACE_API_KEY` (optional)
-- `CLAUDE_API_KEY` (optional)
-- `DATABASE_URL` (default: `sqlite:///./noclick.db`)
-- `RATE_LIMIT` (default: `10/minute`)
-- `ALLOWED_ORIGINS`
-
-Frontend 배포 예시(`frontend/.env.production`):
-
-- `VITE_API_URL`
-- `VITE_APP_TITLE`
-- `VITE_APP_VERSION`
-
-## Project Structure
-
-```text
-NoClick/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── core/
-│   │   ├── crud/
-│   │   ├── models/
-│   │   ├── schemas/
-│   │   └── services/
-│   ├── alembic/
-│   ├── .env.example
-│   └── main.py
-├── frontend/
-│   ├── src/
-│   └── package.json
-├── README.md
-├── CHANGELOG.md
-└── AI_MASTER_CONTEXT.md
-```
+- `POST /api/analysis/analyze`
+- `GET /api/analysis/history?session_id=...&limit=...&skip=...`
+- `GET /api/analysis/{analysis_id}`
