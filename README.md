@@ -78,3 +78,9 @@ npm run dev
 - `POST /api/analysis/analyze`
 - `GET /api/analysis/history?session_id=...&limit=...&skip=...`
 - `GET /api/analysis/{analysis_id}`
+
+## 문서
+
+- 변경 이력: [docs/CHANGELOG.md](./docs/CHANGELOG.md)
+- DB 가이드: [docs/DB_GUIDE.md](./docs/DB_GUIDE.md)
+- AI 내부 컨텍스트: [docs/AI_MASTER_CONTEXT.md](./docs/AI_MASTER_CONTEXT.md)
