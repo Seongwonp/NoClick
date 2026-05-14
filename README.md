@@ -1,125 +1,96 @@
-# 🔍 No-Click — 리뷰의 진짜 얼굴을 보여주는 AI
+# No-Click
 
-> **어떤 플랫폼의 리뷰든, 텍스트를 붙여넣으면 30초 안에 광고 여부를 판별하고 숨겨진 단점을 복원합니다.**
+리뷰 본문 텍스트를 분석해 광고성 패턴, 숨겨진 단점, 요약 결론을 제공하는 FastAPI + React 프로젝트입니다.
 
----
+## 핵심 기능
 
-## 💡 왜 No-Click인가?
+- 광고 표현/과장 문구 하이라이트
+- 숨겨진 단점 추론 (`hidden_negatives`)
+- 신뢰도 점수/광고 확률 점수 제공
+- 분석 히스토리 저장/조회
 
-온라인 리뷰의 상당수는 협찬·체험단·바이럴 글이지만, 대부분의 사용자는 이를 구분하지 못합니다.
-기존 광고 탐지 도구는 "광고 같음 / 아님"만 판별하고 특정 플랫폼에 종속됩니다.
+## 기술 스택
 
-**No-Click은 다릅니다.**
-- 광고 글이 *안 쓴 단점*이 무엇인지 AI가 추론합니다
-- 네이버 블로그부터 쿠팡·인스타그램까지 플랫폼 무관 분석
-- 탈광고 재작성으로 "진짜 리뷰"가 어떻게 보여야 하는지 제시합니다
+- Frontend: React 19, TypeScript, Vite, Tailwind CSS v4
+- Backend: FastAPI, SQLAlchemy, Alembic, SQLite
+- AI: Gemini / HuggingFace(EXAONE fallback)
 
----
+## 빠른 시작
 
-## ✨ 핵심 기능 3가지
-
-| 기능 | 설명 |
-|------|------|
-| 🕵️ **광고 패턴 탐지** | 플랫폼별 광고 표현을 형광펜으로 시각화 |
-| 🔮 **숨긴 단점 복원** | "안 쓴 내용"을 AI가 역추론 |
-| ✍️ **탈광고 재작성** | 광고가 없었다면 어떻게 썼을지 제안 |
-
----
-
-## 🏗️ 기술 스택
-
-```
-Frontend   React + TypeScript + Tailwind CSS v4
-Backend    Python 3.11 · FastAPI · SQLite
-AI         Gemini 3.0 Flash-preview · EXAONE 3.5 · Claude 3.5 Sonnet
-```
-
-**분석 지원 플랫폼:** 네이버 블로그/지도 · 인스타그램 · 쿠팡 · 기타 전체
-
----
-
-## 🚀 빠른 시작
+### 1) Backend 실행
 
 ```bash
-# 1. 환경 변수 설정
-cp .env.example .env   # API 키 입력
-
-# 2. 백엔드
 cd backend
+cp .env.example .env
 poetry install
 poetry run alembic upgrade head
-poetry run python main.py
+poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
-# 3. 프론트엔드
+- API 문서: `http://localhost:8000/docs`
+
+### 2) Frontend 실행
+
+```bash
 cd frontend
-npm install && npm run dev
+npm install
+npm run dev
 ```
 
-Swagger UI: `http://localhost:8000/docs`
+- 기본 주소: `http://localhost:5173`
+- 기본 API 주소: `http://localhost:8000/api/analysis`
 
----
+## 환경 변수
 
-## 📡 API
+Backend(`backend/.env`) 주요 항목:
 
-**`POST /api/analysis/analyze`** — 리뷰 분석 요청
+- `GEMINI_API_KEYS` (쉼표 구분 다중 키 지원)
+- `HUGGINGFACE_API_KEY` (선택)
+- `CLAUDE_API_KEY` (선택)
+- `DATABASE_URL` (기본 `sqlite:///./noclick.db`)
+- `RATE_LIMIT` (기본 `10/minute`)
+- `ALLOWED_ORIGINS` (콤마 구분)
 
-| 파라미터 | 값 |
-|---------|-----|
-| `platform` | `naver` · `insta` · `coupang` · `other` |
-| `model` | `gemini` · `huggingface` |
+Frontend 배포 변수 예시는 `frontend/.env.production` 참고:
 
----
+- `VITE_API_URL`
+- `VITE_APP_TITLE`
+- `VITE_APP_VERSION`
 
-## 📂 프로젝트 구조
+## API 요약
 
-```
+기본 prefix: `/api/analysis`
+
+1. `POST /analyze`
+   - 요청: `content`, `platform`, `model`, `session_id`, `api_key(optional)`
+   - `platform`: `naver | insta | coupang | other` (미지정 시 백엔드 기본값 `general`)
+   - `model`: `gemini | huggingface`
+
+2. `GET /history?session_id=...&limit=10&skip=0`
+   - 세션별 분석 이력 조회 (페이지네이션)
+
+3. `GET /{analysis_id}`
+   - 단건 분석 결과 조회
+
+## 프로젝트 구조
+
+```text
+NoClick/
 ├── backend/
-│   └── app/
-│       ├── api/          # 라우터
-│       ├── core/         # 프롬프트 & 설정
-│       ├── services/     # AI 엔진 & 스크래퍼 (핵심)
-│       └── models/       # DB 모델 & 스키마
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── crud/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   └── services/
+│   ├── alembic/
+│   ├── .env.example
+│   └── main.py
 ├── frontend/
-│   └── src/              # React 컴포넌트
-└── .env.example
+│   ├── src/
+│   └── package.json
+├── README.md
+├── CHANGELOG.md
+└── AI_MASTER_CONTEXT.md
 ```
-
----
-
-## 🎯 MVP 성공 기준
-
-- **정확도** 85% 이상 (실제 바이럴 데이터 30개 기준)
-- **속도** 결과 출력까지 30초 이내
-- **안정성** 시연 중 무중단
-
----
-
-## 🗓️ 개발 로드맵 (2주)
-
-| 기간 | 작업 |
-|------|------|
-| Day 1–4 | 환경 세팅 완료 · 기획 확정 · 데이터 30개 수집 |
-| Day 5–8 | AI 프롬프트 v1 · 스크래퍼 · UI 스켈레톤 |
-| Day 9–12 | 추론 로직 고도화 · 형광펜 시각화 · 통합 테스트 |
-| Day 13–14 | 최종 시뮬레이션 · 배포 |
-
----
-
-## 🔭 향후 확장 계획
-
-- **크롬 익스텐션** — 드래그만 하면 즉시 분석
-- **B2B 리포트** — "진짜 단점" 데이터를 소상공인·기업에 판매
-
----
-
-## 👥 팀
-
-| 역할 | 담당 |
-|------|------|
-| AI & Backend | 성원 — AI 엔진 설계 · 프롬프트 튜닝 · DB 아키텍처 |
-| Frontend | 아미 — 사용자 경험 설계 · UI 구현 |
-| UI/UX & Frontend | 예솔 — 결과 시각화 · 형광펜 애니메이션.연결 |
-
----
-
-*© 2026 No-Click Project Team. All Rights Reserved.*
