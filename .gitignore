@@ -1,3 +1,7 @@
+# Jupyter
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -5,10 +9,13 @@ __pycache__/
 .venv/
 venv/
 ENV/
+.env
 backend/.env
 .env.*
 !.env.example
 *.db
+*.db-shm
+*.db-wal
 *.sqlite3
 
 # Node (Frontend)
@@ -31,3 +38,6 @@ frontend/.env.production
 # OS
 .DS_Store
 Thumbs.db
+
+# PPT (개인 보관용)
+*.pptx
