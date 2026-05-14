@@ -18,7 +18,10 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ analysisResult }) => {
   const savedCostDisplay = (() => {
     const raw = (analysisResult.saved_cost || '').trim();
     if (!raw || raw === '0원') return '-';
-    return raw.replace(/\s+/g, '');
+    const compact = raw.replace(/\s+/g, '');
+    const amountMatch = compact.match(/^[^()]+원/);
+    if (amountMatch) return amountMatch[0];
+    return compact.split('(')[0] || compact;
   })();
 
   return (
@@ -61,8 +64,8 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ analysisResult }) => {
         ].map((s, i) => (
           <div key={i} className="flex-1 flex flex-col items-center justify-center gap-1.5 min-w-0">
             <p className="text-[11px] font-bold text-[#009368]/70 uppercase tracking-widest">{s.label}</p>
-            <p className="font-black text-[18px] text-gray-800 flex items-baseline gap-0.5 whitespace-nowrap tabular-nums">
-              <span style={{ color: s.color }} className="truncate max-w-full">{s.val}</span>
+            <p className="font-black text-[clamp(14px,3.8vw,18px)] leading-tight text-gray-800 flex items-baseline justify-center gap-0.5 tabular-nums min-w-0 w-full text-center">
+              <span style={{ color: s.color }} className="max-w-full break-all">{s.val}</span>
               {s.unit && <span className="text-[11px] text-gray-400 font-bold">{s.unit}</span>}
             </p>
           </div>
